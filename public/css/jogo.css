@@ -4,296 +4,330 @@
 
 /* Container Principal */
 .product-page {
-    max-width: 1200px;
-    margin: 100px auto 40px; /* 100px para evitar sobreposição com a navbar do homepage.css */
-    padding: 0 20px;
-    font-family: 'Inter', sans-serif;
-    color: #ffffff;
+  max-width: 1200px;
+  margin: 100px auto 40px; /* 100px para evitar sobreposição com a navbar do homepage.css */
+  padding: 0 20px;
+  font-family: "Inter", sans-serif;
+  color: #ffffff;
 }
 
 .game-title {
-    font-size: 2.2rem;
-    margin-bottom: 25px;
-    font-weight: 700;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 10px;
+  font-size: 2.2rem;
+  margin-bottom: 25px;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
 }
 
 /* Grid de Duas Colunas (Galeria e Card de Compra) */
 .game-details-container {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 40px;
-    align-items: start;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+  align-items: start;
 }
 
 /* ==========================================
    GALERIA DE IMAGENS
    ========================================== */
 .game-gallery {
-    width: 100%;
+  width: 100%;
 }
 
 .main-view {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #000;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
 }
 
 .main-view img {
-    width: 100%;
-    height: 500px;
-    object-fit: cover;
-    display: block;
-    transition: opacity 0.3s ease;
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s ease;
 }
 
 /* Setas de Navegação na Imagem Principal */
 .nav-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    border: none;
-    font-size: 24px;
-    padding: 15px;
-    cursor: pointer;
-    border-radius: 50%;
-    transition: background 0.3s ease;
-    z-index: 10;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  font-size: 24px;
+  padding: 15px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.3s ease;
+  z-index: 10;
 }
 
-.nav-arrow:hover { background: var(--accent-blue, #2a2aef); }
-.prev-img { left: 15px; }
-.next-img { right: 15px; }
+.nav-arrow:hover {
+  background: var(--accent-blue, #2a2aef);
+}
+.prev-img {
+  left: 15px;
+}
+.next-img {
+  right: 15px;
+}
 
 /* Lista de Miniaturas */
 .thumb-list {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
-    overflow-x: auto;
-    padding-bottom: 5px; /* Espaço para scroll se houver muitas */
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  overflow-x: auto;
+  padding-bottom: 5px; /* Espaço para scroll se houver muitas */
 }
 
-.thumb-list::-webkit-scrollbar { height: 6px; }
-.thumb-list::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+.thumb-list::-webkit-scrollbar {
+  height: 6px;
+}
+.thumb-list::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 10px;
+}
 
 .thumb {
-    width: 150px;
-    height: 85px;
-    object-fit: cover;
-    border-radius: 8px;
-    cursor: pointer;
-    opacity: 0.5;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
+  width: 150px;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
 }
 
-.thumb:hover { opacity: 0.8; }
+.thumb:hover {
+  opacity: 0.8;
+}
 .thumb.active {
-    opacity: 1;
-    border-color: var(--accent-blue, #2a2aef);
-    box-shadow: 0 0 10px rgba(42, 42, 239, 0.5);
+  opacity: 1;
+  border-color: var(--accent-blue, #2a2aef);
+  box-shadow: 0 0 10px rgba(42, 42, 239, 0.5);
 }
 
 /* ==========================================
    CARD DE COMPRA (LATERAL DIREITA)
    ========================================== */
 .purchase-card {
-    background-color: #1a1a2e; /* Mantendo o padrão de caixas secundárias */
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-    border: 1px solid #333355;
-    position: sticky;
-    top: 100px; /* Acompanha a rolagem */
+  background-color: #1a1a2e; /* Mantendo o padrão de caixas secundárias */
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333355;
+  position: sticky;
+  top: 100px; /* Acompanha a rolagem */
 }
 
 .price-section {
-    margin-bottom: 25px;
+  margin-bottom: 25px;
 }
 
 .price-section .value {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #00ff88; /* Verde destaque para dinheiro */
-    display: block;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #00ff88; /* Verde destaque para dinheiro */
+  display: block;
 }
 
 .platform-info-card {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
 }
 
 .platform-info-card i {
-    font-size: 2rem;
-    color: #a5b1c2;
+  font-size: 2rem;
+  color: #a5b1c2;
 }
 
-.info-text strong { font-size: 1.1rem; color: #fff; }
-.info-text span { font-size: 0.9rem; color: #a5b1c2; }
+.info-text strong {
+  font-size: 1.1rem;
+  color: #fff;
+}
+.info-text span {
+  font-size: 0.9rem;
+  color: #a5b1c2;
+}
 
 .activation-msg {
-    font-size: 0.9rem;
-    color: #a5b1c2;
-    margin-bottom: 25px;
-    text-align: center;
+  font-size: 0.9rem;
+  color: #a5b1c2;
+  margin-bottom: 25px;
+  text-align: center;
 }
 
 /* Botões de Ação */
 .buy-wishlist-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .btn-purchase-green {
-    background-color: #00ff88;
-    color: #111;
-    border: none;
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
+  background-color: #00ff88;
+  color: #111;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
 }
 
-.btn-purchase-green:hover { background-color: #33ff99; transform: scale(1.02); }
+.btn-purchase-green:hover {
+  background-color: #33ff99;
+  transform: scale(1.02);
+}
 
 .btn-wishlist-grey {
-    background-color: #444466;
-    color: #fff;
-    border: none;
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  background-color: #444466;
+  color: #fff;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.btn-wishlist-grey:hover { background-color: #555577; }
+.btn-wishlist-grey:hover {
+  background-color: #555577;
+}
 
 /* ==========================================
    MODAL DO CARRINHO
    ========================================== */
 .modal-cart {
-    display: none;
-    position: fixed;
-    z-index: 3000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(3px);
+  display: none;
+  position: fixed;
+  z-index: 3000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(3px);
 }
 
 .modal-content {
-    background-color: #050533;
-    margin: 8% auto;
-    padding: 30px;
-    border: 1px solid var(--accent-blue, #2a2aef);
-    border-radius: 15px;
-    width: 90%;
-    max-width: 500px;
-    color: white;
-    position: relative;
-    box-shadow: 0 0 25px rgba(32, 36, 255, 0.3);
-    animation: slideDown 0.3s ease;
+  background-color: #050533;
+  margin: 8% auto;
+  padding: 30px;
+  border: 1px solid var(--accent-blue, #2a2aef);
+  border-radius: 15px;
+  width: 90%;
+  max-width: 500px;
+  color: white;
+  position: relative;
+  box-shadow: 0 0 25px rgba(32, 36, 255, 0.3);
+  animation: slideDown 0.3s ease;
 }
 
 @keyframes slideDown {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .close-modal {
-    position: absolute;
-    right: 25px;
-    top: 20px;
-    font-size: 30px;
-    font-weight: bold;
-    color: #a5b1c2;
-    cursor: pointer;
-    transition: color 0.3s;
+  position: absolute;
+  right: 25px;
+  top: 20px;
+  font-size: 30px;
+  font-weight: bold;
+  color: #a5b1c2;
+  cursor: pointer;
+  transition: color 0.3s;
 }
 
-.close-modal:hover { color: #ff4757; }
+.close-modal:hover {
+  color: #ff4757;
+}
 
 .modal-content h2 {
-    margin-bottom: 25px;
-    border-bottom: 1px solid #333355;
-    padding-bottom: 15px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #333355;
+  padding-bottom: 15px;
 }
 
 .cart-footer {
-    margin-top: 25px;
-    border-top: 1px solid #333355;
-    padding-top: 20px;
+  margin-top: 25px;
+  border-top: 1px solid #333355;
+  padding-top: 20px;
 }
 
 .cart-total {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
 }
 
-.cart-total span { color: #00ff88; }
+.cart-total span {
+  color: #00ff88;
+}
 
 .btn-checkout {
-    background-color: var(--accent-blue, #2a2aef);
-    color: white;
-    border: none;
-    padding: 15px;
-    border-radius: 8px;
-    width: 100%;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: var(--accent-blue, #2a2aef);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .btn-checkout:hover {
-    background-color: var(--hover-blue, #2024ff);
+  background-color: var(--hover-blue, #2024ff);
 }
 
 /* ==========================================
    RESPONSIVIDADE
    ========================================== */
 @media (max-width: 900px) {
-    .game-details-container {
-        grid-template-columns: 1fr; /* Muda para uma coluna em telas menores */
-    }
-    
-    .purchase-card {
-        position: static;
-    }
+  .game-details-container {
+    grid-template-columns: 1fr; /* Muda para uma coluna em telas menores */
+  }
 
-    .main-view img {
-        height: 350px;
-    }
+  .purchase-card {
+    position: static;
+  }
+
+  .main-view img {
+    height: 350px;
+  }
 }
 
 @media (max-width: 600px) {
-    .main-view img {
-        height: 250px;
-    }
-    .thumb {
-        width: 100px;
-        height: 60px;
-    }
+  .main-view img {
+    height: 250px;
+  }
+  .thumb {
+    width: 100px;
+    height: 60px;
+  }
 }

@@ -3,135 +3,137 @@
    ========================================== */
 
 .points-container {
-    max-width: 1200px;
-    margin: 100px auto 40px; /* 100px para evitar sobreposição da Navbar fixa */
-    padding: 20px;
-    color: #ffffff;
-    font-family: 'Inter', sans-serif;
+  max-width: 1200px;
+  margin: 100px auto 40px; /* 100px para evitar sobreposição da Navbar fixa */
+  padding: 20px;
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
 }
 
 /* Painel de Cabeçalho (Header da Loja) */
 .points-header {
-    background-color: #1a1a2e; /* Padrão de caixas secundárias */
-    padding: 40px 30px;
-    border-radius: 12px;
-    text-align: center;
-    margin-bottom: 40px;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-    border: 1px solid #333355;
+  background-color: #1a1a2e; /* Padrão de caixas secundárias */
+  padding: 40px 30px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333355;
 }
 
 .points-header h1 {
-    font-size: 2.8rem;
-    color: #feca57; /* Dourado/Amarelo característico da loja de pontos */
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  font-size: 2.8rem;
+  color: #feca57; /* Dourado/Amarelo característico da loja de pontos */
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .points-header p {
-    font-size: 1.2rem;
-    color: #a5b1c2;
+  font-size: 1.2rem;
+  color: #a5b1c2;
 }
 
 #saldo-pontos {
-    font-size: 2.2rem;
-    font-weight: bold;
-    text-shadow: 0 0 15px rgba(254, 202, 87, 0.3);
+  font-size: 2.2rem;
+  font-weight: bold;
+  text-shadow: 0 0 15px rgba(254, 202, 87, 0.3);
 }
 
 /* Grid de Recompensas */
 .coupons-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 25px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
 }
 
 /* Card Individual de Cupom */
 .coupon-card {
-    background-color: #2a2a4a;
-    padding: 25px 20px;
-    border-radius: 12px;
-    text-align: center;
-    border-top: 5px solid #feca57; /* Borda superior dourada de destaque */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  background-color: #2a2a4a;
+  padding: 25px 20px;
+  border-radius: 12px;
+  text-align: center;
+  border-top: 5px solid #feca57; /* Borda superior dourada de destaque */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .coupon-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 20px rgba(254, 202, 87, 0.15); /* Brilho dourado ao passar o mouse */
+  transform: translateY(-8px);
+  box-shadow: 0 12px 20px rgba(254, 202, 87, 0.15); /* Brilho dourado ao passar o mouse */
 }
 
 .coupon-card h3 {
-    font-size: 1.6rem;
-    margin-bottom: 5px;
-    color: #ffffff;
+  font-size: 1.6rem;
+  margin-bottom: 5px;
+  color: #ffffff;
 }
 
 .coupon-card .discount {
-    font-size: 2.5rem;
-    color: #00ff88; /* Verde neon indicando dinheiro/economia */
-    font-weight: bold;
-    margin: 20px 0;
-    text-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+  font-size: 2.5rem;
+  color: #00ff88; /* Verde neon indicando dinheiro/economia */
+  font-weight: bold;
+  margin: 20px 0;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
 }
 
 .coupon-card .cost {
-    font-size: 1.2rem;
-    color: #feca57;
-    margin-bottom: 20px;
-    font-weight: 600;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
+  font-size: 1.2rem;
+  color: #feca57;
+  margin-bottom: 20px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Botão de Resgate */
 .btn-redeem {
-    background-color: #feca57;
-    color: #111111;
-    border: none;
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    width: 100%;
+  background-color: #feca57;
+  color: #111111;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  width: 100%;
 }
 
 .btn-redeem:hover:not(:disabled) {
-    background-color: #ff9f43; /* Tom ligeiramente mais escuro no hover */
-    transform: scale(1.03);
+  background-color: #ff9f43; /* Tom ligeiramente mais escuro no hover */
+  transform: scale(1.03);
 }
 
 .btn-redeem:disabled {
-    background-color: #4b4b6b; /* Fundo cinza/azulado escuro para botão inativo */
-    color: #888888;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
+  background-color: #4b4b6b; /* Fundo cinza/azulado escuro para botão inativo */
+  color: #888888;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 /* Estilização do contador de pontos na Navbar Superior (criada no pontos.html) */
 .user-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(254, 202, 87, 0.1);
-    padding: 8px 15px;
-    border-radius: 20px;
-    border: 1px solid rgba(254, 202, 87, 0.3);
-    transition: background 0.3s ease;
-    cursor: default;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(254, 202, 87, 0.1);
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: 1px solid rgba(254, 202, 87, 0.3);
+  transition: background 0.3s ease;
+  cursor: default;
 }
 
 .user-actions:hover {
-    background: rgba(254, 202, 87, 0.2);
+  background: rgba(254, 202, 87, 0.2);
 }

@@ -1,70 +1,101 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FrameStore | Loja de Games</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="css/homepage.css">
-    <link rel="stylesheet" href="css/jogo.css">
-</head>
-<body>
-
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/homepage.css" />
+    <link rel="stylesheet" href="css/jogo.css" />
+    <link rel="stylesheet" href="css/header.css" />
+  </head>
+  <body>
     <header class="navbar">
-        <div class="logo-container">
-            <div class="dashboard-menu" onclick="toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            
-            <a href="homepage.html" class="logo-link">
-                <img src="/src/templates/assets/cover/site_logo.png" alt="Logo Unico" class="logo-unico">
-                <img src="/src/templates/assets/cover/site_nome.png" alt="Logo Nome" class="logo-nome">
-            </a>
-        </div>
-        
-        <div class="search-bar">
-            <input type="text" placeholder="Procurar jogos...">
-            <i class="fas fa-search"></i>
+      <div class="logo-container">
+        <div class="dashboard-menu" onclick="toggleMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
 
-        <i class="fas fa-shopping-cart"></i>
-        <a href="login.html">
-            <button class="btn-entrar">Entrar</button>
+        <a href="homepage.html" class="logo-link">
+          <img
+            src="img/site_logo.png"
+            alt="Logo"
+            class="logo-unico"
+          />
+          <img
+            src="img/site_nome.png"
+            alt="Nome do Site"
+            class="logo-nome"
+          />
         </a>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Procurar jogos..." />
+        <i class="fas fa-search"></i>
+      </div>
+
+      <div class="user-actions">
+        <a href="pontos.html" class="action-badge points-badge">
+          <i class="fas fa-star"></i> <span id="nav-pontos">0</span> Pts
+        </a>
+        <a href="carrinho.html" class="action-badge cart-badge">
+          <i class="fas fa-shopping-cart"></i> <span>Carrinho</span>
+        </a>
+        <div id="auth-container" style="display: inline-block;">
+          <a href="login.html">
+            <button class="btn-entrar">Entrar</button>
+          </a>
+        </div>
+      </div>
     </header>
 
     <aside class="sidebar-menu" id="sidebar">
-        <div class="sidebar-header">
-            <div class="dashboard-menu" onclick="toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+      <div class="sidebar-header">
+        <div class="dashboard-menu" onclick="toggleMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-        
-        <ul>
-            <li><a href="#"><i class="fas fa-tag"></i> Ofertas</a></li>
-            <li><a href="#"><i class="fas fa-gift"></i> Gift Cards</a></li>
-            <li><a href="#"><i class="fas fa-desktop"></i> PC</a></li>
-            <li><a href="#"><i class="fab fa-playstation"></i> Playstation</a></li>
-            <li><a href="#"><i class="fab fa-xbox"></i> Xbox</a></li>
-            <li><a href="#"><i class="fas fa-mobile-alt"></i> Mobile</a></li>
-        </ul>
+      </div>
+      <ul>
+        <li>
+          <a href="#"><i class="fas fa-tag"></i> Ofertas</a>
+        </li>
+        <li>
+          <a href="#"><i class="fas fa-gift"></i> Gift Cards</a>
+        </li>
+        <li>
+          <a href="#"><i class="fas fa-desktop"></i> PC</a>
+        </li>
+        <li>
+          <a href="#"><i class="fab fa-playstation"></i> Playstation</a>
+        </li>
+        <li>
+          <a href="#"><i class="fab fa-xbox"></i> Xbox</a>
+        </li>
+        <li>
+          <a href="#"><i class="fas fa-mobile-alt"></i> Mobile</a>
+        </li>
+      </ul>
     </aside>
 
     <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
 
     <section class="main-banner">
-        <div class="banner-slider" id="banner-slider">
-            <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
-            <button class="next" onclick="changeSlide(1)">&#10095;</button>
-        </div>
+      <div class="banner-slider" id="banner-slider">
+        <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
+        <button class="next" onclick="changeSlide(1)">&#10095;</button>
+      </div>
     </section>
 
     <div class="games-grid" id="games-container"></div>
 
     <script src="js/homepage.js"></script>
-</body>
+  </body>
 </html>

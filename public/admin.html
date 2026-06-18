@@ -1,99 +1,217 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FrameStore | Painel Admin</title>
-    <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/admin.css" />
+    <link rel="stylesheet" href="css/header.css" />
+  </head>
+  <body>
     <header class="admin-navbar">
-        <div class="logo-container">
-            <a href="homepage.html" class="logo-link">
-                <img src="/src/templates/assets/cover/site_logo.png" alt="Logo" class="logo-unico">
-                <span style="font-weight: bold; font-size: 1.2rem; margin-left: 10px;">Painel Admin</span>
-            </a>
-        </div>
-        <div class="user-actions">
-            <button class="btn-voltar" onclick="window.location.href='perfil.html'"><i class="fas fa-arrow-left"></i> Voltar ao Perfil</button>
-        </div>
+      <div class="logo-container">
+        <a href="homepage.html" class="logo-link">
+          <img
+            src="img/site_logo.png"
+            alt="Logo"
+            class="logo-unico"
+          />
+          <span style="font-weight: bold; font-size: 1.2rem; margin-left: 10px"
+            >Painel Admin</span
+          >
+        </a>
+      </div>
+      <div class="user-actions">
+        <button
+          class="btn-voltar"
+          onclick="window.location.href = 'perfil.html'"
+        >
+          <i class="fas fa-arrow-left"></i> Voltar ao Perfil
+        </button>
+      </div>
     </header>
 
     <main class="admin-container">
-        <aside class="admin-sidebar">
-            <button class="tab-btn active" onclick="switchAdminTab('jogos')"><i class="fas fa-gamepad"></i> Gestão de Jogos</button>
-            <button class="tab-btn" onclick="switchAdminTab('usuarios')"><i class="fas fa-users"></i> Gestão de Usuários</button>
-            <button class="tab-btn" onclick="switchAdminTab('cupons')"><i class="fas fa-ticket-alt"></i> Gestão de Cupons</button>
-        </aside>
+      <aside class="admin-sidebar">
+        <button class="tab-btn active" onclick="switchAdminTab('jogos')">
+          <i class="fas fa-gamepad"></i> Gestão de Jogos
+        </button>
+        <button class="tab-btn" onclick="switchAdminTab('usuarios')">
+          <i class="fas fa-users"></i> Gestão de Usuários
+        </button>
+        <button class="tab-btn" onclick="switchAdminTab('cupons')">
+          <i class="fas fa-ticket-alt"></i> Gestão de Cupons
+        </button>
+      </aside>
 
-        <section class="admin-content">
-            
-            <div id="tab-jogos" class="tab-pane active">
-                <h2>Gerir Catálogo de Jogos</h2>
-                <div class="form-container">
-                    <h3>Adicionar Novo Jogo</h3>
-                    <form id="form-jogo" onsubmit="salvarJogo(event)">
-                        <div class="input-grid">
-                            <input type="text" id="jogo-titulo" placeholder="Título do Jogo" required>
-                            <input type="number" id="jogo-preco" step="0.01" placeholder="Preço (R$)" required>
-                            <input type="number" id="jogo-desconto" step="1" placeholder="Desconto (%) (Opcional)">
-                            <input type="text" id="jogo-platform" placeholder="Plataforma (ex: Steam)" required>
-                        </div>
-                        <div class="file-grid">
-                            <div><label>Capa:</label><input type="file" id="jogo-cover" accept="image/*" required></div>
-                            <div><label>Screen 1:</label><input type="file" id="jogo-screen1" accept="image/*"></div>
-                            <div><label>Screen 2:</label><input type="file" id="jogo-screen2" accept="image/*"></div>
-                            <div><label>Screen 3:</label><input type="file" id="jogo-screen3" accept="image/*"></div>
-                        </div>
-                        <button type="submit" class="btn-action btn-green">Cadastrar Jogo</button>
-                    </form>
+      <section class="admin-content">
+        <div id="tab-jogos" class="tab-pane active">
+          <h2>Gerir Catálogo de Jogos</h2>
+          <div class="form-container">
+            <h3>Adicionar Novo Jogo</h3>
+            <form id="form-jogo" onsubmit="salvarJogo(event)">
+              <div class="input-grid">
+                <input
+                  type="text"
+                  id="jogo-titulo"
+                  placeholder="Título do Jogo"
+                  required
+                />
+                <input
+                  type="number"
+                  id="jogo-preco"
+                  step="0.01"
+                  placeholder="Preço (R$)"
+                  required
+                />
+                <input
+                  type="number"
+                  id="jogo-desconto"
+                  step="1"
+                  placeholder="Desconto (%) (Opcional)"
+                />
+                <input
+                  type="text"
+                  id="jogo-platform"
+                  placeholder="Plataforma (ex: Steam)"
+                  required
+                />
+              </div>
+              <div class="file-grid">
+                <div>
+                  <label>Capa:</label
+                  ><input
+                    type="file"
+                    id="jogo-cover"
+                    accept="image/*"
+                    required
+                  />
                 </div>
-                <h3>Jogos Cadastrados</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr><th>ID</th><th>Título</th><th>Preço</th><th>Desconto</th><th>Ações</th></tr>
-                    </thead>
-                    <tbody id="lista-jogos"><tr><td colspan="5">Carregando...</td></tr></tbody>
-                </table>
-            </div>
-
-            <div id="tab-usuarios" class="tab-pane">
-                <h2>Gerir Usuários (Saldos e Pontos)</h2>
-                <table class="data-table">
-                    <thead>
-                        <tr><th>ID</th><th>Nome</th><th>Email</th><th>Saldo (R$)</th><th>Pontos</th><th>Ações</th></tr>
-                    </thead>
-                    <tbody id="lista-usuarios"><tr><td colspan="6">Carregando...</td></tr></tbody>
-                </table>
-            </div>
-
-            <div id="tab-cupons" class="tab-pane">
-                <h2>Gerir Loja de Recompensas (Cupons)</h2>
-                <div class="form-container">
-                    <h3>Criar Novo Cupom</h3>
-                    <form id="form-cupom" onsubmit="salvarCupom(event)">
-                        <div class="input-grid">
-                            <input type="text" id="cupom-nome" placeholder="Nome (Ex: MEGA10)" required>
-                            <input type="text" id="cupom-tipo" placeholder="Descrição/Tipo" required>
-                            <input type="number" id="cupom-desconto" step="0.01" placeholder="Desconto Fixo (R$)" required>
-                            <input type="number" id="cupom-custo" placeholder="Custo em Pontos" required>
-                        </div>
-                        <button type="submit" class="btn-action btn-green">Cadastrar Cupom</button>
-                    </form>
+                <div>
+                  <label>Screen 1:</label
+                  ><input type="file" id="jogo-screen1" accept="image/*" />
                 </div>
-                <table class="data-table">
-                    <thead>
-                        <tr><th>ID</th><th>Nome</th><th>Desconto (R$)</th><th>Custo (Pts)</th><th>Ações</th></tr>
-                    </thead>
-                    <tbody id="lista-cupons"><tr><td colspan="5">Carregando...</td></tr></tbody>
-                </table>
-            </div>
+                <div>
+                  <label>Screen 2:</label
+                  ><input type="file" id="jogo-screen2" accept="image/*" />
+                </div>
+                <div>
+                  <label>Screen 3:</label
+                  ><input type="file" id="jogo-screen3" accept="image/*" />
+                </div>
+              </div>
+              <button type="submit" class="btn-action btn-green">
+                Cadastrar Jogo
+              </button>
+            </form>
+          </div>
+          <h3>Jogos Cadastrados</h3>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Título</th>
+                  <th>Preço</th>
+                  <th>Desconto</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="lista-jogos">
+                <tr>
+                  <td colspan="5" style="text-align: center; color: #a5b1c2;">Carregando...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-        </section>
+        <div id="tab-usuarios" class="tab-pane">
+          <h2>Gerir Usuários (Saldos e Pontos)</h2>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Email</th>
+                  <th>Saldo (R$)</th>
+                  <th>Pontos</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="lista-usuarios">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: #a5b1c2;">Carregando...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-cupons" class="tab-pane">
+          <h2>Gerir Loja de Recompensas (Cupons)</h2>
+          <div class="form-container">
+            <h3>Criar Novo Cupom</h3>
+            <form id="form-cupom" onsubmit="salvarCupom(event)">
+              <div class="input-grid">
+                <input
+                  type="text"
+                  id="cupom-nome"
+                  placeholder="Nome (Ex: MEGA10)"
+                  required
+                />
+                <input
+                  type="text"
+                  id="cupom-tipo"
+                  placeholder="Descrição/Tipo"
+                  required
+                />
+                <input
+                  type="number"
+                  id="cupom-desconto"
+                  step="0.01"
+                  placeholder="Desconto Fixo (R$)"
+                  required
+                />
+                <input
+                  type="number"
+                  id="cupom-custo"
+                  placeholder="Custo em Pontos"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn-action btn-green">
+                Cadastrar Cupom
+              </button>
+            </form>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Desconto (R$)</th>
+                  <th>Custo (Pts)</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="lista-cupons">
+                <tr>
+                  <td colspan="5" style="text-align: center; color: #a5b1c2;">Carregando...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </main>
 
     <script src="js/admin.js"></script>
-</body>
+  </body>
 </html>

@@ -14,6 +14,7 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   font-family: "Inter", sans-serif;
   background-color: var(--bg-color);
@@ -29,16 +30,19 @@ body {
   background-color: var(--box-bg);
   border-bottom: 2px solid var(--accent-blue);
 }
+
 .logo-link {
   display: flex;
   align-items: center;
   text-decoration: none;
   color: white;
 }
+
 .logo-unico {
   height: 40px;
   border-radius: 8px;
 }
+
 .btn-voltar {
   background: #444466;
   color: white;
@@ -48,6 +52,7 @@ body {
   cursor: pointer;
   transition: 0.3s;
 }
+
 .btn-voltar:hover {
   background: #555577;
 }
@@ -59,12 +64,14 @@ body {
   padding: 0 20px;
   gap: 30px;
 }
+
 .admin-sidebar {
   width: 250px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
+
 .tab-btn {
   background: var(--box-bg);
   color: #a5b1c2;
@@ -80,10 +87,12 @@ body {
   gap: 10px;
   align-items: center;
 }
+
 .tab-btn:hover {
   background: var(--box-alt);
   color: white;
 }
+
 .tab-btn.active {
   background: var(--accent-blue);
   color: white;
@@ -97,13 +106,16 @@ body {
   padding: 30px;
   border: 1px solid #333355;
 }
+
 .tab-pane {
   display: none;
 }
+
 .tab-pane.active {
   display: block;
   animation: fadeIn 0.3s ease;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -120,16 +132,19 @@ body {
   margin-bottom: 30px;
   border-left: 4px solid var(--accent-blue);
 }
+
 .form-container h3 {
   margin-bottom: 15px;
   font-size: 1.2rem;
 }
+
 .input-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 15px;
   margin-bottom: 15px;
 }
+
 .input-grid input {
   padding: 12px;
   background: var(--bg-color);
@@ -138,6 +153,7 @@ body {
   border-radius: 5px;
   outline: none;
 }
+
 .file-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -155,41 +171,118 @@ body {
   cursor: pointer;
   transition: 0.3s;
 }
+
 .btn-green {
   background: var(--green);
   color: #111;
   width: 100%;
 }
+
 .btn-green:hover {
   background: #33ff99;
 }
-.btn-red {
-  background: var(--red);
-  padding: 5px 10px;
-  font-size: 0.9rem;
-}
-.btn-yellow {
-  background: var(--yellow);
-  color: #111;
-  padding: 5px 10px;
-  font-size: 0.9rem;
+
+/* ==========================================
+   ESTILOS DE TABELA ADMIN
+   ========================================== */
+.table-container {
+  background: var(--box-bg);
+  border: 1px solid #333355;
+  border-radius: 10px;
+  overflow-x: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  margin-top: 20px;
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-}
-.data-table th,
-.data-table td {
-  padding: 15px;
   text-align: left;
-  border-bottom: 1px solid #333355;
 }
+
 .data-table th {
   background: var(--box-alt);
   color: #a5b1c2;
+  padding: 16px 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--accent-blue);
 }
-.data-table tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+
+.data-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #2a2a4a;
+  vertical-align: middle;
+  color: #e1e1e6;
+  font-size: 0.95rem;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(42, 42, 239, 0.08);
+}
+
+/* ==========================================
+   INPUTS E BOTÕES DENTRO DA TABELA
+   ========================================== */
+.data-table input[type="number"] {
+  width: 90px;
+  padding: 8px 12px;
+  background: var(--bg-color);
+  border: 1px solid #444;
+  color: var(--text-color);
+  border-radius: 6px;
+  font-family: "Inter", monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  outline: none;
+  text-align: center;
+}
+
+.data-table input[type="number"]:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 8px rgba(42, 42, 239, 0.4);
+}
+
+.data-table .btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.data-table .btn-red {
+  background: var(--red);
+}
+
+.data-table .btn-red:hover {
+  background: #ff2a3f;
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
+  transform: translateY(-1px);
+}
+
+.data-table .btn-yellow {
+  background: var(--yellow);
+  color: #111;
+}
+
+.data-table .btn-yellow:hover {
+  background: #ffb833;
+  box-shadow: 0 0 10px rgba(254, 202, 87, 0.4);
+  transform: translateY(-1px);
 }

@@ -455,6 +455,21 @@ app.delete('/api/admin/cupons/:id', verificarAdmin, async (req, res) => {
     }
 });
 
+app.get('/api/usuarios/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [rows] = await db.query('SELECT id, nome, email, saldo, pontos, adm FROM USUARIOS WHERE id = ?', [id]);
+        
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Usuário não encontrado.' });
+        }
+
+        res.json(rows[0]);
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao buscar dados do usuário.' });
+    }
+});
+
 // Inicialização do Servidor
 app.listen(port, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${port}`);

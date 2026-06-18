@@ -1,106 +1,133 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FrameStore | Detalhes do Jogo</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="css/homepage.css">
-    <link rel="stylesheet" href="css/jogo.css">
-</head>
-<body>
-
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/homepage.css" />
+    <link rel="stylesheet" href="css/jogo.css" />
+    <link rel="stylesheet" href="css/header.css" />
+  </head>
+  <body>
     <header class="navbar">
-        <div class="logo-container">
-            <div class="dashboard-menu" onclick="toggleMenu()">
-                <span></span><span></span><span></span>
-            </div>            
-            
-            <a href="homepage.html" class="logo-link">
-                <img src="/src/templates/assets/cover/site_logo.png" alt="Logo Unico" class="logo-unico">
-                <img src="/src/templates/assets/cover/site_nome.png" alt="Logo Nome" class="logo-nome">
-            </a>
+      <div class="logo-container">
+        <div class="dashboard-menu" onclick="toggleMenu()">
+          <span></span><span></span><span></span>
         </div>
-        <div class="search-bar">
-            <input type="text" placeholder="Procurar jogos...">
-            <i class="fas fa-search"></i>
+
+        <a href="homepage.html" class="logo-link">
+          <img src="img/site_logo.png" alt="Logo" class="logo-unico" />
+          <img src="img/site_nome.png" alt="Nome do Site" class="logo-nome" />
+        </a>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Procurar jogos..." />
+        <i class="fas fa-search"></i>
+      </div>
+
+      <div class="user-actions">
+        <a href="pontos.html" style="color: white; margin-right: 15px; text-decoration: none">
+          <i class="fas fa-star"></i> <span id="nav-pontos">0</span>
+        </a>
+        <a href="carrinho.html" style="color: white; margin-right: 20px">
+          <i class="fas fa-shopping-cart"></i>
+        </a>
+        <div id="auth-container" style="display: inline-block;">
+          <a href="login.html">
+            <button class="btn-entrar">Entrar</button>
+          </a>
         </div>
+      </div>
     </header>
 
     <aside class="sidebar-menu" id="sidebar">
-        <div class="sidebar-header">
-            <div class="dashboard-menu" onclick="toggleMenu()">
-                <span></span><span></span><span></span>
-            </div>
+      <div class="sidebar-header">
+        <div class="dashboard-menu" onclick="toggleMenu()">
+          <span></span><span></span><span></span>
         </div>
-        <ul>
-            <li><a href="homepage.html"><i class="fas fa-home"></i> Início</a></li>
-            <li><a href="#"><i class="fas fa-tag"></i> Ofertas</a></li>
-            <li><a href="#"><i class="fas fa-gift"></i> Gift Cards</a></li>
-            <li><a href="#"><i class="fas fa-desktop"></i> PC</a></li>
-            <li><a href="#"><i class="fab fa-playstation"></i> Playstation</a></li>
-            <li><a href="#"><i class="fab fa-xbox"></i> Xbox</a></li>
-        </ul>
+      </div>
+      <ul>
+        <li>
+          <a href="homepage.html"><i class="fas fa-home"></i> Início</a>
+        </li>
+        <li>
+          <a href="#"><i class="fas fa-tag"></i> Ofertas</a>
+        </li>
+        <li>
+          <a href="#"><i class="fas fa-gift"></i> Gift Cards</a>
+        </li>
+        <li>
+          <a href="#"><i class="fas fa-desktop"></i> PC</a>
+        </li>
+        <li>
+          <a href="#"><i class="fab fa-playstation"></i> Playstation</a>
+        </li>
+        <li>
+          <a href="#"><i class="fab fa-xbox"></i> Xbox</a>
+        </li>
+      </ul>
     </aside>
+
     <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
 
     <main class="product-page">
-        <h1 class="game-title">Carregando...</h1>
+      <h1 class="game-title">Carregando...</h1>
 
-        <div class="game-details-container">
-            
-            <div class="game-gallery">
-                <div class="main-view">
-                    <button class="nav-arrow prev-img" onclick="moveGallery(-1)">❮</button>
-                    <img id="current-img" alt="Jogo">
-                    <button class="nav-arrow next-img" onclick="moveGallery(1)">❯</button>
-                </div>
-                <div class="thumb-list"></div>
-            </div>
-
-            <aside class="purchase-card">
-                <div class="price-section">
-                    </div>
-                
-                <div class="platform-info-card">
-                    <i class="fab fa-steam"></i>
-                    <div class="info-text">
-                        <strong id="game-platform">Steam</strong>
-                        <br>
-                        <span>Windows</span>
-                    </div>
-                </div>
-
-                <p class="activation-msg">Ativado através de Chave de ativação</p>
-
-                <div class="buy-wishlist-buttons">
-                    <button class="btn-purchase-green" onclick="adicionarAoCarrinho()">
-                        <i class="fas fa-shopping-cart"></i> Comprar
-                    </button>
-                    <button class="btn-wishlist-grey">
-                        <i class="fas fa-heart"></i> Desejo
-                    </button>
-                </div>
-            </aside>
-
-            <div id="cart-modal" class="modal-cart">
-                <div class="modal-content">
-                    <span class="close-modal" onclick="fecharCarrinho()">&times;</span>
-                    <h2>Meu Carrinho</h2>
-                    <div id="cart-items-list"></div>
-                    <div class="cart-footer">
-                        <div class="cart-total">
-                            Total: <span id="cart-total-value">R$ 0,00</span>
-                        </div>
-                        <button class="btn-checkout">Finalizar Compra</button>
-                    </div>
-                </div>
-            </div>
-
+      <div class="game-details-container">
+        <div class="game-gallery">
+          <div class="main-view">
+            <button class="nav-arrow prev-img" onclick="moveGallery(-1)">
+              ❮
+            </button>
+            <img id="current-img" alt="Jogo" />
+            <button class="nav-arrow next-img" onclick="moveGallery(1)">
+              ❯
+            </button>
+          </div>
+          <div class="thumb-list"></div>
         </div>
+
+        <aside class="purchase-card">
+          <div class="price-section"></div>
+
+          <div class="platform-info-card">
+            <i class="fab fa-steam"></i>
+            <div class="info-text">
+              <strong id="game-platform">Steam</strong>
+              <br />
+              <span>Windows</span>
+            </div>
+          </div>
+
+          <p class="activation-msg">Ativado através de Chave de ativação</p>
+
+          <div class="buy-wishlist-buttons">
+            <button class="btn-purchase-green" onclick="adicionarAoCarrinho()">
+              <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+            </button>
+          </div>
+        </aside>
+
+        <div id="cart-modal" class="modal-cart">
+          <div class="modal-content">
+            <span class="close-modal" onclick="fecharCarrinho()">&times;</span>
+            <h2>Adicionado ao Carrinho!</h2>
+            <div id="cart-items-list"></div>
+            <div class="cart-footer" style="display: flex; gap: 10px; justify-content: space-between; margin-top: 20px;">
+              <button class="btn-entrar" style="background: #444; color: white;" onclick="window.location.href='homepage.html'">Continuar Comprando</button>
+              <button class="btn-checkout" onclick="window.location.href='carrinho.html'">Ir para o Pagamento</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
 
     <script src="js/homepage.js"></script>
     <script src="js/jogo.js"></script>
-</body>
+  </body>
 </html>

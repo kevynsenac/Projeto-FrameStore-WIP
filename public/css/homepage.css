@@ -2,376 +2,391 @@
    1. VARIÁVEIS E RESET GLOBAL
    ========================================== */
 :root {
-    --bg-color: #050533;
-    --card-bg: #0000FF;
-    --text-color: #ffffff;
-    --price-color: #00ff00;
-    --accent-blue: #2a2aef;
-    --hover-blue: #2024ff;
-    --promo-red: #ff4747;
+  --bg-color: #050533;
+  --card-bg: #0000ff;
+  --text-color: #ffffff;
+  --price-color: #00ff00;
+  --accent-blue: #2a2aef;
+  --hover-blue: #2024ff;
+  --promo-red: #ff4747;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    overflow-x: hidden; /* Evita rolagem horizontal indesejada pelo menu lateral */
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden;
 }
 
 /* ==========================================
-   2. CABEÇALHO (NAVBAR) E LOGO
-   ========================================== */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 5%;
-    background-color: var(--bg-color);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-}
-
-.logo-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-}
-
-.logo-unico {
-    height: 60px; 
-    width: auto;
-    border-radius: 15px;
-    transition: transform 0.3s ease;
-}
-
-.logo-nome {
-    height: 30px; 
-    width: auto;
-    border-radius: 10px;
-    transition: transform 0.3s ease;
-}
-
-.logo-link:hover .logo-unico,
-.logo-link:hover .logo-nome {
-    transform: scale(1.05);
-}
-
-/* Ícone de Menu (Hambúrguer) */
-.dashboard-menu {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 30px;
-    height: 20px;
-    cursor: pointer;
-    margin-right: 10px;
-    transition: transform 0.2s ease;
-}
-
-.dashboard-menu span {
-    display: block;
-    height: 3px;
-    width: 100%;
-    background-color: var(--text-color);
-    border-radius: 2px;
-    transition: background-color 0.3s ease, filter 0.3s ease;
-}
-
-.dashboard-menu:hover {
-    transform: scale(1.1);
-}
-
-.dashboard-menu:hover span {
-    background-color: var(--hover-blue);
-    filter: drop-shadow(0 0 5px var(--hover-blue));
-}
-
-/* Barra de Pesquisa */
-.search-bar {
-    flex-grow: 0.5;
-    display: flex;
-    align-items: center;
-    background-color: var(--accent-blue);
-    border-radius: 20px;
-    padding: 12px 20px;
-    transition: box-shadow 0.3s ease;
-}
-
-.search-bar:focus-within {
-    box-shadow: 0 0 10px var(--hover-blue);
-}
-
-.search-bar input {
-    background: transparent;
-    border: none;
-    color: var(--text-color);
-    width: 100%;
-    outline: none;
-    font-size: 1rem;
-}
-
-.search-bar input::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.search-bar i {
-    color: var(--text-color);
-    cursor: pointer;
-    transition: transform 0.2s, filter 0.2s;
-}
-
-.search-bar i:hover {
-    filter: brightness(1.2);
-    transform: scale(1.1);
-}
-
-/* Botão Entrar */
-.btn-entrar {
-    background-color: var(--accent-blue);
-    color: var(--text-color);
-    border: none;
-    padding: 10px 35px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 1rem;
-    transition: background-color 0.2s, transform 0.2s, filter 0.2s;
-}
-
-.btn-entrar:hover {
-    background-color: var(--hover-blue);
-    filter: brightness(1.2);
-    transform: scale(1.05);
-}
-
-/* ==========================================
-   3. MENU LATERAL (SIDEBAR) E OVERLAY
+   2. MENU LATERAL (SIDEBAR) E OVERLAY
    ========================================== */
 .sidebar-menu {
-    width: 260px;
-    background-color: var(--bg-color);
-    padding: 20px;
-    position: fixed;
-    top: 0;
-    left: -300px; /* Escondido por padrão */
-    height: 100vh;
-    z-index: 2000; /* Sobrepõe tudo */
-    transition: left 0.4s ease-in-out;
-    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+  width: 260px;
+  background-color: var(--bg-color);
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: -300px;
+  height: 100vh;
+  z-index: 2000;
+  transition: left 0.4s ease-in-out;
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
 }
 
 .sidebar-menu.active {
-    left: 0;
+  left: 0;
 }
 
 .sidebar-header {
-    display: flex;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 20px;
+  display: flex;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
 }
 
 .sidebar-menu ul {
-    list-style: none;
+  list-style: none;
 }
 
 .sidebar-menu li {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .sidebar-menu a {
-    color: var(--text-color);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    opacity: 0.8;
-    transition: all 0.3s ease;
+  color: var(--text-color);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  opacity: 0.8;
+  transition: all 0.3s ease;
 }
 
 .sidebar-menu a i {
-    width: 25px;
-    text-align: center;
+  width: 25px;
+  text-align: center;
 }
 
 .sidebar-menu a:hover {
-    opacity: 1;
-    padding-left: 10px;
-    color: var(--hover-blue);
-    text-shadow: 0 0 8px rgba(32, 36, 255, 0.6);
+  opacity: 1;
+  padding-left: 10px;
+  color: var(--hover-blue);
+  text-shadow: 0 0 8px rgba(32, 36, 255, 0.6);
 }
 
 /* Fundo Escuro do Menu */
 .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: none;
-    z-index: 1500;
-    backdrop-filter: blur(2px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  z-index: 1500;
+  backdrop-filter: blur(2px);
 }
 
 .overlay.active {
-    display: block;
-    animation: fadeIn 0.3s ease-in-out;
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ==========================================
-   4. BANNER PRINCIPAL (SLIDER)
+   3. BANNER PRINCIPAL (SLIDER)
    ========================================== */
 .main-banner {
-    position: relative;
-    max-width: 900px;
-    margin: 30px auto;
-    border-radius: 30px;
-    overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  position: relative;
+  max-width: 900px;
+  margin: 30px auto;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
 }
 
 .banner-slider {
-    position: relative;
-    width: 100%;
+  position: relative;
+  width: 100%;
 }
 
 .slide {
-    display: none;
-    width: 100%;
+  display: none;
+  width: 100%;
 }
 
 .slide.active {
-    display: block;
-    animation: fade 0.5s ease-in-out;
+  display: block;
+  animation: fade 0.5s ease-in-out;
 }
 
 @keyframes fade {
-    from { opacity: 0.4; }
-    to { opacity: 1; }
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .slide img {
-    width: 100%;
-    height: 450px;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.4s ease, filter 0.4s ease;
+  width: 100%;
+  height: 450px;
+  object-fit: cover;
+  display: block;
+  transition:
+    transform 0.4s ease,
+    filter 0.4s ease;
 }
 
 .main-banner:hover img {
-    filter: brightness(1.1);
-    transform: scale(1.02);
+  filter: brightness(1.1);
+  transform: scale(1.02);
 }
 
-.prev, .next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.5);
-    color: var(--text-color);
-    padding: 15px 20px;
-    border: none;
-    cursor: pointer;
-    font-size: 24px;
-    border-radius: 50%;
-    transition: background-color 0.3s ease;
-    z-index: 10;
+.prev,
+.next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--text-color);
+  padding: 15px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+  z-index: 10;
 }
 
-.prev { left: 20px; }
-.next { right: 20px; }
+.prev {
+  left: 20px;
+}
+.next {
+  right: 20px;
+}
 
-.prev:hover, .next:hover {
-    background: var(--accent-blue);
+.prev:hover,
+.next:hover {
+  background: var(--accent-blue);
 }
 
 /* ==========================================
-   5. GRID DE JOGOS E CARDS
+   4. GRID DE JOGOS E CARDS
    ========================================== */
 .games-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 40px;
-    padding: 30px 5%;
-    justify-items: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 40px;
+  padding: 30px 5%;
+  justify-items: center;
 }
 
 .game-card {
-    position: relative;
-    background-color: var(--card-bg);
-    border-radius: 20px;
-    overflow: hidden;
-    text-align: center;
-    padding-bottom: 20px;
-    width: 100%;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  background-color: var(--card-bg);
+  border-radius: 20px;
+  overflow: hidden;
+  text-align: center;
+  padding-bottom: 20px;
+  width: 100%;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .game-card:hover {
-    transform: translateY(-5px) scale(1.03);
-    box-shadow: 0 10px 25px rgba(42, 42, 239, 0.5); /* Brilho azul embaixo */
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 10px 25px rgba(42, 42, 239, 0.5);
 }
 
 .game-card img {
-    width: 100%;
-    height: 300px; /* Aumentado para valorizar a capa (estilo retrato) */
-    object-fit: cover;
-    border-bottom: 3px solid var(--accent-blue);
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-bottom: 3px solid var(--accent-blue);
 }
 
 .game-card h3 {
-    font-size: 1.2rem;
-    margin: 15px 10px 10px;
-    color: var(--text-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; /* Corta nomes muito longos com "..." */
+  font-size: 1.2rem;
+  margin: 15px 10px 10px;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .price {
-    color: var(--price-color);
-    font-weight: bold;
-    font-size: 1.3rem;
-    margin-top: 5px;
+  color: var(--price-color);
+  font-weight: bold;
+  font-size: 1.3rem;
+  margin-top: 5px;
 }
 
-/* Etiqueta de Desconto */
 .promo-badge {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background-color: var(--promo-red); 
-    color: var(--text-color);
-    padding: 6px 12px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    z-index: 10;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
-    letter-spacing: 1px;
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background-color: var(--promo-red);
+  color: var(--text-color);
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+  letter-spacing: 1px;
+}
+
+/* ==========================================
+   5. NAVBAR E BARRA DE PESQUISA
+   ========================================== */
+.navbar {
+  padding: 12px 5%;
+  gap: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 25px;
+  padding: 8px 18px;
+  flex-grow: 1;
+  max-width: 500px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.search-bar:focus-within {
+  border-color: var(--accent-blue);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 10px rgba(42, 42, 239, 0.3);
+}
+
+.search-bar input {
+  flex-grow: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  outline: none;
+  padding: 5px 10px;
+  font-size: 1rem;
+}
+
+.search-bar input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.search-bar i {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.search-bar:focus-within i,
+.search-bar i:hover {
+  color: var(--text-color);
+}
+
+/* ==========================================
+   6. AÇÕES DO USUÁRIO (PONTOS E CARRINHO)
+   ========================================== */
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  white-space: nowrap;
+}
+
+.action-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+/* Badge de Pontos (Dourado) */
+.points-badge {
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.points-badge:hover {
+  background: rgba(255, 215, 0, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.2);
+}
+
+/* Badge do Carrinho (Neutro/Acento) */
+.cart-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cart-badge:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--price-color);
+  border-color: var(--price-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 255, 0, 0.15);
+}
+
+/* ==========================================
+   7. MEDIA QUERIES (RESPONSIVIDADE)
+   ========================================== */
+@media (max-width: 992px) {
+  .search-bar {
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 10px 15px;
+  }
+  
+  .search-bar {
+    order: 3;
+    width: 100%;
+    max-width: none;
+    margin-top: 15px;
+  }
+  
+  .action-badge span {
+    display: none; /* Oculta os textos "Pts" e "Carrinho" em telas pequenas */
+  }
 }

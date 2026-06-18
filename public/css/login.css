@@ -2,197 +2,264 @@
    1. VARIÁVEIS E RESET GLOBAL
    ========================================== */
 :root {
-    --bg-color: #050533;
-    --box-bg: #0a0a3d;
-    --text-color: #ffffff;
-    --accent-blue: #2a2aef;
-    --hover-blue: #2024ff;
-    --input-bg: #1a1a4a;
-    --error-color: #ff4747;
+  --bg-color: #050533;
+  --box-bg: #0a0a3d;
+  --text-color: #ffffff;
+  --accent-blue: #2a2aef;
+  --hover-blue: #2024ff;
+  --input-bg: #1a1a4a;
+  --error-color: #ff4747;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  background-color: var(--bg-color, #050533);
+  color: var(--text-color, #ffffff);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column; /* Força os elementos a ficarem um embaixo do outro */
 }
 
 /* ==========================================
    2. BARRA SUPERIOR (NAVBAR) SIMPLIFICADA
    ========================================== */
 .navbar {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    padding: 15px 5%;
-    background-color: var(--bg-color);
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 15px 5%;
+  background-color: var(--bg-color);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .logo-link {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    gap: 15px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  gap: 15px;
 }
 
-.logo-unico { height: 50px; border-radius: 12px; transition: transform 0.3s; }
-.logo-nome { height: 25px; border-radius: 8px; transition: transform 0.3s; }
-.logo-link:hover img { transform: scale(1.05); }
+.logo-unico {
+  height: 50px;
+  border-radius: 12px;
+  transition: transform 0.3s;
+}
+.logo-nome {
+  height: 25px;
+  border-radius: 8px;
+  transition: transform 0.3s;
+}
+.logo-link:hover img {
+  transform: scale(1.05);
+}
 
 /* ==========================================
    3. CONTAINER DE LOGIN / CADASTRO
    ========================================== */
 .login-wrapper {
-    display: flex;
-    flex-direction: column; 
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    padding: 100px 20px 20px; /* Espaço para a navbar */
+  flex: 1; /* Faz o wrapper empurrar o fundo e ocupar o restante da tela */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 40px 20px;
 }
 
 .login-container {
-    background-color: var(--box-bg);
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    width: 100%;
-    max-width: 450px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--box-bg);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 450px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.login-container h1 { font-size: 2rem; margin-bottom: 10px; }
-.login-container p { color: #a5b1c2; margin-bottom: 30px; font-size: 0.95rem; }
+.login-container h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+.login-container p {
+  color: #a5b1c2;
+  margin-bottom: 30px;
+  font-size: 0.95rem;
+}
 
 /* Abas (Entrar / Criar Conta) */
 .tabs {
-    display: flex;
-    margin-bottom: 30px;
-    background-color: var(--input-bg);
-    border-radius: 10px;
-    overflow: hidden;
+  display: flex;
+  margin-bottom: 30px;
+  background-color: var(--input-bg);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .tab-btn {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    color: var(--text-color);
+  flex: 1;
+  padding: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  color: var(--text-color);
 }
 
 .tab-btn.active {
-    background-color: var(--accent-blue);
+  background-color: var(--accent-blue);
 }
 
 .tab-btn.inactive {
-    background-color: transparent;
-    opacity: 0.7;
+  background-color: transparent;
+  opacity: 0.7;
 }
 
-.tab-btn.inactive:hover { opacity: 1; background-color: rgba(42, 42, 239, 0.2); }
+.tab-btn.inactive:hover {
+  opacity: 1;
+  background-color: rgba(42, 42, 239, 0.2);
+}
 
 /* Inputs do Formulário */
 .input-group {
-    position: relative;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    background-color: var(--input-bg);
-    border-radius: 8px;
-    border: 1px solid transparent;
-    transition: border-color 0.3s ease;
+  position: relative;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  background-color: var(--input-bg);
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease;
 }
 
-.input-group:focus-within { border-color: var(--accent-blue); }
+.input-group:focus-within {
+  border-color: var(--accent-blue);
+}
 
 .input-group i {
-    position: absolute;
-    left: 15px;
-    color: #a5b1c2;
-    font-size: 1.1rem;
+  position: absolute;
+  left: 15px;
+  color: #a5b1c2;
+  font-size: 1.1rem;
 }
 
 .input-group input {
-    width: 100%;
-    padding: 15px 45px;
-    background: transparent;
-    border: none;
-    color: var(--text-color);
-    font-size: 1rem;
-    outline: none;
+  width: 100%;
+  padding: 15px 45px;
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  font-size: 1rem;
+  outline: none;
 }
 
-.input-group input::placeholder { color: rgba(255, 255, 255, 0.5); }
+.input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
 
 .eye-icon {
-    position: absolute;
-    right: 15px;
-    left: auto !important;
-    cursor: pointer;
-    transition: color 0.3s;
+  position: absolute;
+  right: 15px;
+  left: auto !important;
+  cursor: pointer;
+  transition: color 0.3s;
 }
 
-.eye-icon:hover { color: var(--text-color); }
+.eye-icon:hover {
+  color: var(--text-color);
+}
 
 /* Opções de Login e Dicas de Senha */
 .login-options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  font-size: 0.9rem;
 }
 
-.remember-me { display: flex; align-items: center; gap: 8px; }
-.forgot-link { color: var(--accent-blue); text-decoration: none; transition: color 0.3s; }
-.forgot-link:hover { color: var(--hover-blue); text-decoration: underline; }
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.forgot-link {
+  color: var(--accent-blue);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.forgot-link:hover {
+  color: var(--hover-blue);
+  text-decoration: underline;
+}
 
-.password-tips { background: rgba(0, 0, 0, 0.2); padding: 15px; border-radius: 8px; margin-bottom: 25px; }
-.password-tips h3 { font-size: 0.9rem; margin-bottom: 10px; color: #a5b1c2; }
-.password-tips ul { list-style: none; padding: 0; }
-.password-tips li { font-size: 0.85rem; margin-bottom: 5px; padding-left: 15px; position: relative; color: #ccc; }
-.password-tips li::before { content: "•"; position: absolute; left: 0; color: var(--accent-blue); }
+.password-tips {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+}
+.password-tips h3 {
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  color: #a5b1c2;
+}
+.password-tips ul {
+  list-style: none;
+  padding: 0;
+}
+.password-tips li {
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+  padding-left: 15px;
+  position: relative;
+  color: #ccc;
+}
+.password-tips li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--accent-blue);
+}
 
 /* Botão de Acesso Principal */
 .btn-access {
-    width: 100%;
-    background-color: var(--accent-blue);
-    color: var(--text-color);
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+  width: 100%;
+  background-color: var(--accent-blue);
+  color: var(--text-color);
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    transform 0.2s;
 }
 
 .btn-access:hover {
-    background-color: var(--hover-blue);
-    transform: translateY(-2px);
+  background-color: var(--hover-blue);
+  transform: translateY(-2px);
 }
 
-.hidden { display: none !important; }
+.hidden {
+  display: none !important;
+}
 
 /* Remove ícone nativo do Edge */
-input::-ms-reveal, input::-ms-clear { display: none !important; }
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+}

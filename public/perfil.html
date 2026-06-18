@@ -1,94 +1,163 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FrameStore | Seu Perfil</title>
-    <link rel="stylesheet" href="css/perfil.css"> 
-    <link rel="stylesheet" href="css/homepage.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="profile-page">
-
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/perfil.css" />
+    <link rel="stylesheet" href="css/header.css" />
+    <link rel="stylesheet" href="css/homepage.css" />
+  </head>
+  <body class="profile-page">
     <header class="navbar">
-        <div class="logo-container">
-            <a href="homepage.html" class="logo-link">
-                <img src="/src/templates/assets/cover/site_logo.png" alt="Logo Unico" class="logo-unico">
-                <img src="/src/templates/assets/cover/site_nome.png" alt="Logo Nome" class="logo-nome">
-            </a>
-        </div>
+      <div class="logo-container">
+        <a href="homepage.html" class="logo-link">
+          <img
+            src="img/site_logo.png"
+            alt="Logo"
+            class="logo-unico"
+          />
+          <img
+            src="img/site_nome.png"
+            alt="Nome do Site"
+            class="logo-nome"
+          />
+        </a>
+      </div>
     </header>
 
     <div class="main-container">
-        <aside class="sidebar-menu" id="sidebar">
-            <div class="toggle-container">
-                <button class="menu-toggle" onclick="toggleMenu()">
-                    <i class="fas fa-bars"></i>
-                </button>
+      <aside class="sidebar-menu" id="sidebar">
+        <div class="toggle-container">
+          <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+        <ul>
+          <li>
+            <a href="homepage.html"
+              ><i class="fas fa-home"></i><span>Início</span></a
+            >
+          </li>
+          <li>
+            <a href="#"><i class="fas fa-tag"></i><span>Ofertas</span></a>
+          </li>
+          <li>
+            <a href="#"><i class="fas fa-desktop"></i><span>PC</span></a>
+          </li>
+          <li>
+            <a href="#"
+              ><i class="fab fa-playstation"></i><span>Playstation</span></a
+            >
+          </li>
+          <li>
+            <a href="#"><i class="fab fa-xbox"></i><span>Xbox</span></a>
+          </li>
+        </ul>
+      </aside>
+
+      <main class="profile-content">
+        <section class="profile-header">
+          <div class="user-info-section">
+            <div class="profile-avatar-container">
+              <img
+                src="img/site_logo.png"
+                alt="Avatar do Usuário"
+                class="profile-avatar"
+              />
             </div>
-            <ul>
-                <li><a href="homepage.html"><i class="fas fa-home"></i><span>Início</span></a></li>
-                <li><a href="#"><i class="fas fa-tag"></i><span>Ofertas</span></a></li>
-                <li><a href="#"><i class="fas fa-desktop"></i><span>PC</span></a></li>
-                <li><a href="#"><i class="fab fa-playstation"></i><span>Playstation</span></a></li>
-                <li><a href="#"><i class="fab fa-xbox"></i><span>Xbox</span></a></li>
-            </ul>
-        </aside>
+            <div class="user-text-info">
+              <h1 id="nome-usuario">Carregando...</h1>
+              <p id="email-usuario">
+                <i class="fas fa-user"></i> carregando...
+              </p>
+            </div>
+          </div>
+        </section>
 
-        <main class="profile-content">
-            <section class="profile-header">
-                <div class="user-info-section">
-                    <div class="profile-avatar-container">
-                        <img src="../src/templates/assets/cover/site_logo.png" alt="Avatar do Usuário" class="profile-avatar">
-                    </div>
-                    <div class="user-text-info">
-                        <h1 id="nome-usuario">Carregando...</h1>
-                        <p id="email-usuario"><i class="fas fa-user"></i> carregando...</p>
-                    </div>
-                </div>
-            </section>
+        <section class="profile-tabs">
+          <button class="tab-profile active" onclick="switchTab('biblioteca')">
+            Biblioteca
+          </button>
+          <button class="tab-profile inactive" onclick="switchTab('carteira')">
+            Carteira
+          </button>
+          <button class="tab-profile inactive" onclick="switchTab('conta')">
+            Minha Conta
+          </button>
+        </section>
 
-            <section class="profile-tabs">
-                <button class="tab-profile active" onclick="switchTab('biblioteca')">Biblioteca</button>
-                <button class="tab-profile inactive" onclick="switchTab('carteira')">Carteira</button>
-                <button class="tab-profile inactive" onclick="switchTab('conta')">Minha Conta</button>
-            </section>
+        <section id="tab-biblioteca" class="tab-content active">
+          <h2>Meus Jogos</h2>
+          <div class="games-grid" id="biblioteca-container">
+            <p>Carregando biblioteca...</p>
+          </div>
+        </section>
 
-            <section id="tab-biblioteca" class="tab-content active">
-                <h2>Meus Jogos</h2>
-                <div class="games-grid" id="biblioteca-container">
-                    <p>Carregando biblioteca...</p>
-                </div>
-            </section>
+        <section id="tab-carteira" class="tab-content">
+          <div class="wallet-info">
+            <div class="wallet-card">
+              <h3>Saldo Disponível</h3>
+              <p id="saldo-usuario">R$ 0,00</p>
+            </div>
+            <div class="wallet-card">
+              <h3>Pontos Acumulados</h3>
+              <p id="pontos-usuario" style="color: #feca57">
+                0 <i class="fas fa-star" style="font-size: 1.2rem"></i>
+              </p>
+            </div>
+          </div>
 
-            <section id="tab-carteira" class="tab-content">
-                <div class="wallet-info">
-                    <div class="wallet-card">
-                        <h3>Saldo Disponível</h3>
-                        <p id="saldo-usuario">R$ 0,00</p>
-                    </div>
-                    <div class="wallet-card">
-                        <h3>Pontos Acumulados</h3>
-                        <p id="pontos-usuario" style="color: #feca57;">0 <i class="fas fa-star" style="font-size: 1.2rem;"></i></p>
-                    </div>
+          <h2>Meus Cupons</h2>
+          <ul class="coupon-list" id="cupons-container">
+            <p>Carregando cupons...</p>
+          </ul>
+        </section>
+
+        <section id="tab-conta" class="tab-content">
+          <h2>Configurações da Conta</h2>
+          <br />
+          <div id="admin-panel-container" style="display: none">
+            <button
+              class="btn-admin"
+              onclick="window.location.href = 'admin.html'"
+            >
+              <i class="fas fa-cogs"></i> Painel Administrativo
+            </button>
+          </div>
+          <button class="btn-logout" onclick="fazerLogout()">
+            <i class="fas fa-sign-out-alt"></i> Sair da Conta
+          </button>
+        </section>
+
+        <div id="library-modal" class="modal-overlay" style="display: none;">
+          <div class="modal-content">
+            <span class="close-modal" onclick="fecharModalJogo()">&times;</span>
+            <div class="modal-body">
+              <img id="modal-game-cover" src="" alt="Capa do Jogo">
+              <div class="modal-info">
+                <h2 id="modal-game-title">Título</h2>
+                <p>Adquirido em: <span id="modal-game-date"></span></p>
+                
+                <div class="code-box">
+                  <p>Chave de Ativação:</p>
+                  <strong id="modal-game-code">XX-XXXX-XXX-X</strong>
                 </div>
                 
-                <h2>Meus Cupons</h2>
-                <ul class="coupon-list" id="cupons-container">
-                    <p>Carregando cupons...</p>
-                </ul>
-            </section>
-
-            <section id="tab-conta" class="tab-content">
-                <h2>Configurações da Conta</h2>
-                <br>
-                <div id="admin-panel-container" style="display: none;">
-                    <button class="btn-admin" onclick="window.location.href='admin.html'"><i class="fas fa-cogs"></i> Painel Administrativo</button>
-                </div>
-                <button class="btn-logout" onclick="fazerLogout()"><i class="fas fa-sign-out-alt"></i> Sair da Conta</button>
-            </section>
-        </main>
+                <button class="btn-play">
+                  <i class="fas fa-play"></i> Resgatar código de ativação
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
 
     <script src="js/perfil.js"></script>
-</body>
+  </body>
 </html>

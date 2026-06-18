@@ -1,5 +1,5 @@
-PORT=
-DB_HOST=
+PORT=3000
+DB_HOST=localhost
 DB_USER=
 DB_PASSWORD=
-DB_NAME=
+DB_NAME=framestore

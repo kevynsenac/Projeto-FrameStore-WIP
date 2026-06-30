@@ -21,40 +21,6 @@ Nosso sistema foi desenhado para recompensar o usuário continuamente através d
 
 ---
 
-## 💻 Tutorial: Como rodar o projeto localmente
-
-Para testar ou desenvolver na FrameStore, siga os passos abaixo:
-
-1. **Pré-requisitos:** Certifique-se de ter o [Node.js](https://nodejs.org/) e um servidor de banco de dados SQL (MySQL) instalados.
-2. **Instalação das dependências:** Abra o terminal na pasta raiz do projeto e execute:
-   ```bash
-   npm install
-   ```
-
-
-3. **Configuração do Ambiente:** - Crie um arquivo `.env` na raiz do projeto.
-
-- Configure as variáveis de conexão com o banco de dados (ex: `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`, `PORT`).
-
-4. **Banco de Dados:** Execute o script SQL de criação das tabelas no seu banco de dados para estruturar o sistema (detalhes na seção de Modelagem abaixo).
-5. **Carga Inicial (Seed):** Para popular o banco de dados com o catálogo de jogos iniciais, execute o script de seed na raiz do projeto:
-
-```bash
-node src/seed.js
-
-```
-
-6. **Iniciando o Servidor:**
-
-```bash
-node src/server.js
-
-```
-
-7. **Acesso:** Abra o navegador e acesse `http://localhost:3000` (ou a porta configurada no seu `.env`). O sistema redirecionará para a tela de Login/Cadastro.
-
----
-
 ## 🏗️ 1. Arquitetura e Tecnologias
 
 - **Frontend:** HTML, CSS, JavaScript.

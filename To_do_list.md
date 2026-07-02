@@ -1,0 +1,5 @@
+- Implementar descrição e requisitos nas tables dos jogos e nas suas páginas
+- Implementar roda de pontos
+- Remover alerts e colocar os avisos nas páginas
+- Fazer da homepage a página principal (caso logado) e se não estiver logado, expulsa pro login
+- Ao criar cadastro, já fazer login

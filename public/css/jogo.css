@@ -1,15 +1,74 @@
 /* ==========================================
+   HEADER / NAVBAR (Integrado do header.css)
+   ========================================== */
+.navbar {
+  background-color: #0f0f1e;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  height: 70px;
+  min-height: 70px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-unico {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.logo-nome {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 10px 15px;
+    height: 60px;
+  }
+
+  .logo-unico {
+    height: 42px;
+  }
+  .logo-nome {
+    height: 26px;
+  }
+}
+
+/* Garante que imagens não quebrem o layout */
+.logo-container img {
+  max-height: 100%;
+  width: auto;
+}
+
+/* ==========================================
    PÁGINA DO JOGO (DETALHES E COMPRA)
    ========================================== */
 
 /* Container Principal */
 .product-page {
   max-width: 1200px;
-  margin: 100px auto 40px; /* 100px para evitar sobreposição com a navbar do homepage.css */
+  margin: 20px auto 40px; /* Reduzido de 100px para 20px devido ao header sticky */
   padding: 0 20px;
   font-family: "Inter", sans-serif;
   color: #ffffff;
-  min-height: 60vh; /* Mantém a altura da página para o spinner não ficar colado no topo */
+  min-height: 60vh;
 }
 
 /* Animação suave para quando o jogo terminar de carregar */
@@ -139,7 +198,7 @@
    CARD DE COMPRA (LATERAL DIREITA)
    ========================================== */
 .purchase-card {
-  background-color: #1a1a2e; /* Mantendo o padrão de caixas secundárias */
+  background-color: #1a1a2e;
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
@@ -155,7 +214,7 @@
 .price-section .value {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #00ff88; /* Verde destaque para dinheiro */
+  color: #00ff88;
   display: block;
 }
 
@@ -332,7 +391,7 @@
    ========================================== */
 @media (max-width: 900px) {
   .game-details-container {
-    grid-template-columns: 1fr; /* Muda para uma coluna em telas menores */
+    grid-template-columns: 1fr;
   }
 
   .purchase-card {

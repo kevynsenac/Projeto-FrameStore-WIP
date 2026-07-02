@@ -10,7 +10,6 @@
     />
     <link rel="stylesheet" href="css/homepage.css" />
     <link rel="stylesheet" href="css/jogo.css" />
-    <link rel="stylesheet" href="css/header.css" />
   </head>
   <body>
     <header class="navbar">
@@ -31,9 +30,11 @@
         </a>
         <a href="carrinho.html" class="action-badge cart-badge">
           <i class="fas fa-shopping-cart"></i> <span>Carrinho</span>
-          <span id="cart-count" class="cart-count" style="display: none;">0</span>
+          <span id="cart-count" class="cart-count" style="display: none"
+            >0</span
+          >
         </a>
-        <div id="auth-container" style="display: inline-block;">
+        <div id="auth-container" style="display: inline-block">
           <a href="login.html">
             <button class="btn-entrar">Entrar</button>
           </a>
@@ -77,7 +78,7 @@
         <p>Buscando detalhes do jogo...</p>
       </div>
 
-      <div id="game-content" style="display: none;">
+      <div id="game-content" style="display: none">
         <h1 class="game-title"></h1>
 
         <div class="game-details-container">
@@ -109,7 +110,10 @@
             <p class="activation-msg">Ativado através de Chave de ativação</p>
 
             <div class="buy-wishlist-buttons">
-              <button class="btn-purchase-green" onclick="adicionarAoCarrinho()">
+              <button
+                class="btn-purchase-green"
+                onclick="adicionarAoCarrinho()"
+              >
                 <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
               </button>
             </div>
@@ -117,12 +121,33 @@
 
           <div id="cart-modal" class="modal-cart">
             <div class="modal-content">
-              <span class="close-modal" onclick="fecharCarrinho()">&times;</span>
+              <span class="close-modal" onclick="fecharCarrinho()"
+                >&times;</span
+              >
               <h2>Adicionado ao Carrinho!</h2>
               <div id="cart-items-list"></div>
-              <div class="cart-footer" style="display: flex; gap: 10px; justify-content: space-between; margin-top: 20px;">
-                <button class="btn-entrar" style="background: #444; color: white;" onclick="window.location.href='homepage.html'">Continuar Comprando</button>
-                <button class="btn-checkout" onclick="window.location.href='carrinho.html'">Ir para o Pagamento</button>
+              <div
+                class="cart-footer"
+                style="
+                  display: flex;
+                  gap: 10px;
+                  justify-content: space-between;
+                  margin-top: 20px;
+                "
+              >
+                <button
+                  class="btn-entrar"
+                  style="background: #444; color: white"
+                  onclick="window.location.href = 'homepage.html'"
+                >
+                  Continuar Comprando
+                </button>
+                <button
+                  class="btn-checkout"
+                  onclick="window.location.href = 'carrinho.html'"
+                >
+                  Ir para o Pagamento
+                </button>
               </div>
             </div>
           </div>

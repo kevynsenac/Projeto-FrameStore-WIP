@@ -10,19 +10,12 @@ const db = require("./db");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configurações iniciais
+// ==========================================
+// 1. CONFIGURAÇÕES E MIDDLEWARES GLOBAIS
+// ==========================================
 app.use(cors());
 app.use(express.json());
-
-// =======================
-// SERVIR ARQUIVOS ESTÁTICOS (Pasta public)
-// =======================
 app.use(express.static(path.join(__dirname, "..", "public")));
-
-// Rota raiz → Página inicial (login.html)
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "public", "login.html"));
-});
 
 // Configuração do Multer para uploads de imagens em memória (LONGBLOB)
 const storage = multer.memoryStorage();
@@ -35,7 +28,7 @@ function formatarImagem(buffer) {
 }
 
 // ==========================================
-// MIDDLEWARE DE SEGURANÇA (ADMIN)
+// 2. MIDDLEWARES DE SEGURANÇA
 // ==========================================
 async function verificarAdmin(req, res, next) {
   const userId = req.headers["x-user-id"] || req.body.id_usuario_admin;
@@ -66,9 +59,94 @@ async function verificarAdmin(req, res, next) {
 }
 
 // ==========================================
-// 1. ROTAS PÚBLICAS DE JOGOS
+// 3. ROTA RAIZ (FRONTEND)
 // ==========================================
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "public", "login.html"));
+});
 
+// ==========================================
+// 4. ROTAS DE AUTENTICAÇÃO E USUÁRIOS
+// ==========================================
+app.post("/api/register", async (req, res) => {
+  const { email, senha, nome } = req.body;
+  try {
+    const query =
+      "INSERT INTO USUARIOS (nome, email, senha, saldo, pontos, adm) VALUES (?, ?, ?, 0, 0, 0)";
+    const [result] = await db.query(query, [nome, email, senha]);
+
+    res
+      .status(201)
+      .json({ message: "Conta criada com sucesso!", id: result.insertId });
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.status(400).json({ error: "Este e-mail já está em uso." });
+    }
+    res.status(500).json({ error: "Erro interno ao criar conta." });
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  const { email, senha } = req.body;
+  try {
+    const [rows] = await db.query(
+      "SELECT id, nome, email, saldo, pontos, adm FROM USUARIOS WHERE email = ? AND senha = ?",
+      [email, senha],
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({ error: "Credenciais inválidas." });
+    }
+
+    res.json({ message: "Login efetuado com sucesso!", user: rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao processar o login." });
+  }
+});
+
+app.get("/api/usuarios/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await db.query(
+      "SELECT id, nome, email, saldo, pontos, adm FROM USUARIOS WHERE id = ?",
+      [id],
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Usuário não encontrado." });
+    }
+
+    res.json(rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar dados do usuário." });
+  }
+});
+
+app.get("/api/usuarios/:id/biblioteca", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const query = `
+            SELECT j.id, j.titulo, j.cover, b.data_compra 
+            FROM BIBLIOTECA b
+            JOIN JOGOS j ON b.id_jogo = j.id
+            WHERE b.id_usuario = ?
+        `;
+    const [jogos] = await db.query(query, [id]);
+
+    const jogosFormatados = jogos.map((j) => ({
+      ...j,
+      cover: formatarImagem(j.cover),
+    }));
+
+    res.json(jogosFormatados);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar biblioteca do usuário." });
+  }
+});
+
+// ==========================================
+// 5. ROTAS DE CATÁLOGO (JOGOS PÚBLICOS)
+// ==========================================
 app.get("/api/jogos", async (req, res) => {
   try {
     const [jogos] = await db.query(
@@ -111,71 +189,8 @@ app.get("/api/jogos/:id", async (req, res) => {
 });
 
 // ==========================================
-// 2. AUTENTICAÇÃO E PERFIL
+// 6. ROTAS DE CARRINHO E CHECKOUT
 // ==========================================
-
-app.post("/api/register", async (req, res) => {
-  const { email, senha, nome } = req.body;
-  try {
-    const query =
-      "INSERT INTO USUARIOS (nome, email, senha, saldo, pontos, adm) VALUES (?, ?, ?, 0, 0, 0)";
-    const [result] = await db.query(query, [nome, email, senha]);
-
-    res
-      .status(201)
-      .json({ message: "Conta criada com sucesso!", id: result.insertId });
-  } catch (error) {
-    if (error.code === "ER_DUP_ENTRY") {
-      return res.status(400).json({ error: "Este e-mail já está em uso." });
-    }
-    res.status(500).json({ error: "Erro interno ao criar conta." });
-  }
-});
-
-app.post("/api/login", async (req, res) => {
-  const { email, senha } = req.body;
-  try {
-    const [rows] = await db.query(
-      "SELECT id, nome, email, saldo, pontos, adm FROM USUARIOS WHERE email = ? AND senha = ?",
-      [email, senha],
-    );
-
-    if (rows.length === 0) {
-      return res.status(401).json({ error: "Credenciais inválidas." });
-    }
-
-    res.json({ message: "Login efetuado com sucesso!", user: rows[0] });
-  } catch (error) {
-    res.status(500).json({ error: "Erro ao processar o login." });
-  }
-});
-
-app.get("/api/usuarios/:id/biblioteca", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const query = `
-            SELECT j.id, j.titulo, j.cover, b.data_compra 
-            FROM BIBLIOTECA b
-            JOIN JOGOS j ON b.id_jogo = j.id
-            WHERE b.id_usuario = ?
-        `;
-    const [jogos] = await db.query(query, [id]);
-
-    const jogosFormatados = jogos.map((j) => ({
-      ...j,
-      cover: formatarImagem(j.cover),
-    }));
-
-    res.json(jogosFormatados);
-  } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar biblioteca do usuário." });
-  }
-});
-
-// ==========================================
-// 3. GERENCIAMENTO DO CARRINHO
-// ==========================================
-
 app.get("/api/carrinho/:id_usuario", async (req, res) => {
   const { id_usuario } = req.params;
   try {
@@ -227,9 +242,6 @@ app.delete("/api/carrinho", async (req, res) => {
   }
 });
 
-// ==========================================
-// 4. CHECKOUT E SISTEMA DE COMPRAS
-// ==========================================
 app.post("/api/checkout", async (req, res) => {
   const { id_usuario, id_cupom } = req.body;
   const connection = await db.getConnection();
@@ -316,9 +328,8 @@ app.post("/api/checkout", async (req, res) => {
 });
 
 // ==========================================
-// 5. SISTEMA DE PONTOS E CUPONS
+// 7. ROTAS DE PONTOS E CUPONS
 // ==========================================
-
 app.get("/api/cupons", async (req, res) => {
   try {
     const [cupons] = await db.query("SELECT * FROM CUPONS");
@@ -392,9 +403,10 @@ app.post("/api/cupons/resgatar", async (req, res) => {
 });
 
 // ==========================================
-// 6. PAINEL ADMINISTRATIVO
+// 8. ROTAS DE ADMINISTRAÇÃO (PROTEGIDAS)
 // ==========================================
 
+// --- ADMIN: JOGOS ---
 app.post(
   "/api/admin/jogos",
   verificarAdmin,
@@ -501,10 +513,12 @@ app.delete("/api/admin/jogos/:id", verificarAdmin, async (req, res) => {
   }
 });
 
+// --- ADMIN: USUÁRIOS ---
 app.get("/api/admin/usuarios", verificarAdmin, async (req, res) => {
   try {
+    // Adicionamos 'senha' na query SELECT abaixo
     const [usuarios] = await db.query(
-      "SELECT id, nome, email, saldo, pontos, adm FROM USUARIOS",
+      "SELECT id, nome, email, senha, saldo, pontos, adm FROM USUARIOS",
     );
     res.json(usuarios);
   } catch (error) {
@@ -514,19 +528,24 @@ app.get("/api/admin/usuarios", verificarAdmin, async (req, res) => {
 
 app.put("/api/admin/usuarios/:id", verificarAdmin, async (req, res) => {
   const { id } = req.params;
-  const { saldo, pontos } = req.body;
+  // Agora desestruturando todos os dados enviados do Modal do Admin
+  const { nome, email, saldo, pontos, adm } = req.body;
+  
   try {
-    await db.query("UPDATE USUARIOS SET saldo = ?, pontos = ? WHERE id = ?", [
-      saldo,
-      pontos,
-      id,
-    ]);
-    res.json({ message: "Carteira do usuário modificada com sucesso!" });
+    await db.query(
+      "UPDATE USUARIOS SET nome = ?, email = ?, saldo = ?, pontos = ?, adm = ? WHERE id = ?", 
+      [nome, email, saldo, pontos, adm, id]
+    );
+    res.json({ message: "Dados do usuário modificados com sucesso!" });
   } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.status(400).json({ error: "Este e-mail já está sendo utilizado por outro usuário." });
+    }
     res.status(500).json({ error: "Erro ao modificar dados do usuário." });
   }
 });
 
+// --- ADMIN: CUPONS ---
 app.post("/api/admin/cupons", verificarAdmin, async (req, res) => {
   const { nome, tipo, desconto, custo_pontos } = req.body;
   try {
@@ -564,25 +583,21 @@ app.delete("/api/admin/cupons/:id", verificarAdmin, async (req, res) => {
   }
 });
 
-app.get("/api/usuarios/:id", async (req, res) => {
+app.delete("/api/admin/usuarios/:id", verificarAdmin, async (req, res) => {
   const { id } = req.params;
   try {
-    const [rows] = await db.query(
-      "SELECT id, nome, email, saldo, pontos, adm FROM USUARIOS WHERE id = ?",
-      [id],
-    );
-
-    if (rows.length === 0) {
-      return res.status(404).json({ error: "Usuário não encontrado." });
-    }
-
-    res.json(rows[0]);
+    // Como você configurou "ON DELETE CASCADE" no banco de dados,
+    // excluir o usuário aqui irá automaticamente limpar os cupons, jogos e carrinho dele!
+    await db.query("DELETE FROM USUARIOS WHERE id = ?", [id]);
+    res.json({ message: "Usuário removido com sucesso." });
   } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar dados do usuário." });
+    res.status(500).json({ error: "Erro ao remover o usuário." });
   }
 });
 
-// Inicialização do Servidor
+// ==========================================
+// 9. INICIALIZAÇÃO DO SERVIDOR
+// ==========================================
 app.listen(port, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${port}`);
 });

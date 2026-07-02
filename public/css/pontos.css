@@ -1,29 +1,185 @@
 /* ==========================================
-   LOJA DE RECOMPENSAS (PONTOS)
+   HEADER / NAVBAR (Integrado do header.css)
    ========================================== */
-
-.points-container {
-  max-width: 1200px;
-  margin: 100px auto 40px; /* 100px para evitar sobreposição da Navbar fixa */
-  padding: 20px;
-  color: #ffffff;
-  font-family: "Inter", sans-serif;
+.navbar {
+  background-color: #0f0f1e;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  height: 70px;
+  min-height: 70px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-/* Painel de Cabeçalho (Header da Loja) */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-unico {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.logo-nome {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Badge de Saldo */
+.balance-badge {
+  background: rgba(0, 255, 136, 0.1);
+  color: #00ff88;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  cursor: default;
+}
+
+.balance-badge:hover {
+  background: rgba(0, 255, 136, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 255, 136, 0.2);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 10px 15px;
+    height: 60px;
+  }
+  .logo-unico {
+    height: 42px;
+  }
+  .logo-nome {
+    height: 26px;
+  }
+}
+
+/* ==========================================
+   LOJA DE RECOMPENSAS (PONTOS) - WRAPPER
+   ========================================== */
+.points-wrapper {
+  max-width: 1200px;
+  margin: 20px auto 40px; /* Alinhado com o layout sticky */
+  padding: 0 20px;
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+  min-height: 60vh;
+}
+
+/* ==========================================
+   SEÇÃO EXPLICATIVA (COMO FUNCIONA)
+   ========================================== */
+.points-explainer {
+  margin-bottom: 40px;
+  animation: fadeInContent 0.5s ease-in-out;
+}
+
+.points-explainer h2 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #ffffff;
+}
+
+.explainer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.explainer-card {
+  background-color: #1a1a2e;
+  padding: 30px 20px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid #333355;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.explainer-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(42, 42, 239, 0.3);
+  border-color: #2a2aef;
+}
+
+.explainer-card i {
+  font-size: 3rem;
+  color: #2a2aef;
+  margin-bottom: 20px;
+}
+
+.explainer-card h3 {
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  color: #ffffff;
+}
+
+.explainer-card p {
+  color: #a5b1c2;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Card Especial: Em Breve (Roleta) */
+.feature-soon {
+  border-color: #ffaa00;
+  opacity: 0.85;
+}
+
+.feature-soon i {
+  color: #ffaa00;
+}
+
+.feature-soon:hover {
+  box-shadow: 0 12px 25px rgba(255, 170, 0, 0.2);
+  border-color: #ffaa00;
+}
+
+.soon-badge {
+  position: absolute;
+  top: 15px;
+  right: -30px;
+  background: linear-gradient(135deg, #ffaa00, #ff5500);
+  color: white;
+  padding: 5px 30px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transform: rotate(45deg);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================
+   PAINEL DE CABEÇALHO DA LOJA
+   ========================================== */
 .points-header {
-  background-color: #1a1a2e; /* Padrão de caixas secundárias */
+  background-color: #1a1a2e;
   padding: 40px 30px;
   border-radius: 12px;
   text-align: center;
   margin-bottom: 40px;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
   border: 1px solid #333355;
+  animation: fadeInContent 0.7s ease-in-out;
 }
 
 .points-header h1 {
   font-size: 2.8rem;
-  color: #feca57; /* Dourado/Amarelo característico da loja de pontos */
+  color: #feca57;
   margin-bottom: 15px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -40,7 +196,27 @@
   text-shadow: 0 0 15px rgba(254, 202, 87, 0.3);
 }
 
-/* Grid de Recompensas */
+/* ==========================================
+   LOADING E ANIMAÇÃO
+   ========================================== */
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading-container {
+  min-height: 30vh;
+}
+
+/* ==========================================
+   GRID DE RECOMPENSAS (CUPONS)
+   ========================================== */
 .coupons-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -53,7 +229,7 @@
   padding: 25px 20px;
   border-radius: 12px;
   text-align: center;
-  border-top: 5px solid #feca57; /* Borda superior dourada de destaque */
+  border-top: 5px solid #feca57;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -65,7 +241,7 @@
 
 .coupon-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 20px rgba(254, 202, 87, 0.15); /* Brilho dourado ao passar o mouse */
+  box-shadow: 0 12px 20px rgba(254, 202, 87, 0.15);
 }
 
 .coupon-card h3 {
@@ -76,7 +252,7 @@
 
 .coupon-card .discount {
   font-size: 2.5rem;
-  color: #00ff88; /* Verde neon indicando dinheiro/economia */
+  color: #00ff88;
   font-weight: bold;
   margin: 20px 0;
   text-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
@@ -109,31 +285,14 @@
 }
 
 .btn-redeem:hover:not(:disabled) {
-  background-color: #ff9f43; /* Tom ligeiramente mais escuro no hover */
+  background-color: #ff9f43;
   transform: scale(1.03);
 }
 
 .btn-redeem:disabled {
-  background-color: #4b4b6b; /* Fundo cinza/azulado escuro para botão inativo */
+  background-color: #4b4b6b;
   color: #888888;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
-}
-
-/* Estilização do contador de pontos na Navbar Superior (criada no pontos.html) */
-.user-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(254, 202, 87, 0.1);
-  padding: 8px 15px;
-  border-radius: 20px;
-  border: 1px solid rgba(254, 202, 87, 0.3);
-  transition: background 0.3s ease;
-  cursor: default;
-}
-
-.user-actions:hover {
-  background: rgba(254, 202, 87, 0.2);
 }

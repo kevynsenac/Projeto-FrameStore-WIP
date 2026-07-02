@@ -10,56 +10,123 @@
     />
     <link rel="stylesheet" href="css/homepage.css" />
     <link rel="stylesheet" href="css/pontos.css" />
-    <link rel="stylesheet" href="css/header.css" />
   </head>
   <body>
     <header class="navbar">
       <div class="logo-container">
+        <div class="dashboard-menu" onclick="toggleMenu()">
+          <span></span><span></span><span></span>
+        </div>
         <a href="homepage.html" class="logo-link">
-          <img
-            src="img/site_logo.png"
-            alt="Logo"
-            class="logo-unico"
-          />
-          <img
-            src="img/site_nome.png"
-            alt="Nome do Site"
-            class="logo-nome"
-          />
+          <img src="img/site_logo.png" alt="Logo" class="logo-unico" />
+          <img src="img/site_nome.png" alt="Nome do Site" class="logo-nome" />
         </a>
       </div>
-      <div
-        class="user-actions"
-        style="
-          color: white;
-          font-weight: bold;
-          font-size: 1.2rem;
-          margin-right: 20px;
-        "
-      >
-        <i class="fas fa-star" style="color: #feca57"></i>
-        <span id="nav-pontos">0</span>
+
+      <div class="user-actions">
+        <div class="action-badge points-badge">
+          <i class="fas fa-star"></i> <span id="nav-pontos">0</span> Pts
+        </div>
+        <div class="action-badge balance-badge">
+          <i class="fas fa-wallet"></i> <span id="nav-saldo">R$ 0,00</span>
+        </div>
+        <a href="carrinho.html" class="action-badge cart-badge">
+          <i class="fas fa-shopping-cart"></i> <span>Carrinho</span>
+          <span id="cart-count" class="cart-count" style="display: none"
+            >0</span
+          >
+        </a>
+        <div id="auth-container" style="display: inline-block">
+          <a href="login.html">
+            <button class="btn-entrar">Entrar</button>
+          </a>
+        </div>
       </div>
     </header>
 
-    <main class="points-container">
+    <aside class="sidebar-menu" id="sidebar">
+      <div class="sidebar-header">
+        <div class="dashboard-menu" onclick="toggleMenu()">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+      <ul>
+        <li>
+          <a href="homepage.html"><i class="fas fa-home"></i> Início</a>
+        </li>
+        <li>
+          <a href="#"><i class="fas fa-tag"></i> Ofertas</a>
+        </li>
+        <li>
+          <a href="#"><i class="fas fa-desktop"></i> PC</a>
+        </li>
+      </ul>
+    </aside>
+
+    <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+
+    <main class="points-wrapper">
+      <section class="points-explainer">
+        <h2>Como funciona a FrameStore Points?</h2>
+        <div class="explainer-grid">
+          <div class="explainer-card">
+            <i class="fas fa-gamepad"></i>
+            <h3>Compre e Ganhe</h3>
+            <p>
+              Ao finalizar qualquer compra na loja, uma porcentagem do valor
+              gasto volta para sua conta em formato de pontos.
+            </p>
+          </div>
+          <div class="explainer-card">
+            <i class="fas fa-ticket-alt"></i>
+            <h3>Troque por Cupons</h3>
+            <p>
+              Junte seus pontos e troque-os por descontos reais na Loja de
+              Recompensas abaixo para economizar no próximo jogo.
+            </p>
+          </div>
+          <div class="explainer-card feature-soon">
+            <div class="soon-badge">Em Breve</div>
+            <i class="fas fa-dharmachakra"></i>
+            <h3>Roleta Diária</h3>
+            <p>
+              Faça login todos os dias para girar a roleta da sorte e ganhar
+              desde pontos extras até jogos gratuitos direto na conta!
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section class="points-header">
         <h1>Loja de Recompensas</h1>
-        <p>Troque seus pontos acumulados em compras por cupons de desconto.</p>
+        <p>Utilize seu saldo para resgatar benefícios exclusivos.</p>
         <h2 style="margin-top: 20px">
           Seu Saldo:
           <span id="saldo-pontos" style="color: #feca57">0</span> pontos
         </h2>
       </section>
 
-      <section>
-        <h2 style="margin-bottom: 20px">Cupons Disponíveis</h2>
-        <div class="coupons-grid" id="cupons-loja-container">
-          <p>Carregando recompensas...</p>
-        </div>
+      <div id="loading-spinner" class="loading-container">
+        <div class="spinner"></div>
+        <p>Carregando recompensas disponíveis...</p>
+      </div>
+
+      <section id="loja-content" style="display: none">
+        <h2
+          style="
+            margin-bottom: 20px;
+            color: #fff;
+            border-bottom: 2px solid #333355;
+            padding-bottom: 10px;
+          "
+        >
+          Cupons Disponíveis
+        </h2>
+        <div class="coupons-grid" id="cupons-loja-container"></div>
       </section>
     </main>
 
+    <script src="js/homepage.js"></script>
     <script src="js/pontos.js"></script>
   </body>
 </html>

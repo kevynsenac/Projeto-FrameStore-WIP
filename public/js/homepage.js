@@ -1,6 +1,6 @@
 let currentSlide = 0;
 let bannerInterval;
-let todosJogos = []; // Armazena todos os jogos para o filtro de busca
+let todosJogos = [];
 
 function changeSlide(direction) {
   const slides = document.querySelectorAll(".slide");
@@ -30,29 +30,81 @@ function toggleMenu() {
 }
 
 // ==========================================
-// AUTENTICAÇÃO HEADER
+// INTEGRAÇÃO COM API
 // ==========================================
-function verificarAutenticacaoNavbar() {
+const API_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000/api' 
+    : '/api';
+
+// ==========================================
+// AUTENTICAÇÃO HEADER, CARRINHO E DADOS FRESCOS
+// ==========================================
+async function verificarAutenticacaoNavbar() {
   const userStr = localStorage.getItem("usuarioLogado");
+
+  if (userStr) {
+    let usuario = JSON.parse(userStr);
+    
+    // Atualiza a UI imediatamente com o cache local para evitar "pulos" visuais
+    atualizarUIHeader(usuario);
+
+    // Busca os dados reais e atualizados do Banco de Dados
+    try {
+      const response = await fetch(`${API_URL}/usuarios/${usuario.id}`);
+      if (response.ok) {
+        const usuarioAtualizado = await response.json();
+        
+        // Sobrescreve o localStorage com os dados corretos (pontos/saldo novos)
+        localStorage.setItem("usuarioLogado", JSON.stringify(usuarioAtualizado));
+        
+        // Atualiza a interface com os pontos reais
+        atualizarUIHeader(usuarioAtualizado);
+      }
+    } catch (error) {
+      console.error("Erro ao sincronizar dados atualizados do usuário:", error);
+    }
+
+    // Busca a quantidade de itens no carrinho (sempre atualizado do DB)
+    atualizarContadorCarrinho(usuario.id);
+  }
+}
+
+// Função auxiliar para renderizar os dados do usuário no header
+function atualizarUIHeader(usuario) {
   const authContainer = document.getElementById("auth-container");
   const navPontos = document.getElementById("nav-pontos");
 
-  if (userStr) {
-    const usuario = JSON.parse(userStr);
-    
-    // Atualiza pontuação do topo
-    if (navPontos) navPontos.innerText = usuario.pontos || 0;
-    
-    // Troca botão Entrar por acesso ao Perfil
-    if (authContainer) {
-      const primeiroNome = usuario.nome.split(" ")[0];
-      authContainer.innerHTML = `
-        <a href="perfil.html" style="color: white; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-user-circle" style="font-size: 1.5rem;"></i>
-            <span>${primeiroNome}</span>
-        </a>
-      `;
+  if (navPontos) navPontos.innerText = usuario.pontos || 0;
+
+  if (authContainer) {
+    const primeiroNome = usuario.nome.split(" ")[0];
+    authContainer.innerHTML = `
+      <a href="perfil.html" class="profile-badge">
+          <i class="fas fa-user-circle" style="font-size: 1.2rem;"></i>
+          <span>${primeiroNome}</span>
+      </a>
+    `;
+  }
+}
+
+async function atualizarContadorCarrinho(id_usuario) {
+  try {
+    const response = await fetch(`${API_URL}/carrinho/${id_usuario}`);
+    if (response.ok) {
+      const itens = await response.json();
+      const cartCount = document.getElementById("cart-count");
+      
+      if (cartCount) {
+        if (itens.length > 0) {
+          cartCount.innerText = itens.length;
+          cartCount.style.display = "flex";
+        } else {
+          cartCount.style.display = "none";
+        }
+      }
     }
+  } catch (error) {
+    console.error("Erro ao atualizar contador do carrinho:", error);
   }
 }
 
@@ -73,14 +125,16 @@ function configurarBusca() {
 }
 
 // ==========================================
-// INTEGRAÇÃO COM API
+// RENDERIZAÇÃO DE JOGOS E BANNER COM LOADING
 // ==========================================
-// Substitua o hardcode por isso:
-const API_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000/api' 
-    : '/api';
-
 async function fetchGames() {
+  const spinner = document.getElementById("loading-spinner");
+  const container = document.getElementById("games-container");
+
+  // Inicia o estado de Loading
+  if (spinner) spinner.style.display = "flex";
+  if (container) container.innerHTML = "";
+
   try {
     const response = await fetch(`${API_URL}/jogos`);
     if (!response.ok) throw new Error("Falha ao buscar jogos.");
@@ -91,8 +145,12 @@ async function fetchGames() {
     renderGames(todosJogos);
   } catch (error) {
     console.error("Erro:", error);
-    document.getElementById("games-container").innerHTML =
-      '<p style="color: white; text-align: center; grid-column: 1/-1;">Erro ao carregar o catálogo de jogos.</p>';
+    if (container) {
+      container.innerHTML = '<p style="color: white; text-align: center; grid-column: 1/-1;">Erro ao carregar o catálogo de jogos.</p>';
+    }
+  } finally {
+    // Finaliza o estado de Loading (ocorre dando erro ou sucesso)
+    if (spinner) spinner.style.display = "none";
   }
 }
 
@@ -110,7 +168,7 @@ function renderBanner(jogos) {
   const existingSlides = bannerSlider.querySelectorAll(".slide");
   existingSlides.forEach((slide) => slide.remove());
 
-  const jogosBanner = jogos.filter((j) => j.cover).slice(0, 3);
+  const jogosBanner = jogos.filter((j) => j.cover && j.desconto !== null);
 
   if (jogosBanner.length === 0) {
     const placeholder = document.createElement("div");
@@ -124,7 +182,6 @@ function renderBanner(jogos) {
     const slideDiv = document.createElement("div");
     slideDiv.className = index === 0 ? "slide active" : "slide";
     
-    // Evita clique no banner caso o jogo exibido lá também seja "Em Breve"
     const isEmBreveBanner = parseFloat(game.preco) === 0 && parseFloat(game.desconto) !== 100;
     
     if (!isEmBreveBanner) {
@@ -132,7 +189,21 @@ function renderBanner(jogos) {
       slideDiv.onclick = () => { window.location.href = `jogo.html?id=${game.id}`; };
     }
 
-    slideDiv.innerHTML = `<img src="${game.cover}" alt="${game.titulo}">`;
+    const desconto = parseFloat(game.desconto);
+    let descontoTag = "";
+    
+    if (desconto === 100) {
+      descontoTag = `<div class="banner-discount-tag" style="background: linear-gradient(135deg, #00ff88, #00aa55);">GRÁTIS</div>`;
+    } else if (desconto > 0) {
+      descontoTag = `<div class="banner-discount-tag">-${desconto}%</div>`;
+    }
+
+    slideDiv.innerHTML = `
+      <img src="${game.cover}" alt="${game.titulo}">
+      <div class="banner-title">${game.titulo}</div>
+      ${descontoTag}
+    `;
+    
     bannerSlider.insertBefore(slideDiv, bannerSlider.querySelector(".prev"));
   });
 
@@ -160,7 +231,6 @@ function renderGames(jogos) {
     const temDesconto = desconto > 0;
     const precoFinal = temDesconto ? preco * (1 - desconto / 100) : preco;
 
-    // Regra de bloqueio de clique para jogos não lançados
     const isEmBreve = preco === 0 && desconto !== 100;
 
     if (!isEmBreve) {
@@ -176,10 +246,10 @@ function renderGames(jogos) {
 
     if (preco === 0) {
       if (desconto === 100) {
-        badgeHTML = `<span class="promo-badge" style="background:#00ff88; color:#111;">GRÁTIS</span>`;
+        badgeHTML = `<span class="promo-badge" style="background: linear-gradient(135deg, #00ff88, #00aa55); color:#111;">GRÁTIS</span>`;
         precoHTML = `<p class="price" style="color:#00ff88;">Grátis</p>`;
       } else {
-        badgeHTML = `<span class="promo-badge" style="background:#ff9500;">EM BREVE</span>`;
+        badgeHTML = `<span class="promo-badge" style="background: linear-gradient(135deg, #ffaa00, #ff5500);">EM BREVE</span>`;
         precoHTML = `<p class="price">Em Breve</p>`;
       }
     } else if (temDesconto) {

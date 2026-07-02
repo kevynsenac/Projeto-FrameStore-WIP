@@ -9,6 +9,28 @@
   padding: 0 20px;
   font-family: "Inter", sans-serif;
   color: #ffffff;
+  min-height: 60vh; /* Mantém a altura da página para o spinner não ficar colado no topo */
+}
+
+/* Animação suave para quando o jogo terminar de carregar */
+#game-content {
+  animation: fadeInContent 0.5s ease-in-out;
+}
+
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ajuste do spinner especificamente para a tela do jogo */
+.product-page .loading-container {
+  min-height: 50vh; /* Centraliza o loading verticalmente */
 }
 
 .game-title {

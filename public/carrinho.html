@@ -15,62 +15,95 @@
   <body>
     <header class="navbar">
       <div class="logo-container">
+        <div class="dashboard-menu" onclick="toggleMenu()">
+          <span></span><span></span><span></span>
+        </div>
+
         <a href="homepage.html" class="logo-link">
-          <img
-            src="img/site_logo.png"
-            alt="Logo"
-            class="logo-unico"
-          />
-          <img
-            src="img/site_nome.png"
-            alt="Nome do Site"
-            class="logo-nome"
-          />
+          <img src="img/site_logo.png" alt="Logo" class="logo-unico" />
+          <img src="img/site_nome.png" alt="Nome do Site" class="logo-nome" />
         </a>
+      </div>
+
+      <div class="user-actions">
+        <a href="pontos.html" class="action-badge points-badge">
+          <i class="fas fa-star"></i> <span id="nav-pontos">0</span> Pts
+        </a>
+        
+        <div class="action-badge balance-badge">
+          <i class="fas fa-wallet"></i> <span id="nav-saldo">R$ 0,00</span>
+        </div>
+
+        <div id="auth-container" style="display: inline-block;">
+          <a href="login.html">
+            <button class="btn-entrar">Entrar</button>
+          </a>
+        </div>
       </div>
     </header>
 
-    <main class="cart-container">
-      <section class="cart-items">
-        <h2>Meu Carrinho</h2>
-        <div id="cart-list">
-          <p>Carregando itens...</p>
+    <aside class="sidebar-menu" id="sidebar">
+      <div class="sidebar-header">
+        <div class="dashboard-menu" onclick="toggleMenu()">
+          <span></span><span></span><span></span>
         </div>
-      </section>
+      </div>
+      <ul>
+        <li><a href="homepage.html"><i class="fas fa-home"></i> Início</a></li>
+        <li><a href="#"><i class="fas fa-tag"></i> Ofertas</a></li>
+        <li><a href="#"><i class="fas fa-gift"></i> Gift Cards</a></li>
+        <li><a href="#"><i class="fas fa-desktop"></i> PC</a></li>
+        <li><a href="#"><i class="fab fa-playstation"></i> Playstation</a></li>
+        <li><a href="#"><i class="fab fa-xbox"></i> Xbox</a></li>
+      </ul>
+    </aside>
 
-      <aside class="cart-summary">
-        <h2>Resumo do Pedido</h2>
-        <div class="summary-row">
-          <span>Subtotal:</span>
-          <span id="cart-subtotal">R$ 0,00</span>
-        </div>
+    <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
 
-        <div class="coupon-section">
-          <label for="coupon-select">Aplicar Cupom:</label>
-          <select id="coupon-select" onchange="calcularTotal()">
-            <option value="">Nenhum cupom selecionado</option>
-          </select>
-          <div
-            class="summary-row"
-            style="margin-top: 15px; color: #ff4757; display: none"
-            id="discount-row"
-          >
-            <span>Desconto:</span>
-            <span id="cart-discount">- R$ 0,00</span>
+    <main class="cart-wrapper">
+      
+      <div id="loading-spinner" class="loading-container">
+        <div class="spinner"></div>
+        <p>Carregando seu carrinho...</p>
+      </div>
+
+      <div class="cart-container" id="cart-content" style="display: none;">
+        <section class="cart-items">
+          <h2>Meu Carrinho</h2>
+          <div id="cart-list"></div>
+        </section>
+
+        <aside class="cart-summary">
+          <h2>Resumo do Pedido</h2>
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span id="cart-subtotal">R$ 0,00</span>
           </div>
-        </div>
 
-        <div class="summary-row summary-total">
-          <span>Total:</span>
-          <span id="cart-total">R$ 0,00</span>
-        </div>
+          <div class="coupon-section">
+            <label for="coupon-select">Aplicar Cupom:</label>
+            <select id="coupon-select" onchange="calcularTotal()">
+              <option value="">Nenhum cupom selecionado</option>
+            </select>
+            <div class="summary-row" style="margin-top: 15px; color: #ff4757; display: none" id="discount-row">
+              <span>Desconto:</span>
+              <span id="cart-discount">- R$ 0,00</span>
+            </div>
+          </div>
 
-        <button class="btn-checkout" onclick="finalizarCompra()">
-          Finalizar Compra
-        </button>
-      </aside>
+          <div class="summary-row summary-total">
+            <span>Total:</span>
+            <span id="cart-total">R$ 0,00</span>
+          </div>
+
+          <button class="btn-checkout" id="btn-finalizar" onclick="finalizarCompra()">
+            Finalizar Compra
+          </button>
+        </aside>
+      </div>
     </main>
 
+    <script src="js/homepage.js"></script>
     <script src="js/carrinho.js"></script>
   </body>
 </html>

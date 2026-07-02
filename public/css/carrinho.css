@@ -2,15 +2,52 @@
    MEU CARRINHO (CHECKOUT)
    ========================================== */
 
-.cart-container {
+/* Wrapper principal para controlar o espaçamento e o Loading */
+.cart-wrapper {
   max-width: 1200px;
   margin: 100px auto 40px; /* 100px para afastar da navbar fixa */
-  padding: 20px;
+  padding: 0 20px;
+  min-height: 60vh;
+}
+
+/* Ajuste do spinner especificamente para o carrinho */
+.cart-wrapper .loading-container {
+  min-height: 50vh;
+}
+
+/* O container do carrinho agora fica dentro do wrapper */
+.cart-container {
   color: #ffffff;
   font-family: "Inter", sans-serif;
   display: grid;
   grid-template-columns: 2fr 1fr; /* 2 terços para itens, 1 terço para resumo */
   gap: 30px;
+  animation: fadeInContent 0.5s ease-in-out;
+}
+
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Badge de Saldo (Header) --- */
+.balance-badge {
+  background: rgba(0, 255, 136, 0.1);
+  color: #00ff88;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  cursor: default; /* Como é só informativo, não precisa cursor de clique */
+}
+
+.balance-badge:hover {
+  background: rgba(0, 255, 136, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 255, 136, 0.2);
 }
 
 /* --- Sessão da Lista de Itens --- */
@@ -36,7 +73,7 @@
   align-items: center;
   border-bottom: 1px solid #333355;
   padding: 20px 0;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .cart-item:last-child {
@@ -68,6 +105,30 @@
   font-size: 1.3rem;
   display: block;
   margin-top: 5px;
+}
+
+/* --- Tratamento Visual para Jogo Já Possuído --- */
+.cart-item.owned-item {
+  opacity: 0.7;
+  background: rgba(255, 170, 0, 0.05);
+  border: 1px dashed #ffaa00;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.owned-warning {
+  color: #ffaa00;
+  font-size: 0.95rem;
+  font-weight: bold;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 170, 0, 0.1);
+  padding: 6px 12px;
+  border-radius: 6px;
+  width: fit-content;
 }
 
 .btn-remove {
@@ -179,10 +240,17 @@
   letter-spacing: 1px;
 }
 
-.btn-checkout:hover {
+.btn-checkout:hover:not(:disabled) {
   background-color: #33ff99;
   transform: scale(1.03);
   box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+}
+
+.btn-checkout:disabled {
+  background-color: #555;
+  color: #888;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* ==========================================
@@ -210,5 +278,9 @@
 
   .cart-item-info {
     margin-left: 0;
+  }
+  
+  .owned-warning {
+    margin: 10px auto;
   }
 }

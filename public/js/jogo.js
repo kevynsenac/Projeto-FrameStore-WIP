@@ -2,24 +2,48 @@ let galeria = [];
 let imagemAtualIndex = 0;
 let jogoAtual = null;
 
+// Usamos um nome de constante diferente (BASE_API_URL) para evitar o erro de SyntaxError 
+// de conflito com o "const API_URL" que já existe no homepage.js carregado no mesmo HTML
+const BASE_API_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000/api' 
+    : '/api';
+
 async function carregarDetalhesJogo() {
   const urlParams = new URLSearchParams(window.location.search);
   const jogoId = urlParams.get("id");
 
+  const spinner = document.getElementById("loading-spinner");
+  const content = document.getElementById("game-content");
+
+  // Se não houver ID na URL
   if (!jogoId) {
     document.querySelector(".game-title").innerText = "Jogo não encontrado.";
+    if (spinner) spinner.style.display = "none";
+    if (content) content.style.display = "block";
     return;
   }
 
+  // Inicia o estado de Loading
+  if (spinner) spinner.style.display = "flex";
+  if (content) content.style.display = "none";
+
   try {
-    const response = await fetch(`${API_URL}/jogos/${jogoId}`);
+    const response = await fetch(`${BASE_API_URL}/jogos/${jogoId}`);
     if (!response.ok) throw new Error("Falha ao buscar detalhes do jogo.");
 
     jogoAtual = await response.json();
     renderizarDetalhes(jogoAtual);
+    
+    // Mostra o conteúdo do jogo em caso de sucesso
+    if (content) content.style.display = "block";
   } catch (error) {
     console.error("Erro:", error);
     document.querySelector(".game-title").innerText = "Erro ao carregar os dados.";
+    // Mostra o conteúdo para exibir a mensagem de erro no título
+    if (content) content.style.display = "block";
+  } finally {
+    // Finaliza o estado de Loading
+    if (spinner) spinner.style.display = "none";
   }
 }
 
@@ -33,14 +57,36 @@ function formatPrice(value) {
 function renderizarDetalhes(game) {
   document.querySelector(".game-title").innerText = game.titulo;
 
-  let precoFinal = parseFloat(game.preco);
-  const temDesconto = game.desconto && parseFloat(game.desconto) > 0;
-  const priceSection = document.querySelector(".price-section");
+  const precoOriginal = parseFloat(game.preco);
+  const desconto = game.desconto ? parseFloat(game.desconto) : 0;
+  let precoFinal = precoOriginal;
+  
+  const temDesconto = desconto > 0;
+  const isEmBreve = precoOriginal === 0 && desconto !== 100;
+  const isGratis = precoOriginal === 0 && desconto === 100;
 
-  if (temDesconto) {
-    precoFinal -= precoFinal * (parseFloat(game.desconto) / 100);
+  const priceSection = document.querySelector(".price-section");
+  const btnPurchase = document.querySelector(".btn-purchase-green");
+
+  // Corrige a exibição para jogos Grátis e Em Breve
+  if (isEmBreve) {
+    priceSection.innerHTML = `<span class="value" style="color: #ffaa00; font-size: 2rem;">Em Breve</span>`;
+    // Desabilita o botão de comprar visualmente e logicamente
+    if (btnPurchase) {
+        btnPurchase.disabled = true;
+        btnPurchase.style.opacity = "0.5";
+        btnPurchase.style.cursor = "not-allowed";
+        btnPurchase.innerHTML = `<i class="fas fa-clock"></i> Indisponível`;
+    }
+  } else if (isGratis) {
+    priceSection.innerHTML = `<span class="value" style="color: #00ff88;">Grátis</span>`;
+    if (btnPurchase) {
+        btnPurchase.innerHTML = `<i class="fas fa-cart-plus"></i> Adicionar à Conta`;
+    }
+  } else if (temDesconto) {
+    precoFinal -= precoFinal * (desconto / 100);
     priceSection.innerHTML = `
-            <span style="text-decoration: line-through; font-size: 0.6em; color: #aaa; display: block;">${formatPrice(game.preco)}</span>
+            <span style="text-decoration: line-through; font-size: 0.6em; color: #aaa; display: block;">${formatPrice(precoOriginal)}</span>
             <span class="value">${formatPrice(precoFinal)}</span>
         `;
   } else {
@@ -101,6 +147,14 @@ function moveGallery(step) {
 async function adicionarAoCarrinho() {
   if (!jogoAtual) return;
 
+  // Bloqueio extra: Impede a compra de jogos que não lançaram se tentarem burlar o HTML
+  const precoOriginal = parseFloat(jogoAtual.preco);
+  const desconto = jogoAtual.desconto ? parseFloat(jogoAtual.desconto) : 0;
+  if (precoOriginal === 0 && desconto !== 100) {
+      alert("Este jogo ainda está 'Em Breve' e não pode ser adicionado.");
+      return;
+  }
+
   const userStr = localStorage.getItem("usuarioLogado");
   if (!userStr) {
     alert("Você precisa fazer login para adicionar jogos ao carrinho.");
@@ -110,7 +164,7 @@ async function adicionarAoCarrinho() {
   const usuarioLogado = JSON.parse(userStr);
 
   try {
-    const response = await fetch(`${API_URL}/carrinho`, {
+    const response = await fetch(`${BASE_API_URL}/carrinho`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -127,6 +181,11 @@ async function adicionarAoCarrinho() {
     }
 
     atualizarModalCarrinhoVisual();
+
+    // Atualiza o contador de itens no header (função que vem do homepage.js)
+    if (typeof atualizarContadorCarrinho === "function") {
+      atualizarContadorCarrinho(usuarioLogado.id);
+    }
 
   } catch (error) {
     console.error("Erro no fetch do carrinho:", error);
@@ -159,7 +218,7 @@ function fecharCarrinho() {
 }
 
 window.onload = () => {
-  // Dispara a verificação de sessão do header declarada em homepage.js
+  // Dispara a verificação de sessão do header declarada em homepage.js e atualiza dados do DB
   if (typeof verificarAutenticacaoNavbar === "function") {
     verificarAutenticacaoNavbar();
   }

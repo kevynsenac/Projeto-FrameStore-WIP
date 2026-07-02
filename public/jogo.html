@@ -25,17 +25,13 @@
         </a>
       </div>
 
-      <div class="search-bar">
-        <input type="text" id="search-input" placeholder="Procurar jogos..." />
-        <i class="fas fa-search"></i>
-      </div>
-
       <div class="user-actions">
-        <a href="pontos.html" style="color: white; margin-right: 15px; text-decoration: none">
-          <i class="fas fa-star"></i> <span id="nav-pontos">0</span>
+        <a href="pontos.html" class="action-badge points-badge">
+          <i class="fas fa-star"></i> <span id="nav-pontos">0</span> Pts
         </a>
-        <a href="carrinho.html" style="color: white; margin-right: 20px">
-          <i class="fas fa-shopping-cart"></i>
+        <a href="carrinho.html" class="action-badge cart-badge">
+          <i class="fas fa-shopping-cart"></i> <span>Carrinho</span>
+          <span id="cart-count" class="cart-count" style="display: none;">0</span>
         </a>
         <div id="auth-container" style="display: inline-block;">
           <a href="login.html">
@@ -76,51 +72,58 @@
     <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
 
     <main class="product-page">
-      <h1 class="game-title">Carregando...</h1>
+      <div id="loading-spinner" class="loading-container">
+        <div class="spinner"></div>
+        <p>Buscando detalhes do jogo...</p>
+      </div>
 
-      <div class="game-details-container">
-        <div class="game-gallery">
-          <div class="main-view">
-            <button class="nav-arrow prev-img" onclick="moveGallery(-1)">
-              ❮
-            </button>
-            <img id="current-img" alt="Jogo" />
-            <button class="nav-arrow next-img" onclick="moveGallery(1)">
-              ❯
-            </button>
-          </div>
-          <div class="thumb-list"></div>
-        </div>
+      <div id="game-content" style="display: none;">
+        <h1 class="game-title"></h1>
 
-        <aside class="purchase-card">
-          <div class="price-section"></div>
-
-          <div class="platform-info-card">
-            <i class="fab fa-steam"></i>
-            <div class="info-text">
-              <strong id="game-platform">Steam</strong>
-              <br />
-              <span>Windows</span>
+        <div class="game-details-container">
+          <div class="game-gallery">
+            <div class="main-view">
+              <button class="nav-arrow prev-img" onclick="moveGallery(-1)">
+                ❮
+              </button>
+              <img id="current-img" alt="Jogo" />
+              <button class="nav-arrow next-img" onclick="moveGallery(1)">
+                ❯
+              </button>
             </div>
+            <div class="thumb-list"></div>
           </div>
 
-          <p class="activation-msg">Ativado através de Chave de ativação</p>
+          <aside class="purchase-card">
+            <div class="price-section"></div>
 
-          <div class="buy-wishlist-buttons">
-            <button class="btn-purchase-green" onclick="adicionarAoCarrinho()">
-              <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
-            </button>
-          </div>
-        </aside>
+            <div class="platform-info-card">
+              <i class="fab fa-steam"></i>
+              <div class="info-text">
+                <strong id="game-platform">Steam</strong>
+                <br />
+                <span>Windows</span>
+              </div>
+            </div>
 
-        <div id="cart-modal" class="modal-cart">
-          <div class="modal-content">
-            <span class="close-modal" onclick="fecharCarrinho()">&times;</span>
-            <h2>Adicionado ao Carrinho!</h2>
-            <div id="cart-items-list"></div>
-            <div class="cart-footer" style="display: flex; gap: 10px; justify-content: space-between; margin-top: 20px;">
-              <button class="btn-entrar" style="background: #444; color: white;" onclick="window.location.href='homepage.html'">Continuar Comprando</button>
-              <button class="btn-checkout" onclick="window.location.href='carrinho.html'">Ir para o Pagamento</button>
+            <p class="activation-msg">Ativado através de Chave de ativação</p>
+
+            <div class="buy-wishlist-buttons">
+              <button class="btn-purchase-green" onclick="adicionarAoCarrinho()">
+                <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+              </button>
+            </div>
+          </aside>
+
+          <div id="cart-modal" class="modal-cart">
+            <div class="modal-content">
+              <span class="close-modal" onclick="fecharCarrinho()">&times;</span>
+              <h2>Adicionado ao Carrinho!</h2>
+              <div id="cart-items-list"></div>
+              <div class="cart-footer" style="display: flex; gap: 10px; justify-content: space-between; margin-top: 20px;">
+                <button class="btn-entrar" style="background: #444; color: white;" onclick="window.location.href='homepage.html'">Continuar Comprando</button>
+                <button class="btn-checkout" onclick="window.location.href='carrinho.html'">Ir para o Pagamento</button>
+              </div>
             </div>
           </div>
         </div>

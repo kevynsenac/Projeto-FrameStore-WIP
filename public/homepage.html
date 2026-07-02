@@ -46,6 +46,7 @@
         </a>
         <a href="carrinho.html" class="action-badge cart-badge">
           <i class="fas fa-shopping-cart"></i> <span>Carrinho</span>
+          <span id="cart-count" class="cart-count" style="display: none;">0</span>
         </a>
         <div id="auth-container" style="display: inline-block;">
           <a href="login.html">
@@ -93,6 +94,11 @@
         <button class="next" onclick="changeSlide(1)">&#10095;</button>
       </div>
     </section>
+
+    <div id="loading-spinner" class="loading-container" style="display: none;">
+      <div class="spinner"></div>
+      <p>Carregando catálogo...</p>
+    </div>
 
     <div class="games-grid" id="games-container"></div>
 

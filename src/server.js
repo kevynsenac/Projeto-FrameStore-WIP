@@ -62,7 +62,7 @@ async function verificarAdmin(req, res, next) {
 // 3. ROTA RAIZ (FRONTEND)
 // ==========================================
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "public", "login.html"));
+  res.sendFile(path.join(__dirname, "..", "public", "homepage.html"));
 });
 
 // ==========================================

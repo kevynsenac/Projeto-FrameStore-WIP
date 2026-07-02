@@ -2,6 +2,14 @@ let currentSlide = 0;
 let bannerInterval;
 let todosJogos = [];
 
+function protegerPagina() {
+  const userStr = localStorage.getItem("usuarioLogado");
+  // Se não houver nada no localStorage, redireciona para o login
+  if (!userStr) {
+    window.location.href = "login.html";
+  }
+}
+
 function changeSlide(direction) {
   const slides = document.querySelectorAll(".slide");
   if (!slides.length) return;
@@ -280,6 +288,7 @@ function renderGames(jogos) {
 // Inicialização
 if (!window.location.pathname.includes("jogo.html")) {
   window.onload = () => {
+    protegerPagina(); // Verifica a autenticação primeiro
     verificarAutenticacaoNavbar();
     configurarBusca();
     fetchGames();

@@ -64,7 +64,7 @@ async function realizarLogin(event) {
   }
 }
 
-// Função de Cadastro
+// Função de Cadastro com Login Automático
 async function realizarCadastro(event) {
   event.preventDefault();
 
@@ -78,25 +78,44 @@ async function realizarCadastro(event) {
   }
 
   try {
-    const response = await fetch(`${API_URL}/register`, {
+    // 1. Realiza o cadastro do usuário
+    const responseRegister = await fetch(`${API_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nome, email, senha }),
     });
 
-    const data = await response.json();
+    const dataRegister = await responseRegister.json();
 
-    if (!response.ok) {
-      alert(data.error || "Erro ao criar conta.");
+    if (!responseRegister.ok) {
+      alert(dataRegister.error || "Erro ao criar conta.");
       return;
     }
 
-    alert("Conta criada com sucesso! Faça login para continuar.");
+    alert("Conta criada com sucesso! Entrando automaticamente...");
     
-    // Limpa o formulário e volta para a aba de login
-    document.getElementById("register-email").value = "";
-    document.getElementById("register-password").value = "";
-    showTab("login"); 
+    // 2. Realiza o login automático com as credenciais recém-criadas
+    const responseLogin = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, senha }),
+    });
+
+    const dataLogin = await responseLogin.json();
+
+    if (!responseLogin.ok) {
+      // Fallback de segurança: se o login falhar por algum motivo bizarro, manda pra aba de login
+      alert("Conta criada, mas ocorreu um erro no login automático. Faça o login manualmente.");
+      document.getElementById("register-email").value = "";
+      document.getElementById("register-password").value = "";
+      showTab("login"); 
+      return;
+    }
+
+    // 3. Salva a sessão no localStorage e redireciona para a Home
+    localStorage.setItem("usuarioLogado", JSON.stringify(dataLogin.user));
+    window.location.href = "homepage.html";
+
   } catch (error) {
     console.error("Erro de conexão:", error);
     alert("Não foi possível conectar ao servidor.");

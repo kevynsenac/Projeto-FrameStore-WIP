@@ -1,5 +1,5 @@
-- Implementar descrição e requisitos nas tables dos jogos e nas suas páginas
-- Implementar roda de pontos
-- Remover alerts e colocar os avisos nas páginas
-- Fazer da homepage a página principal (caso logado) e se não estiver logado, expulsa pro login
-- Ao criar cadastro, já fazer login
+1. Implementar roda de pontos com ganho de pontos diários (e lógica segura para evitar mais de um giro por dia)
+2. Alterar cards dos jogos na homepage.html para ter no topo a plataforma do jogo a qual pertece
+3. Remover alerts e colocar os avisos nas páginas em sí
+4. Implementar descrição e requisitos nas tables dos jogos e nas suas páginas
+5. Implementar datas de duração e condição de resgate único nos cupons

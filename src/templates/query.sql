@@ -1,3 +1,4 @@
+-- Cria o banco de dados e as tables iniciais compatíveis com o projeto
 CREATE DATABASE IF NOT EXISTS framestore;
 
 USE framestore;

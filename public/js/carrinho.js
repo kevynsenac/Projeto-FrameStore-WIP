@@ -86,7 +86,7 @@ async function carregarDadosCarrinho() {
     itensCarrinho = await resCart.json();
 
     // 2. Busca a biblioteca para checar se já possui o jogo
-    const resLib = await fetch(`${BASE_API_URL}/biblioteca/${usuarioLogado.id}`);
+    const resLib = await fetch(`${BASE_API_URL}/usuarios/${usuarioLogado.id}/biblioteca`);
     if (resLib.ok) {
       const libData = await resLib.json();
       // Mapeia para um array simples de IDs (ajuste 'id_jogo' conforme o retorno da sua API)

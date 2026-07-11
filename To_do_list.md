@@ -2,5 +2,5 @@
 2. Alterar cards dos jogos na homepage.html para ter no topo a plataforma do jogo a qual pertece
 3. Remover alerts e colocar os avisos nas páginas em sí
 4. Implementar descrição e requisitos nas tables dos jogos e nas suas páginas
-5. Implementar datas de duração e condição de resgate único nos cupons
-6. Bug Fix: opção de alterar senhas no painel do adm
+5. Implementar datas de duração e condição de resgate único nos cupons (precisa de bug fix)
+6. Bug fix: Opção de alterar senhas no painel do adm

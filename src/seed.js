@@ -1,9 +1,10 @@
-require("dotenv").config(); // Carrega as variáveis do .env
+// Script para popular o banco de dados com jogos de exemplo e suas respectivas imagens (cover e screenshots)
+// Para executar: npm run seed
+require("dotenv").config();
 const pool = require("./db.js");
 const fs = require("fs");
 const path = require("path");
 
-// Função auxiliar que converte a imagem em Buffer Binário
 function getFileBuffer(imagePath) {
   try {
     if (!imagePath) return null;
@@ -43,7 +44,7 @@ const games = [
   {
     titulo: "Assassin's Creed Black Flag",
     preco: 119.99,
-    desconto: 50.0,
+    desconto: null,
     platform: "Steam",
     cover: "templates/assets/cover/assassins_creed_black_flag.jpg",
     screenshot1: "templates/assets/screenshots/assassins_creed_1.png",
@@ -126,7 +127,6 @@ async function seedDatabase() {
   try {
     console.log("Iniciando o Seed do Banco de Dados...");
 
-    // Desativa a checagem de FK para permitir o TRUNCATE
     await pool.query("SET FOREIGN_KEY_CHECKS = 0");
     await pool.query("TRUNCATE TABLE JOGOS");
     await pool.query("SET FOREIGN_KEY_CHECKS = 1");

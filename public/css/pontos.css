@@ -1,5 +1,5 @@
 /* ==========================================
-   HEADER / NAVBAR (Integrado do header.css)
+   HEADER / NAVBAR
    ========================================== */
 .navbar {
   background-color: #0f0f1e;
@@ -12,28 +12,32 @@
   z-index: 1000;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   height: 70px;
-  min-height: 70px;
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
 .logo-container {
   display: flex;
   align-items: center;
   gap: 12px;
+  height: 100%;
 }
 
 .logo-unico {
-  height: 48px;
+  height: 40px; /* Tamanho fixo para a logo quadrada/ícone */
   width: auto;
-  object-fit: contain;
   border-radius: 8px;
 }
 
 .logo-nome {
-  height: 32px;
+  height: 25px; /* Tamanho fixo para o texto/nome */
   width: auto;
   object-fit: contain;
+}
+
+/* Responsividade unificada */
+@media (max-width: 768px) {
+  .navbar { height: 60px; }
+  .logo-unico { height: 32px; }
+  .logo-nome { height: 20px; }
 }
 
 /* Badge de Saldo */
@@ -48,19 +52,6 @@
   background: rgba(0, 255, 136, 0.15);
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(0, 255, 136, 0.2);
-}
-
-@media (max-width: 768px) {
-  .navbar {
-    padding: 10px 15px;
-    height: 60px;
-  }
-  .logo-unico {
-    height: 42px;
-  }
-  .logo-nome {
-    height: 26px;
-  }
 }
 
 /* ==========================================

@@ -31,35 +31,44 @@ body {
    2. BARRA SUPERIOR (NAVBAR) SIMPLIFICADA
    ========================================== */
 .navbar {
-  width: 100%;
+  background-color: #0f0f1e;
+  padding: 12px 20px;
   display: flex;
   align-items: center;
-  padding: 15px 5%;
-  background-color: var(--bg-color);
-  position: fixed;
+  justify-content: space-between;
+  position: sticky;
   top: 0;
-  left: 0;
   z-index: 1000;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  height: 70px;
 }
 
-.logo-link {
+.logo-container {
   display: flex;
   align-items: center;
-  text-decoration: none;
-  gap: 15px;
+  gap: 12px;
+  height: 100%;
 }
 
 .logo-unico {
-  height: 50px;
-  border-radius: 12px;
-  transition: transform 0.3s;
-}
-.logo-nome {
-  height: 25px;
+  height: 40px; /* Tamanho fixo para a logo quadrada/ícone */
+  width: auto;
   border-radius: 8px;
-  transition: transform 0.3s;
 }
+
+.logo-nome {
+  height: 25px; /* Tamanho fixo para o texto/nome */
+  width: auto;
+  object-fit: contain;
+}
+
+/* Responsividade unificada */
+@media (max-width: 768px) {
+  .navbar { height: 60px; }
+  .logo-unico { height: 32px; }
+  .logo-nome { height: 20px; }
+}
+
 .logo-link:hover img {
   transform: scale(1.05);
 }

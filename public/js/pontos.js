@@ -1,12 +1,84 @@
-const BASE_API_URL =
-  window.location.hostname === "localhost"
-    ? "http://localhost:3000/api"
-    : "/api";
+const BASE_API_URL = window.location.hostname === "localhost" ? "http://localhost:3000/api" : "/api";
 
 let usuarioLogado = null;
+let idsMeusCupons = [];
 
 // ==========================================
-// AUTENTICAÇÃO E ATUALIZAÇÃO DO HEADER
+// CONFIGURAÇÃO DA ROLETA (CANVAS)
+// ==========================================
+const canvas = document.getElementById('wheelCanvas');
+const ctx = canvas ? canvas.getContext('2d') : null;
+
+// 10 Segmentos intercalados refletindo as probabilidades do Back-end
+// 10% (1 fatia 250) | 20% (2 fatias 100) | 30% (3 fatias 50) | 40% (4 fatias 0)
+const segments = [
+  { points: 250, color: "#feca57", label: "250" },
+  { points: 0,   color: "#444466", label: "0" },
+  { points: 50,  color: "#2a2aef", label: "50" },
+  { points: 100, color: "#00ff88", label: "100" },
+  { points: 0,   color: "#444466", label: "0" },
+  { points: 50,  color: "#2a2aef", label: "50" },
+  { points: 0,   color: "#444466", label: "0" },
+  { points: 100, color: "#00ff88", label: "100" },
+  { points: 50,  color: "#2a2aef", label: "50" },
+  { points: 0,   color: "#444466", label: "0" }
+];
+
+let currentRotation = 0;
+let isSpinning = false;
+let countdownInterval;
+
+// Desenha a roleta baseada no ângulo de rotação
+function drawWheel(rotation = 0) {
+  if (!ctx) return;
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  const radius = 140;
+  const sliceAngle = (Math.PI * 2) / segments.length;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  let currentAngle = rotation;
+
+  segments.forEach((segment) => {
+    // Desenha a fatia
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+    ctx.closePath();
+    ctx.fillStyle = segment.color;
+    ctx.fill();
+    ctx.strokeStyle = "#1a1a2e";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Desenha o texto
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(currentAngle + sliceAngle / 2);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = segment.points === 0 ? "#fff" : "#111"; // Contraste dinâmico
+    ctx.font = "bold 18px Inter"; // Fonte ajustada para 10 fatias
+    ctx.fillText(segment.label, radius * 0.72, 0); // Empurrado um pouco mais pra borda
+    ctx.restore();
+
+    currentAngle += sliceAngle;
+  });
+
+  // Centro da roleta (bolinha menor)
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
+  ctx.fillStyle = "#1a1a2e";
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+  ctx.fillStyle = "#333355";
+  ctx.fill();
+}
+
+// ==========================================
+// AUTENTICAÇÃO E RELÓGIO (COUNTDOWN)
 // ==========================================
 async function verificarAutenticacao() {
   const userStr = localStorage.getItem("usuarioLogado");
@@ -15,190 +87,326 @@ async function verificarAutenticacao() {
     return false;
   }
   usuarioLogado = JSON.parse(userStr);
-
-  // Atualiza UI com o cache primeiro para evitar "pulos"
   atualizarUIHeader(usuarioLogado);
+  verificarStatusRoleta();
 
-  // Busca do DB para ter certeza de que pontos e saldo estão corretos
   try {
-    const response = await fetch(
-      `${BASE_API_URL}/usuarios/${usuarioLogado.id}`,
-    );
+    const response = await fetch(`${BASE_API_URL}/usuarios/${usuarioLogado.id}`);
     if (response.ok) {
-      const usuarioAtualizado = await response.json();
-      localStorage.setItem("usuarioLogado", JSON.stringify(usuarioAtualizado));
-      usuarioLogado = usuarioAtualizado;
-      atualizarUIHeader(usuarioAtualizado);
+      usuarioLogado = await response.json();
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
+      atualizarUIHeader(usuarioLogado);
+      verificarStatusRoleta(); // Checa se já rodou hoje
     }
   } catch (error) {
-    console.error("Erro ao sincronizar dados do usuário:", error);
+    console.error("Erro ao sincronizar usuário:", error);
   }
 
-  // Atualiza também o contador do carrinho visualmente no header
   atualizarContadorCarrinho();
-
   return true;
 }
 
-function formatPrice(value) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value);
-}
-
 function atualizarUIHeader(usuario) {
-  // Atualiza pontos do Banner e da Navbar
-  document.getElementById("saldo-pontos").innerText = usuario.pontos || 0;
-
   const navPontos = document.getElementById("nav-pontos");
   const navSaldo = document.getElementById("nav-saldo");
+  const saldoPainel = document.getElementById("saldo-pontos");
   const authContainer = document.getElementById("auth-container");
 
   if (navPontos) navPontos.innerText = usuario.pontos || 0;
-  if (navSaldo) navSaldo.innerText = formatPrice(usuario.saldo || 0);
+  if (saldoPainel) saldoPainel.innerText = usuario.pontos || 0;
+  
+  const saldoFormatado = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(usuario.saldo || 0);
+  if (navSaldo) navSaldo.innerText = saldoFormatado;
 
   if (authContainer) {
     const primeiroNome = usuario.nome.split(" ")[0];
-    authContainer.innerHTML = `
-      <a href="perfil.html" class="profile-badge">
-          <i class="fas fa-user-circle" style="font-size: 1.2rem;"></i>
-          <span>${primeiroNome}</span>
-      </a>
-    `;
+    authContainer.innerHTML = `<a href="perfil.html" class="profile-badge"><i class="fas fa-user-circle"></i> <span>${primeiroNome}</span></a>`;
   }
 }
 
 async function atualizarContadorCarrinho() {
   try {
-    const response = await fetch(
-      `${BASE_API_URL}/carrinho/${usuarioLogado.id}`,
-    );
+    const response = await fetch(`${BASE_API_URL}/carrinho/${usuarioLogado.id}`);
     if (response.ok) {
       const itens = await response.json();
       const cartCount = document.getElementById("cart-count");
-
       if (cartCount) {
-        if (itens.length > 0) {
-          cartCount.innerText = itens.length;
-          cartCount.style.display = "flex";
-        } else {
-          cartCount.style.display = "none";
-        }
+        cartCount.innerText = itens.length;
+        cartCount.style.display = itens.length > 0 ? "flex" : "none";
       }
     }
-  } catch (error) {
-    console.error("Erro ao atualizar contador do carrinho:", error);
+  } catch (e) {}
+}
+
+// Bloqueia e mostra o contador se já rodou hoje
+function verificarStatusRoleta() {
+  if (!usuarioLogado.ultima_roleta) return;
+
+  const dataServidorStr = new Date().toISOString().split('T')[0];
+  const ultimaRoletaStr = new Date(usuarioLogado.ultima_roleta).toISOString().split('T')[0];
+
+  if (dataServidorStr === ultimaRoletaStr) {
+    iniciarContador();
   }
 }
 
+function iniciarContador() {
+  const btnGirar = document.getElementById("btn-girar");
+  const countdownBox = document.getElementById("countdown-container");
+  const timerText = document.getElementById("countdown-timer");
+
+  btnGirar.disabled = true;
+  btnGirar.innerText = "VOLTE AMANHÃ";
+  countdownBox.style.display = "inline-block";
+
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(() => {
+    const now = new Date();
+    // Calcula meia-noite do dia seguinte (UTC para alinhar com servidor)
+    const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+    const diff = tomorrow - now;
+
+    if (diff <= 0) {
+      clearInterval(countdownInterval);
+      btnGirar.disabled = false;
+      btnGirar.innerText = "GIRAR ROLETA";
+      countdownBox.style.display = "none";
+    } else {
+      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+      timerText.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    }
+  }, 1000);
+}
+
 // ==========================================
-// RENDERIZAÇÃO DA LOJA E RESGATE
+// LÓGICA DE GIRO (INTEGRAÇÃO COM API)
+// ==========================================
+async function iniciarGiroRoleta() {
+  if (isSpinning) return;
+  
+  const btnGirar = document.getElementById("btn-girar");
+  btnGirar.disabled = true;
+  btnGirar.innerText = "GIRANDO...";
+  isSpinning = true;
+
+  try {
+    // 1. Pede o resultado para o servidor
+    const response = await fetch(`${BASE_API_URL}/roleta/girar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id_usuario: usuarioLogado.id }),
+    });
+    
+    const result = await response.json();
+
+    if (!response.ok) {
+      mostrarModal("Roleta Bloqueada", result.error);
+      isSpinning = false;
+      iniciarContador(); // Força o contador se tentou burlar
+      return;
+    }
+
+    // 2. Acha as fatias correspondentes ao prêmio que o backend enviou
+    const winningIndices = [];
+    segments.forEach((s, index) => {
+      if (s.points === result.pontosGanhos) winningIndices.push(index);
+    });
+    
+    // Sorteia uma das fatias vencedoras para o visual não ficar repetitivo
+    const winningIndex = winningIndices[Math.floor(Math.random() * winningIndices.length)];
+    
+    // 3. Calcula o ângulo final para parar na fatia correta (seta fica em 270º / -90º)
+    const sliceAngle = (Math.PI * 2) / segments.length;
+    const targetAngle = (winningIndex * sliceAngle) + (sliceAngle / 2);
+    
+    // Rotação necessária + voltas completas para efeito dramático (ex: 5 voltas)
+    const extraSpins = 5 * Math.PI * 2;
+    const randomOffset = (Math.random() - 0.5) * (sliceAngle * 0.6); // Pequeno desvio
+    const finalRotation = currentRotation + extraSpins + ((3 * Math.PI / 2) - targetAngle) + randomOffset;
+
+    // 4. Anima o Canvas
+    const startTime = Date.now();
+    const duration = 4000; // 4 segundos de giro
+    const startRotation = currentRotation;
+
+    function animateWheel() {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Easing (desaceleração suave)
+      const easeProgress = 1 - Math.pow(1 - progress, 4);
+      
+      currentRotation = startRotation + ((finalRotation - startRotation) * easeProgress);
+      drawWheel(currentRotation);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animateWheel);
+      } else {
+        finalizarGiro(result);
+      }
+    }
+    animateWheel();
+
+  } catch (error) {
+    mostrarModal("Erro", "Falha de conexão com o servidor. Tente novamente.");
+    btnGirar.disabled = false;
+    btnGirar.innerText = "GIRAR ROLETA";
+    isSpinning = false;
+  }
+}
+
+function finalizarGiro(result) {
+  isSpinning = false;
+  
+  // Atualiza usuário com a data de hoje para travar a roleta no front
+  usuarioLogado.ultima_roleta = new Date().toISOString(); 
+  
+  const titulo = result.pontosGanhos > 0 ? "Sorte Grande!" : "Que pena!";
+  mostrarModal(titulo, result.message);
+
+  if (result.pontosGanhos > 0) {
+    usuarioLogado.pontos += result.pontosGanhos;
+    localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
+    atualizarUIHeader(usuarioLogado);
+    carregarCuponsLoja(); // Recarrega botões da loja
+  }
+  
+  iniciarContador(); // Bloqueia e inicia contagem
+}
+
+// ==========================================
+// LOJA DE CUPONS E RESGATE
 // ==========================================
 async function carregarCuponsLoja() {
   const spinner = document.getElementById("loading-spinner");
   const content = document.getElementById("loja-content");
 
-  // Ativa Loading
   if (spinner) spinner.style.display = "flex";
   if (content) content.style.display = "none";
 
   try {
-    const response = await fetch(`${BASE_API_URL}/cupons`);
-    if (!response.ok) throw new Error("Falha ao buscar cupons da loja.");
+    const resMeusCupons = await fetch(`${BASE_API_URL}/usuarios/${usuarioLogado.id}/cupons`);
+    if(resMeusCupons.ok) {
+      const meusCupons = await resMeusCupons.json();
+      idsMeusCupons = meusCupons.map((c) => c.id_cupom || c.id);
+    }
 
+    const response = await fetch(`${BASE_API_URL}/cupons`);
     const cupons = await response.json();
     const container = document.getElementById("cupons-loja-container");
     container.innerHTML = "";
 
-    if (cupons.length === 0) {
-      container.innerHTML =
-        "<p style='grid-column: 1/-1; text-align: center;'>Nenhum cupom disponível na loja no momento.</p>";
-    } else {
-      cupons.forEach((cupom) => {
-        const card = document.createElement("div");
-        card.className = "coupon-card";
+    cupons.forEach((cupom) => {
+      const card = document.createElement("div");
+      card.className = "coupon-card";
+      
+      const jaPossui = idsMeusCupons.includes(cupom.id);
+      const saldoSuficiente = usuarioLogado.pontos >= cupom.custo_pontos;
+      
+      let btnState = "";
+      let btnText = "Resgatar Agora";
 
-        const podeResgatar = usuarioLogado.pontos >= cupom.custo_pontos;
-        const btnState = podeResgatar ? "" : "disabled";
-        const btnText = podeResgatar
-          ? "Resgatar Agora"
-          : "Pontos Insuficientes";
+      if (jaPossui) {
+        btnState = "disabled";
+        btnText = "Já Resgatou";
+      } else if (!saldoSuficiente) {
+        btnState = "disabled";
+        btnText = "Pontos Insuficientes";
+      }
 
-        card.innerHTML = `
-                  <div>
-                      <h3>${cupom.nome}</h3>
-                      <p style="color: #aaa;">${cupom.tipo}</p>
-                      <div class="discount">- R$ ${parseFloat(cupom.desconto).toFixed(2)}</div>
-                  </div>
-                  <div>
-                      <div class="cost"><i class="fas fa-star"></i> ${cupom.custo_pontos} pontos</div>
-                      <button class="btn-redeem" ${btnState} onclick="resgatarCupom(${cupom.id}, ${cupom.custo_pontos})">${btnText}</button>
-                  </div>
-              `;
-        container.appendChild(card);
-      });
-    }
+      card.innerHTML = `
+          <div>
+              <h3>${cupom.nome}</h3>
+              <p style="color: #aaa;">${cupom.tipo}</p>
+              <div class="discount">- R$ ${parseFloat(cupom.desconto).toFixed(2)}</div>
+          </div>
+          <div>
+              <div class="cost"><i class="fas fa-star"></i> ${cupom.custo_pontos} pontos</div>
+              <button class="btn-redeem" ${btnState} onclick="confirmarResgate(${cupom.id}, ${cupom.custo_pontos}, '${cupom.nome}')">${btnText}</button>
+          </div>
+      `;
+      container.appendChild(card);
+    });
 
-    // Exibe Conteúdo após carregar
     if (content) content.style.display = "block";
   } catch (error) {
-    console.error("Erro:", error);
-    const container = document.getElementById("loja-content");
-    if (container) {
-      container.innerHTML =
-        "<p style='text-align: center; color: white;'>Erro ao carregar os cupons da loja.</p>";
-      container.style.display = "block";
-    }
+    console.error("Erro na Loja:", error);
   } finally {
-    // Desativa Loading
     if (spinner) spinner.style.display = "none";
   }
 }
 
-async function resgatarCupom(idCupom, custo) {
-  if (usuarioLogado.pontos < custo) {
-    alert("Você não tem pontos suficientes para este resgate.");
-    return;
-  }
+function confirmarResgate(idCupom, custo, nomeCupom) {
+  mostrarModal(
+    "Confirmar Resgate",
+    `Deseja gastar ${custo} pontos para resgatar o cupom "${nomeCupom}"?`,
+    true,
+    () => processarResgate(idCupom, custo)
+  );
+}
 
-  const confirmar = confirm(`Deseja resgatar este cupom por ${custo} pontos?`);
-  if (!confirmar) return;
-
+async function processarResgate(idCupom, custo) {
   try {
     const response = await fetch(`${BASE_API_URL}/cupons/resgatar`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id_usuario: usuarioLogado.id,
-        id_cupom: idCupom,
-      }),
+      body: JSON.stringify({ id_usuario: usuarioLogado.id, id_cupom: idCupom }),
     });
-
     const result = await response.json();
 
     if (!response.ok) {
-      alert(result.error || "Erro ao resgatar o cupom.");
+      mostrarModal("Erro no Resgate", result.error);
       return;
     }
 
-    alert("Cupom resgatado com sucesso! Verifique sua carteira no Perfil.");
-
-    // Atualiza apenas localmente para ser mais rápido (e já bate de frente no DB no próximo F5)
+    mostrarModal("Sucesso!", "Cupom resgatado! Você pode ativar o cupom quando quiser na hora de comprar seu carrinho.");
     usuarioLogado.pontos -= custo;
     localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
-
     atualizarUIHeader(usuarioLogado);
-    carregarCuponsLoja(); // Recarrega para bloquear botões que o usuário não pode mais pagar
+    carregarCuponsLoja(); 
   } catch (error) {
-    console.error("Erro no resgate:", error);
-    alert("Erro interno ao processar o resgate.");
+    mostrarModal("Erro", "Falha de conexão com o servidor.");
   }
 }
 
+// ==========================================
+// MODAL PERSONALIZADO
+// ==========================================
+function mostrarModal(titulo, mensagem, isConfirmacao = false, acaoConfirmar = null) {
+  document.getElementById("modal-title").innerText = titulo;
+  document.getElementById("modal-msg").innerText = mensagem;
+  const actionsDiv = document.getElementById("modal-actions");
+  actionsDiv.innerHTML = "";
+
+  if (isConfirmacao) {
+    const btnCancel = document.createElement("button");
+    btnCancel.className = "btn-modal btn-cancel";
+    btnCancel.innerText = "Cancelar";
+    btnCancel.onclick = fecharModal;
+
+    const btnConfirm = document.createElement("button");
+    btnConfirm.className = "btn-modal btn-confirm";
+    btnConfirm.innerText = "Confirmar";
+    btnConfirm.onclick = () => { fecharModal(); if (acaoConfirmar) acaoConfirmar(); };
+
+    actionsDiv.append(btnCancel, btnConfirm);
+  } else {
+    const btnOk = document.createElement("button");
+    btnOk.className = "btn-modal btn-confirm";
+    btnOk.innerText = "Entendi";
+    btnOk.onclick = fecharModal;
+    actionsDiv.appendChild(btnOk);
+  }
+  document.getElementById("custom-modal").style.display = "flex";
+}
+function fecharModal() { document.getElementById("custom-modal").style.display = "none"; }
+
+// Inicialização
 window.onload = async () => {
-  const autenticado = await verificarAutenticacao();
-  if (autenticado) {
+  drawWheel(); // Desenha a roleta no estado inicial
+  if (await verificarAutenticacao()) {
     carregarCuponsLoja();
   }
 };

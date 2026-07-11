@@ -1,5 +1,5 @@
 /* ==========================================
-   HEADER / NAVBAR
+   HEADER / NAVBAR (Padrão Unificado)
    ========================================== */
 .navbar {
   background-color: #0f0f1e;
@@ -22,30 +22,30 @@
 }
 
 .logo-unico {
-  height: 40px; /* Tamanho fixo para a logo quadrada/ícone */
+  height: 40px;
   width: auto;
   border-radius: 8px;
 }
 
 .logo-nome {
-  height: 25px; /* Tamanho fixo para o texto/nome */
+  height: 25px;
   width: auto;
   object-fit: contain;
 }
 
-/* Responsividade unificada */
 @media (max-width: 768px) {
   .navbar { height: 60px; }
   .logo-unico { height: 32px; }
   .logo-nome { height: 20px; }
 }
 
-/* Badge de Saldo */
+/* Badge de Saldo e Pontos no Header */
 .balance-badge {
   background: rgba(0, 255, 136, 0.1);
   color: #00ff88;
   border: 1px solid rgba(0, 255, 136, 0.2);
   cursor: default;
+  transition: 0.3s;
 }
 
 .balance-badge:hover {
@@ -54,17 +54,33 @@
   box-shadow: 0 6px 15px rgba(0, 255, 136, 0.2);
 }
 
+.points-badge {
+  background: rgba(254, 202, 87, 0.1);
+  color: #feca57;
+  border: 1px solid rgba(254, 202, 87, 0.2);
+  cursor: default;
+  transition: 0.3s;
+}
+
+.points-badge:hover {
+  background: rgba(254, 202, 87, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(254, 202, 87, 0.2);
+}
+
+
 /* ==========================================
    LOJA DE RECOMPENSAS (PONTOS) - WRAPPER
    ========================================== */
 .points-wrapper {
   max-width: 1200px;
-  margin: 20px auto 40px; /* Alinhado com o layout sticky */
+  margin: 20px auto 40px;
   padding: 0 20px;
   color: #ffffff;
   font-family: "Inter", sans-serif;
   min-height: 60vh;
 }
+
 
 /* ==========================================
    SEÇÃO EXPLICATIVA (COMO FUNCIONA)
@@ -94,11 +110,7 @@
   text-align: center;
   border: 1px solid #333355;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .explainer-card:hover {
@@ -125,37 +137,124 @@
   line-height: 1.5;
 }
 
-/* Card Especial: Em Breve (Roleta) */
-.feature-soon {
-  border-color: #ffaa00;
-  opacity: 0.85;
-}
-
-.feature-soon i {
-  color: #ffaa00;
-}
-
-.feature-soon:hover {
-  box-shadow: 0 12px 25px rgba(255, 170, 0, 0.2);
-  border-color: #ffaa00;
-}
-
-.soon-badge {
-  position: absolute;
-  top: 15px;
-  right: -30px;
-  background: linear-gradient(135deg, #ffaa00, #ff5500);
-  color: white;
-  padding: 5px 30px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  transform: rotate(45deg);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
-}
 
 /* ==========================================
-   PAINEL DE CABEÇALHO DA LOJA
+   SESSÃO DE DESTAQUE: ROLETA DIÁRIA (CANVAS)
+   ========================================== */
+.roulette-container {
+  background: linear-gradient(135deg, #1a1a2e 0%, #252545 100%);
+  border: 2px solid #ffaa00;
+  border-radius: 16px;
+  padding: 40px 20px;
+  text-align: center;
+  margin-bottom: 50px;
+  box-shadow: 0 15px 35px rgba(255, 170, 0, 0.15);
+  animation: fadeInContent 0.6s ease-in-out;
+}
+
+.roulette-header h2 {
+  font-size: 2.5rem;
+  color: #ffaa00;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
+}
+
+.roulette-header p {
+  color: #e1e1e6;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+}
+
+/* Wrapper do Canvas e Ponteiro */
+.wheel-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto 30px;
+}
+
+#wheelCanvas {
+  border-radius: 50%;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+  border: 4px solid #111;
+  background-color: #1a1a2e; /* Fundo escuro atrás do canvas */
+}
+
+/* Seta apontadora no topo da roleta */
+.wheel-pointer {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 35px solid #ff3366; /* Cor da seta (vermelha) */
+  z-index: 10;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+}
+
+/* Botões da Roleta */
+.roulette-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.btn-spin {
+  background: linear-gradient(135deg, #ffaa00, #ff7700);
+  color: #111;
+  font-size: 1.2rem;
+  font-weight: 900;
+  padding: 15px 40px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: 0 8px 20px rgba(255, 170, 0, 0.4);
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+}
+
+.btn-spin:hover:not(:disabled) {
+  transform: scale(1.05) translateY(-3px);
+  box-shadow: 0 12px 25px rgba(255, 170, 0, 0.6);
+}
+
+.btn-spin:disabled {
+  background: #33334d;
+  color: #888888;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Caixa do Contador de Tempo */
+.countdown-box {
+  font-size: 1.1rem;
+  color: #a5b1c2;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px 25px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: inline-block;
+  animation: fadeInContent 0.3s ease;
+}
+
+.countdown-box strong {
+  color: #feca57;
+  letter-spacing: 2px;
+  margin-left: 5px;
+  font-variant-numeric: tabular-nums; /* Evita que o relógio trema */
+}
+
+
+/* ==========================================
+   PAINEL DE CABEÇALHO DA LOJA DE CUPONS
    ========================================== */
 .points-header {
   background-color: #1a1a2e;
@@ -165,7 +264,6 @@
   margin-bottom: 40px;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
   border: 1px solid #333355;
-  animation: fadeInContent 0.7s ease-in-out;
 }
 
 .points-header h1 {
@@ -187,23 +285,6 @@
   text-shadow: 0 0 15px rgba(254, 202, 87, 0.3);
 }
 
-/* ==========================================
-   LOADING E ANIMAÇÃO
-   ========================================== */
-@keyframes fadeInContent {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.loading-container {
-  min-height: 30vh;
-}
 
 /* ==========================================
    GRID DE RECOMPENSAS (CUPONS)
@@ -214,7 +295,6 @@
   gap: 25px;
 }
 
-/* Card Individual de Cupom */
 .coupon-card {
   background-color: #2a2a4a;
   padding: 25px 20px;
@@ -224,9 +304,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -260,7 +338,6 @@
   gap: 8px;
 }
 
-/* Botão de Resgate */
 .btn-redeem {
   background-color: #feca57;
   color: #111111;
@@ -281,9 +358,120 @@
 }
 
 .btn-redeem:disabled {
-  background-color: #4b4b6b;
-  color: #888888;
+  background-color: #33334d;
+  color: #666680;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
+}
+
+
+/* ==========================================
+   MODAL UNIVERSAL (Substitui os Alerts)
+   ========================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.modal-content {
+  background: #1a1a2e;
+  border: 1px solid #333355;
+  border-top: 4px solid #2a2aef;
+  border-radius: 16px;
+  padding: 40px 30px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+#modal-title {
+  color: #fff;
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+}
+
+#modal-msg {
+  color: #a5b1c2;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+.btn-modal {
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.btn-confirm {
+  background: #00ff88;
+  color: #111;
+}
+
+.btn-confirm:hover {
+  background: #33ff99;
+  transform: translateY(-2px);
+}
+
+.btn-cancel {
+  background: #444466;
+  color: #fff;
+}
+
+.btn-cancel:hover {
+  background: #555577;
+  transform: translateY(-2px);
+}
+
+
+/* ==========================================
+   LOADING GLOBAL
+   ========================================== */
+@keyframes fadeInContent {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.loading-container {
+  min-height: 30vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #2a2aef;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

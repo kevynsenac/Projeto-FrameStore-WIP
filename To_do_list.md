@@ -1,6 +1,9 @@
-1. Implementar roda de pontos com ganho de pontos diários (e lógica segura para evitar mais de um giro por dia)
-2. Alterar cards dos jogos na homepage.html para ter no topo a plataforma do jogo a qual pertece
-3. Remover alerts e colocar os avisos nas páginas em sí
-4. Implementar descrição e requisitos nas tables dos jogos e nas suas páginas
-5. Implementar datas de duração e condição de resgate único nos cupons (precisa de bug fix)
-6. Bug fix: Opção de alterar senhas no painel do adm
+FEATURES:
+- Sobre os cards da homepage: Devem ter no topo do card uma faixa dizendo a qual plataforma pertencem e, em baixo do card, se já possui o jogo (em caso positivo)
+- Implementar descrição e requisitos dos jogos e nas suas respectivas páginas
+- Implementar datas de duração nos cupons
+- Remover alerts e colocar os avisos nas páginas em sí (WIP)
+
+BUGS:
+- Na página do jogo, não deve ser possui adicionar ao carrinho jogos que já possui na conta
+- Opção de alterar senhas no painel do adm e duração dos cupons (após implementação)

@@ -57,7 +57,7 @@ async function deletarJogo(req, res) {
 
 async function getUsuarios(req, res) {
   try {
-    const [usuarios] = await db.query("SELECT id, nome, email, senha, saldo, pontos, adm FROM USUARIOS");
+    const [usuarios] = await db.query("SELECT id, nome, email, senha, saldo, pontos, adm, ultima_roleta FROM USUARIOS");
     res.json(usuarios);
   } catch (error) {
     res.status(500).json({ error: "Erro ao listar usuários." });

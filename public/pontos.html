@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/pontos.css" />
   </head>
   <body>
+    <!-- HEADER -->
     <header class="navbar">
       <div class="logo-container">
         <div class="dashboard-menu" onclick="toggleMenu()">
@@ -32,9 +33,7 @@
         </div>
         <a href="carrinho.html" class="action-badge cart-badge">
           <i class="fas fa-shopping-cart"></i> <span>Carrinho</span>
-          <span id="cart-count" class="cart-count" style="display: none"
-            >0</span
-          >
+          <span id="cart-count" class="cart-count" style="display: none">0</span>
         </a>
         <div id="auth-container" style="display: inline-block">
           <a href="login.html">
@@ -44,6 +43,7 @@
       </div>
     </header>
 
+    <!-- MENU LATERAL -->
     <aside class="sidebar-menu" id="sidebar">
       <div class="sidebar-header">
         <div class="dashboard-menu" onclick="toggleMenu()">
@@ -54,55 +54,63 @@
         <li>
           <a href="homepage.html"><i class="fas fa-home"></i> Início</a>
         </li>
-        <li>
-          <a href="#"><i class="fas fa-tag"></i> Ofertas</a>
-        </li>
-        <li>
-          <a href="#"><i class="fas fa-desktop"></i> PC</a>
-        </li>
       </ul>
     </aside>
-
     <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
 
+    <!-- CONTEÚDO PRINCIPAL -->
     <main class="points-wrapper">
+      
+      <!-- COMO FUNCIONA -->
       <section class="points-explainer">
         <h2>Como funciona a FrameStore Points?</h2>
         <div class="explainer-grid">
           <div class="explainer-card">
             <i class="fas fa-gamepad"></i>
             <h3>Compre e Ganhe</h3>
-            <p>
-              Ao finalizar qualquer compra na loja, uma porcentagem do valor
-              gasto volta para sua conta em formato de pontos.
-            </p>
+            <p>Ao finalizar qualquer compra na loja, uma porcentagem do valor gasto volta para sua conta em formato de pontos.</p>
           </div>
           <div class="explainer-card">
             <i class="fas fa-ticket-alt"></i>
             <h3>Troque por Cupons</h3>
-            <p>
-              Junte seus pontos e troque-os por descontos reais na Loja de
-              Recompensas abaixo para economizar no próximo jogo.
-            </p>
+            <p>Junte seus pontos e troque-os por descontos reais na Loja de Recompensas para economizar no próximo jogo.</p>
           </div>
-          <div class="explainer-card feature-soon">
-            <div class="soon-badge">Em Breve</div>
-            <i class="fas fa-dharmachakra"></i>
+          <div class="explainer-card">
+            <i class="fas fa-dharmachakra" style="color: #ffaa00;"></i>
             <h3>Roleta Diária</h3>
-            <p>
-              Faça login todos os dias para girar a roleta da sorte e ganhar
-              desde pontos extras até jogos gratuitos direto na conta!
-            </p>
+            <p>Gire a roleta da sorte abaixo gratuitamente uma vez por dia (UTC±0) e concorra a até 250 pontos direto na sua conta!</p>
           </div>
         </div>
       </section>
 
+      <!-- ROLETA VISUAL (CANVAS) -->
+      <section class="roulette-container" id="sessao-roleta">
+        <div class="roulette-header">
+          <h2>Roleta da Sorte</h2>
+          <p>Tente a sorte hoje! Gire a roleta e concorra a pontos.</p>
+        </div>
+        
+        <div class="wheel-container">
+          <canvas id="wheelCanvas" width="300" height="300"></canvas>
+          <div class="wheel-pointer"></div>
+        </div>
+        
+        <div class="roulette-actions">
+          <button id="btn-girar" class="btn-spin" onclick="iniciarGiroRoleta()">GIRAR ROLETA</button>
+          
+          <div id="countdown-container" class="countdown-box" style="display: none;">
+            <span>Próximo giro em: </span>
+            <strong id="countdown-timer">00:00:00</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOJA DE CUPONS -->
       <section class="points-header">
         <h1>Loja de Recompensas</h1>
         <p>Utilize seu saldo para resgatar benefícios exclusivos.</p>
         <h2 style="margin-top: 20px">
-          Seu Saldo:
-          <span id="saldo-pontos" style="color: #feca57">0</span> pontos
+          Seu Saldo: <span id="saldo-pontos" style="color: #feca57">0</span> pontos
         </h2>
       </section>
 
@@ -112,19 +120,22 @@
       </div>
 
       <section id="loja-content" style="display: none">
-        <h2
-          style="
-            margin-bottom: 20px;
-            color: #fff;
-            border-bottom: 2px solid #333355;
-            padding-bottom: 10px;
-          "
-        >
+        <h2 style="margin-bottom: 20px; color: #fff; border-bottom: 2px solid #333355; padding-bottom: 10px;">
           Cupons Disponíveis
         </h2>
         <div class="coupons-grid" id="cupons-loja-container"></div>
       </section>
+      
     </main>
+
+    <!-- MODAL UNIVERSAL -->
+    <div id="custom-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <h2 id="modal-title">Título</h2>
+        <p id="modal-msg" style="color: #a5b1c2; margin-bottom: 25px;">Mensagem</p>
+        <div id="modal-actions" style="display: flex; gap: 15px; justify-content: center;"></div>
+      </div>
+    </div>
 
     <script src="js/homepage.js"></script>
     <script src="js/pontos.js"></script>

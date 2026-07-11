@@ -19,7 +19,7 @@ async function login(req, res) {
   const { email, senha } = req.body;
   try {
     const [rows] = await db.query(
-      "SELECT id, nome, email, saldo, pontos, adm FROM USUARIOS WHERE email = ? AND senha = ?",
+      "SELECT id, nome, email, saldo, pontos, adm, ultima_roleta FROM USUARIOS WHERE email = ? AND senha = ?",
       [email, senha]
     );
     if (rows.length === 0) {
@@ -34,7 +34,7 @@ async function login(req, res) {
 async function getUsuario(req, res) {
   const { id } = req.params;
   try {
-    const [rows] = await db.query("SELECT id, nome, email, saldo, pontos, adm FROM USUARIOS WHERE id = ?", [id]);
+    const [rows] = await db.query("SELECT id, nome, email, saldo, pontos, adm, ultima_roleta FROM USUARIOS WHERE id = ?", [id]);
     if (rows.length === 0) {
       return res.status(404).json({ error: "Usuário não encontrado." });
     }

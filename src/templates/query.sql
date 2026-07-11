@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS USUARIOS (
     senha VARCHAR(255) NOT NULL,
     saldo DECIMAL(10, 2) DEFAULT 0.00,
     pontos INT DEFAULT 0,
-    adm BOOLEAN DEFAULT FALSE
+    adm BOOLEAN DEFAULT FALSE,
+    ultima_roleta DATE DEFAULT NULL
 );
 
 -- Tabela de Jogos

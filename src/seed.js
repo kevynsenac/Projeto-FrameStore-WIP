@@ -1,7 +1,7 @@
 // Script para popular o banco de dados com jogos de exemplo e suas respectivas imagens (cover e screenshots)
 // Para executar: npm run seed
 require("dotenv").config();
-const pool = require("./db.js");
+const pool = require("./config/db.js");
 const fs = require("fs");
 const path = require("path");
 

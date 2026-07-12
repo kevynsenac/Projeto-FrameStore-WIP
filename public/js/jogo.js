@@ -32,7 +32,7 @@ async function carregarDetalhesJogo() {
     if (!response.ok) throw new Error("Falha ao buscar detalhes do jogo.");
 
     jogoAtual = await response.json();
-    renderizarDetalhes(jogoAtual);
+    await renderizarDetalhes(jogoAtual);
     
     // Mostra o conteúdo do jogo em caso de sucesso
     if (content) content.style.display = "block";
@@ -54,7 +54,7 @@ function formatPrice(value) {
   }).format(value);
 }
 
-function renderizarDetalhes(game) {
+async function renderizarDetalhes(game) {
   document.querySelector(".game-title").innerText = game.titulo;
 
   const precoOriginal = parseFloat(game.preco);
@@ -68,10 +68,34 @@ function renderizarDetalhes(game) {
   const priceSection = document.querySelector(".price-section");
   const btnPurchase = document.querySelector(".btn-purchase-green");
 
-  // Corrige a exibição para jogos Grátis e Em Breve
-  if (isEmBreve) {
+  // 1. CHECAGEM SE O USUÁRIO JÁ POSSUI O JOGO
+  let usuarioTemJogo = false;
+  const userStr = localStorage.getItem("usuarioLogado");
+  if (userStr) {
+    const usuarioLogado = JSON.parse(userStr);
+    try {
+      const response = await fetch(`${BASE_API_URL}/usuarios/${usuarioLogado.id}/biblioteca`);
+      if (response.ok) {
+        const bib = await response.json();
+        usuarioTemJogo = bib.some(j => j.id === game.id);
+      }
+    } catch (e) {
+      console.error("Erro ao checar biblioteca:", e);
+    }
+  }
+
+  // 2. LÓGICA DO BOTÃO E PREÇOS
+  if (usuarioTemJogo) {
+    priceSection.innerHTML = `<span class="value" style="color: #aaa; font-size: 2rem;">Na Biblioteca</span>`;
+    if (btnPurchase) {
+        btnPurchase.disabled = true;
+        btnPurchase.style.background = "#444";
+        btnPurchase.style.color = "#aaa";
+        btnPurchase.style.cursor = "not-allowed";
+        btnPurchase.innerHTML = `<i class="fas fa-check-circle"></i> Já Adquirido`;
+    }
+  } else if (isEmBreve) {
     priceSection.innerHTML = `<span class="value" style="color: #ffaa00; font-size: 2rem;">Em Breve</span>`;
-    // Desabilita o botão de comprar visualmente e logicamente
     if (btnPurchase) {
         btnPurchase.disabled = true;
         btnPurchase.style.opacity = "0.5";
@@ -93,10 +117,44 @@ function renderizarDetalhes(game) {
     priceSection.innerHTML = `<span class="value">${formatPrice(precoFinal)}</span>`;
   }
 
-  if (game.platform) {
-    document.getElementById("game-platform").innerText = game.platform;
+  // 3. LÓGICA DO CARD DA PLATAFORMA E TEMA DA PÁGINA
+  const platformCard = document.getElementById("platform-card");
+  const platformIcon = document.getElementById("platform-icon");
+  const platformName = document.getElementById("game-platform");
+
+  if (platformCard && platformIcon && platformName) {
+    const platformStr = game.platform ? game.platform.toLowerCase() : '';
+    platformCard.className = "platform-info-card"; // Reseta as classes
+
+    if (platformStr.includes("pc") || platformStr.includes("steam")) {
+        document.body.setAttribute('data-theme', 'steam');
+        platformCard.classList.add("bg-steam");
+        platformIcon.className = "fab fa-steam";
+        platformName.innerText = game.platform || "Steam / PC";
+    } else if (platformStr.includes("playstation")) {
+        document.body.setAttribute('data-theme', 'playstation');
+        platformCard.classList.add("bg-playstation");
+        platformIcon.className = "fab fa-playstation";
+        platformName.innerText = game.platform || "PlayStation";
+    } else if (platformStr.includes("xbox")) {
+        document.body.setAttribute('data-theme', 'xbox');
+        platformCard.classList.add("bg-xbox");
+        platformIcon.className = "fab fa-xbox";
+        platformName.innerText = game.platform || "Xbox";
+    } else if (platformStr.includes("nintendo")) {
+        document.body.setAttribute('data-theme', 'nintendo');
+        platformCard.classList.add("bg-nintendo");
+        platformIcon.className = "fas fa-gamepad";
+        platformName.innerText = game.platform || "Nintendo";
+    } else {
+        document.body.removeAttribute('data-theme');
+        platformCard.classList.add("bg-default");
+        platformIcon.className = "fas fa-gamepad";
+        platformName.innerText = game.platform || "Outros";
+    }
   }
 
+  // 4. GALERIA
   galeria = [
     game.cover,
     game.screenshot1,

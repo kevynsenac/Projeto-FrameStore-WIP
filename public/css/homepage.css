@@ -335,7 +335,7 @@ main,
 }
 
 /* ==========================================
-   5. NAVBAR E BUSCA
+   5. NAVBAR E BUSCA UNIFICADA
    ========================================== */
 .navbar {
   background-color: #0f0f1e;
@@ -347,86 +347,186 @@ main,
   top: 0;
   z-index: 1000;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  height: 70px;
+  min-height: 70px;
 }
 
 .logo-container {
+  flex: 1; /* Ocupa o mesmo espaço que as ações da direita */
   display: flex;
   align-items: center;
   gap: 12px;
-  height: 100%;
+  justify-content: flex-start;
 }
 
 .logo-unico {
-  height: 40px; /* Tamanho fixo para a logo quadrada/ícone */
+  max-width: 40px;
+  max-height: 40px;
   width: auto;
+  height: auto;
   border-radius: 8px;
 }
 
 .logo-nome {
-  height: 25px; /* Tamanho fixo para o texto/nome */
+  max-width: 150px;
+  max-height: 25px;
   width: auto;
+  height: auto;
   object-fit: contain;
 }
 
-/* Responsividade unificada */
-@media (max-width: 768px) {
-  .navbar { height: 60px; }
-  .logo-unico { height: 32px; }
-  .logo-nome { height: 20px; }
-}
-
 .search-bar {
+  position: relative;
   display: flex;
   align-items: center;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 30px;
-  padding: 10px 20px;
+  padding: 4px 18px 4px 6px;
   flex-grow: 1;
-  max-width: 500px;
+  max-width: 550px;
+  margin: 0 auto; /* Garante a centralização no meio do espaço restante */
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
+  gap: 10px;
 }
 
-.search-bar:focus-within {
-  border-color: var(--accent-blue);
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 15px rgba(58, 58, 255, 0.3);
-}
-
+/* Força o input do navegador a ficar invisível e herdar o design do container */
 .search-bar input {
   flex-grow: 1;
-  background: transparent;
-  border: none;
-  color: var(--text-color);
-  outline: none;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: var(--text-color) !important;
   padding: 5px 10px;
   font-size: 1rem;
 }
 
-.search-bar input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+.search-bar:focus-within {
+  border-color: var(--accent-blue);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 15px rgba(58, 58, 255, 0.2);
 }
 
-.search-bar i {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.search-bar:focus-within i,
-.search-bar i:hover {
+/* Indicador transformado em botão interno */
+.active-filter-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-weight: 600;
   color: var(--text-color);
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.active-filter-display:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent-blue);
+}
+
+.dropdown-arrow {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+
+/* Rotaciona a seta quando aberto */
+.active-filter-display.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+/* Novo Menu Dropdown (Antiga Sidebar) */
+.filter-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 6px;
+  width: 220px;
+  background-color: #0a0a22;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  list-style: none;
+  padding: 6px 0;
+  z-index: 2000;
+
+  /* Animação via GPU (Sem Lag) */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Estado Aberto do Dropdown */
+.active-filter-display.open .filter-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.filter-dropdown a {
+  color: var(--text-color);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.filter-dropdown a:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--hover-blue);
+}
+
+/* Item ativo no Dropdown */
+.filter-dropdown li.active-filter a {
+  color: var(--accent-blue);
+  background: rgba(58, 58, 255, 0.1);
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 10px 15px;
+    min-height: 60px;
+  }
+
+  .logo-container,
+  .user-actions {
+    flex: initial; /* Desativa a divisão igualitária no mobile */
+  }
+
+  .search-bar {
+    order: 3;
+    width: 100%;
+    max-width: none;
+    margin: 15px 0 10px 0;
+  }
+
+  .action-badge span:not(.cart-count) {
+    display: none;
+  }
 }
 
 /* ==========================================
    6. AÇÕES DO USUÁRIO (PONTOS, CARRINHO E PERFIL)
    ========================================== */
 .user-actions {
+  flex: 1; /* Ocupa o mesmo espaço que o container do logo */
   display: flex;
   align-items: center;
   gap: 15px;
+  justify-content: flex-end;
   white-space: nowrap;
 }
 
@@ -592,4 +692,185 @@ main,
   font-weight: 600;
   letter-spacing: 1px;
   opacity: 0.8;
+}
+
+/* ==========================================
+   9. TEMAS DE PLATAFORMA (DATA-THEME)
+   ========================================== */
+body {
+  transition: background 0.5s ease;
+}
+
+body[data-theme="steam"],
+body[data-theme="pc"] {
+  --bg-color-dark: #0b141a;
+  --bg-color-light: #1b2838;
+  --accent-blue: #66c0f4;
+  --card-bg: #171d25;
+}
+
+body[data-theme="playstation"] {
+  --bg-color-dark: #000022;
+  --bg-color-light: #003791;
+  --accent-blue: #0070d1;
+  --card-bg: #001233;
+}
+
+body[data-theme="xbox"] {
+  --bg-color-dark: #0b1a0b;
+  --bg-color-light: #107c10;
+  --accent-blue: #1b9c1b;
+  --card-bg: #0a1f0a;
+}
+
+body[data-theme="nintendo"] {
+  --bg-color-dark: #220000;
+  --bg-color-light: #a6000c;
+  --accent-blue: #e60012;
+  --card-bg: #330000;
+}
+
+/* ==========================================
+   10. DISPLAY DO FILTRO ATIVO (HEADER)
+   ========================================== */
+.active-filter-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: 1px solid var(--accent-blue);
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0 15px;
+  transition: all 0.3s ease;
+}
+
+.active-filter-display i {
+  color: var(--accent-blue);
+  font-size: 1.2rem;
+}
+
+@media (max-width: 992px) {
+  .active-filter-display {
+    display: none; /* Oculto em telas menores para não quebrar o layout do header */
+  }
+}
+
+/* ==========================================
+   11. INDICADOR LATERAL (SIDEBAR)
+   ========================================== */
+.sidebar-menu {
+  width: 260px;
+  background-color: #0a0a22;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0; /* Fixado em 0 */
+  height: 100vh;
+  z-index: 2000;
+
+  /* Move a barra para fora da tela via GPU e reduz o tempo de 0.4s para 0.3s para maior fluidez */
+  transform: translateX(-110%);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform; /* Informa o navegador para otimizar essa animação antes de ocorrer */
+
+  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.8);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-menu.active {
+  transform: translateX(0); /* Traz a barra de volta para a tela */
+}
+
+/* ==========================================
+   12. CARDS NA BIBLIOTECA
+   ========================================== */
+.game-card.na-biblioteca {
+  opacity: 0.55;
+  filter: grayscale(30%);
+}
+
+.game-card.na-biblioteca:hover {
+  opacity: 0.9;
+  filter: grayscale(0%);
+}
+
+.game-card.na-biblioteca .price {
+  color: #aaa;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+/* ==========================================
+   13. FAIXAS DE PLATAFORMA NOS CARDS
+   ========================================== */
+.platform-banner {
+  width: 100%;
+  padding: 8px 0;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: white;
+  border-radius: 16px 16px 0 0;
+}
+
+/* Injeção de ícones FontAwesome via CSS nas faixas */
+.platform-banner::before {
+  font-family: "Font Awesome 6 Brands", "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+
+.platform-pc {
+  background: linear-gradient(90deg, #1b2838, #2a475e);
+}
+.platform-pc::before {
+  content: "\f3f6";
+} /* steam symbol */
+
+.platform-playstation {
+  background: linear-gradient(90deg, #003791, #0070d1);
+}
+.platform-playstation::before {
+  content: "\f3df";
+} /* playstation symbol */
+
+.platform-xbox {
+  background: linear-gradient(90deg, #107c10, #1b9c1b);
+}
+.platform-xbox::before {
+  content: "\f412";
+} /* xbox symbol */
+
+.platform-nintendo {
+  background: linear-gradient(90deg, #e60012, #ff3333);
+}
+.platform-nintendo::before { 
+  content: "\f11b"; 
+  font-family: "Font Awesome 6 Free"; 
+  font-weight: 900; 
+}
+
+.platform-default {
+  background: linear-gradient(90deg, #444, #666);
+}
+.platform-default::before {
+  content: "\f11b"; /* gamepad */
+  font-family: "Font Awesome 6 Free";
+}
+
+/* ==========================================
+   14. AJUSTES DE SOBREPOSIÇÃO 
+   ========================================== */
+/* Desce a badge de promoção para não ficar em cima da faixa da plataforma */
+.promo-badge {
+  top: 45px;
 }

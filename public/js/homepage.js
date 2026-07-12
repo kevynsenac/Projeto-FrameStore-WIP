@@ -1,6 +1,7 @@
 let currentSlide = 0;
 let bannerInterval;
 let todosJogos = [];
+let jogosNaBiblioteca = []; // Variável global para armazenar os IDs dos jogos comprados
 
 function protegerPagina() {
   const userStr = localStorage.getItem("usuarioLogado");
@@ -28,15 +29,6 @@ function startBannerInterval() {
   bannerInterval = setInterval(() => changeSlide(1), 5000);
 }
 
-function toggleMenu() {
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("overlay");
-  if (sidebar && overlay) {
-    sidebar.classList.toggle("active");
-    overlay.classList.toggle("active");
-  }
-}
-
 // ==========================================
 // INTEGRAÇÃO COM API
 // ==========================================
@@ -45,7 +37,7 @@ const API_URL = window.location.hostname === 'localhost'
     : '/api';
 
 // ==========================================
-// AUTENTICAÇÃO HEADER, CARRINHO E DADOS FRESCOS
+// AUTENTICAÇÃO HEADER, CARRINHO, BIBLIOTECA
 // ==========================================
 async function verificarAutenticacaoNavbar() {
   const userStr = localStorage.getItem("usuarioLogado");
@@ -55,6 +47,9 @@ async function verificarAutenticacaoNavbar() {
     
     // Atualiza a UI imediatamente com o cache local para evitar "pulos" visuais
     atualizarUIHeader(usuario);
+
+    // Busca a biblioteca de jogos do usuário
+    fetchBiblioteca(usuario.id);
 
     // Busca os dados reais e atualizados do Banco de Dados
     try {
@@ -77,7 +72,6 @@ async function verificarAutenticacaoNavbar() {
   }
 }
 
-// Função auxiliar para renderizar os dados do usuário no header
 function atualizarUIHeader(usuario) {
   const authContainer = document.getElementById("auth-container");
   const navPontos = document.getElementById("nav-pontos");
@@ -116,8 +110,26 @@ async function atualizarContadorCarrinho(id_usuario) {
   }
 }
 
+async function fetchBiblioteca(id_usuario) {
+  try {
+    const response = await fetch(`${API_URL}/usuarios/${id_usuario}/biblioteca`);
+    if (response.ok) {
+      const bibliotecaData = await response.json();
+      // Mapeia o array de objetos para salvar apenas os IDs dos jogos na memória
+      jogosNaBiblioteca = bibliotecaData.map(jogo => jogo.id); 
+      
+      // Se os jogos do catálogo já carregaram, re-renderiza para aplicar os estilos de "Na Biblioteca"
+      if (todosJogos.length > 0) {
+        renderGames(todosJogos);
+      }
+    }
+  } catch (error) {
+    console.error("Erro ao buscar biblioteca:", error);
+  }
+}
+
 // ==========================================
-// BUSCA E PESQUISA
+// BUSCA, PESQUISA E FILTROS DE PLATAFORMA
 // ==========================================
 function configurarBusca() {
   const searchInput = document.getElementById("search-input");
@@ -132,6 +144,89 @@ function configurarBusca() {
   });
 }
 
+// Controle de abertura do Dropdown interno
+function toggleDropdown(event) {
+  if (event) event.stopPropagation(); // Impede o clique de propagar para o document
+  const display = document.getElementById("active-filter-display");
+  if (display) {
+    display.classList.toggle("open");
+  }
+}
+
+// Fecha o dropdown automaticamente se o usuário clicar em qualquer outro lugar da tela
+document.addEventListener("click", () => {
+  const display = document.getElementById("active-filter-display");
+  if (display) {
+    display.classList.remove("open");
+  }
+});
+
+function filtrarPlataforma(plataforma) {
+  // 1. Atualiza o tema visual
+  if (plataforma === 'todos' || plataforma === 'ofertas') {
+    document.body.removeAttribute('data-theme');
+  } else {
+    document.body.setAttribute('data-theme', plataforma);
+  }
+
+  // 2. Limpa o input de busca
+  const searchInput = document.getElementById("search-input");
+  if (searchInput) searchInput.value = "";
+
+  // 3. Atualiza os textos do gatilho do Dropdown
+  const filterName = document.getElementById("filter-name");
+  const filterIcon = document.getElementById("filter-icon");
+  
+  const configFiltros = {
+    todos: { nome: "Todos", icone: "fas fa-home" }, // Nome encurtado para caber perfeitamente
+    ofertas: { nome: "Ofertas", icone: "fas fa-tag" },
+    steam: { nome: "Steam / PC", icone: "fab fa-steam" },
+    playstation: { nome: "PlayStation", icone: "fab fa-playstation" },
+    xbox: { nome: "Xbox", icone: "fab fa-xbox" },
+    nintendo: { nome: "Nintendo", icone: "fas fa-gamepad" }
+  };
+
+  if (filterName && filterIcon && configFiltros[plataforma]) {
+    filterName.innerText = configFiltros[plataforma].nome;
+    filterIcon.className = configFiltros[plataforma].icone;
+  }
+
+  // 4. Atualiza a classe ativa dentro da lista do dropdown
+  const dropdownLinks = document.querySelectorAll("#filter-dropdown li");
+  dropdownLinks.forEach(li => {
+    li.classList.remove("active-filter");
+    const link = li.querySelector("a");
+    const onclickAttr = link ? link.getAttribute("onclick") : null;
+    if (onclickAttr && onclickAttr.includes(`'${plataforma}'`)) {
+      li.classList.add("active-filter");
+    }
+  });
+
+  // 5. Lógica de Filtragem de Dados
+  let jogosFiltrados = [];
+
+  if (plataforma === 'todos') {
+    jogosFiltrados = todosJogos;
+  } else if (plataforma === 'ofertas') {
+    jogosFiltrados = todosJogos.filter(game => {
+      const desconto = parseFloat(game.desconto);
+      return desconto > 0 && desconto < 100;
+    });
+  } else {
+    jogosFiltrados = todosJogos.filter((game) => {
+      if (!game.platform) return false;
+      const platStr = game.platform.toLowerCase();
+      
+      if (plataforma === 'steam') {
+        return platStr.includes('steam') || platStr.includes('pc');
+      }
+      return platStr.includes(plataforma.toLowerCase());
+    });
+  }
+
+  renderGames(jogosFiltrados);
+}
+
 // ==========================================
 // RENDERIZAÇÃO DE JOGOS E BANNER COM LOADING
 // ==========================================
@@ -139,7 +234,6 @@ async function fetchGames() {
   const spinner = document.getElementById("loading-spinner");
   const container = document.getElementById("games-container");
 
-  // Inicia o estado de Loading
   if (spinner) spinner.style.display = "flex";
   if (container) container.innerHTML = "";
 
@@ -157,7 +251,6 @@ async function fetchGames() {
       container.innerHTML = '<p style="color: white; text-align: center; grid-column: 1/-1;">Erro ao carregar o catálogo de jogos.</p>';
     }
   } finally {
-    // Finaliza o estado de Loading (ocorre dando erro ou sucesso)
     if (spinner) spinner.style.display = "none";
   }
 }
@@ -226,7 +319,7 @@ function renderGames(jogos) {
   container.innerHTML = "";
 
   if (jogos.length === 0) {
-    container.innerHTML = '<p style="color: white; text-align: center; grid-column: 1/-1;">Nenhum jogo encontrado.</p>';
+    container.innerHTML = '<p style="color: white; text-align: center; grid-column: 1/-1;">Nenhum jogo encontrado para esta plataforma.</p>';
     return;
   }
 
@@ -234,6 +327,25 @@ function renderGames(jogos) {
     const card = document.createElement("div");
     card.className = "game-card";
 
+    // 1. CHECAGEM DE BIBLIOTECA
+    const usuarioTemJogo = jogosNaBiblioteca.includes(game.id);
+    if (usuarioTemJogo) {
+      card.classList.add("na-biblioteca");
+    }
+
+    // 2. FAIXA DA PLATAFORMA
+    const plataformaStr = game.platform ? game.platform.toLowerCase() : '';
+    let classePlataforma = "platform-default";
+    let nomePlataforma = game.platform || "Outros";
+
+    if (plataformaStr.includes("pc") || plataformaStr.includes("steam")) classePlataforma = "platform-pc";
+    else if (plataformaStr.includes("playstation")) classePlataforma = "platform-playstation";
+    else if (plataformaStr.includes("xbox")) classePlataforma = "platform-xbox";
+    else if (plataformaStr.includes("nintendo")) classePlataforma = "platform-nintendo";
+
+    const faixaPlataformaHTML = `<div class="platform-banner ${classePlataforma}">${nomePlataforma}</div>`;
+
+    // 3. CÁLCULO DE PREÇO
     const preco = parseFloat(game.preco);
     const desconto = game.desconto ? parseFloat(game.desconto) : 0;
     const temDesconto = desconto > 0;
@@ -241,6 +353,7 @@ function renderGames(jogos) {
 
     const isEmBreve = preco === 0 && desconto !== 100;
 
+    // Configuração do clique no card
     if (!isEmBreve) {
       card.style.cursor = "pointer";
       card.onclick = () => { window.location.href = `jogo.html?id=${game.id}`; };
@@ -252,7 +365,10 @@ function renderGames(jogos) {
     let badgeHTML = "";
     let precoHTML = "";
 
-    if (preco === 0) {
+    // 4. LÓGICA DO TEXTO (Muda se tiver na biblioteca)
+    if (usuarioTemJogo) {
+       precoHTML = `<p class="price"><i class="fas fa-check-circle"></i> Na Biblioteca</p>`;
+    } else if (preco === 0) {
       if (desconto === 100) {
         badgeHTML = `<span class="promo-badge" style="background: linear-gradient(135deg, #00ff88, #00aa55); color:#111;">GRÁTIS</span>`;
         precoHTML = `<p class="price" style="color:#00ff88;">Grátis</p>`;
@@ -274,9 +390,12 @@ function renderGames(jogos) {
 
     const imgSrc = game.cover || "img/site_logo.png";
 
+    // 5. MONTAGEM FINAL DO CARD
+    // Atualizei o border-radius da imagem para ficar plano no topo, juntando com a faixa da plataforma
     card.innerHTML = `
+            ${faixaPlataformaHTML}
             ${badgeHTML}
-            <img src="${imgSrc}" alt="${game.titulo}" style="width: 100%; border-radius: 8px;">
+            <img src="${imgSrc}" alt="${game.titulo}" style="width: 100%; border-radius: 0 0 8px 8px;">
             <h3>${game.titulo}</h3>
             ${precoHTML}
         `;
@@ -287,10 +406,10 @@ function renderGames(jogos) {
 
 // Inicialização
 if (!window.location.pathname.includes("jogo.html")) {
-  window.onload = () => {
+  document.addEventListener("DOMContentLoaded", () => {
     protegerPagina(); // Verifica a autenticação primeiro
     verificarAutenticacaoNavbar();
     configurarBusca();
     fetchGames();
-  };
-}
+  });
+} 

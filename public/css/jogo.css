@@ -187,13 +187,13 @@
    CARD DE COMPRA (LATERAL DIREITA)
    ========================================== */
 .purchase-card {
-  background-color: #1a1a2e;
+  background-color: var(--card-bg, #1a1a2e); /* Usa o fundo do card do tema */
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-  border: 1px solid #333355;
+  border: 1px solid var(--accent-blue, #333355); /* Borda acompanha a cor da plataforma */
   position: sticky;
-  top: 100px; /* Acompanha a rolagem */
+  top: 100px; 
 }
 
 .price-section {
@@ -211,16 +211,24 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  background: rgba(255, 255, 255, 0.05);
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 20px;
+  color: #fff;
+  transition: background 0.3s ease;
 }
 
 .platform-info-card i {
   font-size: 2rem;
-  color: #a5b1c2;
+  color: #fff; /* Altera o cinza para branco para destacar no fundo colorido */
 }
+
+/* Classes injetadas via JS */
+.bg-steam { background: linear-gradient(90deg, #1b2838, #2a475e); border: 1px solid rgba(102, 192, 244, 0.4); }
+.bg-playstation { background: linear-gradient(90deg, #003791, #0070d1); border: 1px solid rgba(0, 112, 209, 0.4); }
+.bg-xbox { background: linear-gradient(90deg, #107c10, #1b9c1b); border: 1px solid rgba(16, 124, 16, 0.4); }
+.bg-nintendo { background: linear-gradient(90deg, #e60012, #ff3333); border: 1px solid rgba(230, 0, 18, 0.4); }
+.bg-default { background: linear-gradient(90deg, #444, #666); border: 1px solid rgba(255, 255, 255, 0.2); }
 
 .info-text strong {
   font-size: 1.1rem;
@@ -295,10 +303,10 @@
 }
 
 .modal-content {
-  background-color: #050533;
+  background-color: var(--bg-color-dark, #050533); /* Janela do modal acompanha o fundo escuro do tema */
   margin: 8% auto;
   padding: 30px;
-  border: 1px solid var(--accent-blue, #2a2aef);
+  border: 1px solid var(--accent-blue, #2a2aef); /* Borda do modal acompanha a cor da plataforma */
   border-radius: 15px;
   width: 90%;
   max-width: 500px;

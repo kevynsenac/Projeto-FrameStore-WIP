@@ -10,6 +10,7 @@
     />
     <link rel="stylesheet" href="css/homepage.css" />
     <link rel="stylesheet" href="css/jogo.css" />
+    <link rel="icon" type="image/png" href="img/site_favicon.png" />
   </head>
   <body>
     <header class="navbar">
@@ -42,36 +43,6 @@
       </div>
     </header>
 
-    <aside class="sidebar-menu" id="sidebar">
-      <div class="sidebar-header">
-        <div class="dashboard-menu" onclick="toggleMenu()">
-          <span></span><span></span><span></span>
-        </div>
-      </div>
-      <ul>
-        <li>
-          <a href="homepage.html"><i class="fas fa-home"></i> Início</a>
-        </li>
-        <li>
-          <a href="#"><i class="fas fa-tag"></i> Ofertas</a>
-        </li>
-        <li>
-          <a href="#"><i class="fas fa-gift"></i> Gift Cards</a>
-        </li>
-        <li>
-          <a href="#"><i class="fas fa-desktop"></i> PC</a>
-        </li>
-        <li>
-          <a href="#"><i class="fab fa-playstation"></i> Playstation</a>
-        </li>
-        <li>
-          <a href="#"><i class="fab fa-xbox"></i> Xbox</a>
-        </li>
-      </ul>
-    </aside>
-
-    <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
-
     <main class="product-page">
       <div id="loading-spinner" class="loading-container">
         <div class="spinner"></div>
@@ -98,12 +69,10 @@
           <aside class="purchase-card">
             <div class="price-section"></div>
 
-            <div class="platform-info-card">
-              <i class="fab fa-steam"></i>
+            <div class="platform-info-card" id="platform-card">
+              <i id="platform-icon" class="fab fa-steam"></i>
               <div class="info-text">
                 <strong id="game-platform">Steam</strong>
-                <br />
-                <span>Windows</span>
               </div>
             </div>
 

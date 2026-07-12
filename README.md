@@ -1,4 +1,4 @@
-# 🎮 Projeto FrameStore (Outdated README.md)
+# 🎮 Projeto FrameStore (Outdated - Este arquivo precisa ser atualizado mais tarde)
 
 Este documento detalha o funcionamento, a arquitetura e o planejamento do projeto **FrameStore**, uma loja virtual de jogos digitais.
 

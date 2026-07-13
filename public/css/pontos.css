@@ -475,3 +475,32 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ==========================================
+   ESTILIZAÇÃO DO CONTADOR E ESTADO EXPIRADO
+   ========================================== */
+
+/* Estado quando o cupom já passou do prazo */
+.coupon-card.expirado {
+  opacity: 0.4;
+  filter: grayscale(100%); /* Fica tudo cinza/preto e branco */
+  pointer-events: none; /* Impede que seja clicado de alguma forma */
+  border-top-color: #444; /* Remove a borda laranja e bota cinza */
+  box-shadow: none;
+  transform: none;
+}
+
+/* O texto do Temporizador Vivo (Expira em: X dias) */
+.coupon-timer {
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-top: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.coupon-timer i {
+  margin-right: 4px;
+}

@@ -1,11 +1,26 @@
 const db = require("../config/db");
 const { formatarImagem } = require("../utils/imageFormat");
 
+// Função para gerar o código com o formato fiel de cada plataforma
+function gerarCodigoPlataforma(plataforma) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const rnd = (len) => Array.from({length: len}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  let plat = (plataforma || '').toLowerCase();
+  
+  if (plat.includes('steam') || plat.includes('pc')) return `${rnd(5)}-${rnd(5)}-${rnd(5)}`; // Ex: XXXXX-XXXXX-XXXXX
+  if (plat.includes('playstation')) return `${rnd(4)}-${rnd(4)}-${rnd(4)}`; // Ex: XXXX-XXXX-XXXX
+  if (plat.includes('xbox')) return `${rnd(5)}-${rnd(5)}-${rnd(5)}-${rnd(5)}-${rnd(5)}`; // Ex: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+  if (plat.includes('nintendo')) return `${rnd(4)}-${rnd(4)}-${rnd(4)}-${rnd(4)}`; // Ex: XXXX-XXXX-XXXX-XXXX
+  
+  return `${rnd(4)}-${rnd(4)}-${rnd(4)}`; // Padrão Genérico
+}
+
 async function getCarrinho(req, res) {
   const { id_usuario } = req.params;
   try {
+    // Adicionada a coluna j.platform
     const query = `
-      SELECT j.id, j.titulo, j.preco, j.desconto, j.cover 
+      SELECT j.id, j.titulo, j.preco, j.desconto, j.cover, j.platform 
       FROM CARRINHO c
       JOIN JOGOS j ON c.id_jogo = j.id
       WHERE c.id_usuario = ?
@@ -55,8 +70,9 @@ async function checkout(req, res) {
     if (usuarios.length === 0) throw new Error("Usuário não encontrado.");
     let { saldo, pontos } = usuarios[0];
 
+    // Incluindo j.platform para saber qual código de resgate gerar
     const [itensCarrinho] = await connection.query(
-      "SELECT j.id, j.preco, j.desconto FROM CARRINHO c JOIN JOGOS j ON c.id_jogo = j.id WHERE c.id_usuario = ?",
+      "SELECT j.id, j.preco, j.desconto, j.platform FROM CARRINHO c JOIN JOGOS j ON c.id_jogo = j.id WHERE c.id_usuario = ?",
       [id_usuario]
     );
 
@@ -90,8 +106,10 @@ async function checkout(req, res) {
 
     await connection.query("UPDATE USUARIOS SET saldo = ?, pontos = ? WHERE id = ?", [novoSaldo, novosPontosTotais, id_usuario]);
 
+    // Gera o código correspondente à plataforma e anexa à biblioteca
     for (const jogo of itensCarrinho) {
-      await connection.query("INSERT INTO BIBLIOTECA (id_usuario, id_jogo) VALUES (?, ?)", [id_usuario, jogo.id]);
+      const codigoResgate = gerarCodigoPlataforma(jogo.platform);
+      await connection.query("INSERT INTO BIBLIOTECA (id_usuario, id_jogo, codigo_resgate) VALUES (?, ?, ?)", [id_usuario, jogo.id, codigoResgate]);
     }
 
     if (id_cupom) {

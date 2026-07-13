@@ -68,6 +68,27 @@ async function renderizarDetalhes(game) {
   const priceSection = document.querySelector(".price-section");
   const btnPurchase = document.querySelector(".btn-purchase-green");
 
+  const descElement = document.getElementById("game-desc-text");
+  const reqElement = document.getElementById("game-req-text");
+
+  // Injeta a descrição
+  if (descElement) {
+    descElement.innerText = game.descricao || "Descrição não disponível para este jogo.";
+  }
+
+  // Injeta os requisitos formatando as vírgulas como quebras de linha
+  if (reqElement) {
+    if (game.requisitos) {
+      // Divide o texto onde tem vírgula, remove os espaços sobrando (trim) e monta uma lista HTML
+      reqElement.innerHTML = game.requisitos
+        .split(',')
+        .map(requisito => `<p><i class="fas fa-microchip"></i> ${requisito.trim()}</p>`)
+        .join('');
+    } else {
+      reqElement.innerHTML = "<p>Requisitos não especificados.</p>";
+    }
+  }
+
   // 1. CHECAGEM SE O USUÁRIO JÁ POSSUI O JOGO
   let usuarioTemJogo = false;
   const userStr = localStorage.getItem("usuarioLogado");

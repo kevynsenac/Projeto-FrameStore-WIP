@@ -1,4 +1,3 @@
-// Usamos BASE_API_URL para evitar conflito de declaração com outros scripts
 const BASE_API_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000/api' 
     : '/api';
@@ -6,8 +5,34 @@ const BASE_API_URL = window.location.hostname === 'localhost'
 let usuarioLogado = null;
 let itensCarrinho = [];
 let cuponsDisponiveis = [];
-let bibliotecaUsuario = []; // Armazena IDs dos jogos que o usuário já tem
-let temJogoPossuido = false; // Flag de segurança para bloquear checkout
+let bibliotecaUsuario = [];
+let temJogoPossuido = false; 
+
+// ==========================================
+// SISTEMA DE NOTIFICAÇÕES (TOASTS)
+// ==========================================
+function mostrarNotificacao(mensagem, tipo = 'sucesso') {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${tipo}`;
+  
+  const icone = tipo === 'sucesso' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+  toast.innerHTML = `<i class="${icone}"></i> <span>${mensagem}</span>`;
+  
+  container.appendChild(toast);
+
+  // Remove a notificação após 3.5 segundos
+  setTimeout(() => {
+    toast.classList.add('hide');
+    setTimeout(() => toast.remove(), 300); // Tempo da animação CSS
+  }, 3500);
+}
 
 // ==========================================
 // AUTENTICAÇÃO E ATUALIZAÇÃO DO HEADER
@@ -19,11 +44,8 @@ async function verificarAutenticacao() {
     return false;
   }
   usuarioLogado = JSON.parse(userStr);
-  
-  // Atualiza a UI imediatamente com o cache
   atualizarUIHeader(usuarioLogado);
 
-  // Busca os dados reais e atualizados do Banco de Dados (Saldo/Pontos frescos)
   try {
     const response = await fetch(`${BASE_API_URL}/usuarios/${usuarioLogado.id}`);
     if (response.ok) {
@@ -33,9 +55,8 @@ async function verificarAutenticacao() {
       atualizarUIHeader(usuarioAtualizado);
     }
   } catch (error) {
-    console.error("Erro ao sincronizar dados do usuário:", error);
+    console.error("Erro ao sincronizar dados:", error);
   }
-
   return true;
 }
 
@@ -58,58 +79,42 @@ function atualizarUIHeader(usuario) {
   }
 }
 
-// ==========================================
-// FUNÇÕES UTILITÁRIAS
-// ==========================================
 function formatPrice(value) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value);
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 }
 
 // ==========================================
-// CARREGAMENTO DE DADOS (CARRINHO, BIBLIOTECA E CUPONS)
+// CARREGAMENTO DE DADOS
 // ==========================================
 async function carregarDadosCarrinho() {
   const spinner = document.getElementById("loading-spinner");
   const content = document.getElementById("cart-content");
 
-  // Inicia o Loading
   if (spinner) spinner.style.display = "flex";
   if (content) content.style.display = "none";
 
   try {
-    // 1. Busca os itens no carrinho
     const resCart = await fetch(`${BASE_API_URL}/carrinho/${usuarioLogado.id}`);
-    if (!resCart.ok) throw new Error("Falha ao buscar itens do carrinho.");
+    if (!resCart.ok) throw new Error("Falha ao buscar itens.");
     itensCarrinho = await resCart.json();
 
-    // 2. Busca a biblioteca para checar se já possui o jogo
     const resLib = await fetch(`${BASE_API_URL}/usuarios/${usuarioLogado.id}/biblioteca`);
     if (resLib.ok) {
       const libData = await resLib.json();
-      // Mapeia para um array simples de IDs (ajuste 'id_jogo' conforme o retorno da sua API)
       bibliotecaUsuario = libData.map(item => item.id_jogo || item.id); 
     }
 
-    // 3. Busca os cupons do usuário
     await carregarCupons();
-
     renderizarCarrinho();
     calcularTotal();
 
-    // Exibe o conteúdo (usando 'grid' pois o .cart-container no CSS é grid)
     if (content) content.style.display = "grid";
 
   } catch (error) {
-    console.error("Erro:", error);
+    console.error(error);
     const wrapper = document.querySelector(".cart-wrapper");
-    if (wrapper) {
-      wrapper.innerHTML = "<p style='color: white; text-align: center; font-size: 1.2rem; margin-top: 50px;'>Erro ao carregar o carrinho.</p>";
-    }
+    if (wrapper) wrapper.innerHTML = "<p style='color: white; text-align: center; margin-top: 50px;'>Erro ao carregar o carrinho.</p>";
   } finally {
-    // Finaliza o Loading independentemente de sucesso ou erro
     if (spinner) spinner.style.display = "none";
   }
 }
@@ -123,17 +128,17 @@ async function carregarCupons() {
     cuponsDisponiveis = todosCupons.filter((c) => !c.usado);
 
     const select = document.getElementById("coupon-select");
-    select.innerHTML = '<option value="">Nenhum cupom selecionado</option>'; // Reseta opções
+    select.innerHTML = '<option value="">Não utilizar nenhum cupom</option>'; 
 
     cuponsDisponiveis.forEach((cupom) => {
       const option = document.createElement("option");
       option.value = cupom.id;
       option.text = `${cupom.nome} (- R$ ${parseFloat(cupom.desconto).toFixed(2)})`;
-      option.dataset.desconto = cupom.desconto; // Salva o valor para os cálculos
+      option.dataset.desconto = cupom.desconto; 
       select.appendChild(option);
     });
   } catch (error) {
-    console.error("Erro ao carregar cupons:", error);
+    console.error(error);
   }
 }
 
@@ -143,24 +148,32 @@ async function carregarCupons() {
 function renderizarCarrinho() {
   const container = document.getElementById("cart-list");
   container.innerHTML = "";
-  temJogoPossuido = false; // Reseta a flag a cada renderização
+  temJogoPossuido = false;
 
   if (itensCarrinho.length === 0) {
-    container.innerHTML = "<p style='color: #a5b1c2; font-size: 1.1rem;'>Seu carrinho está vazio.</p>";
+    container.innerHTML = "<p style='color: #a5b1c2; font-size: 1.1rem; padding: 20px 0;'>O teu carrinho encontra-se vazio.</p>";
     return;
   }
 
   itensCarrinho.forEach((jogo) => {
-    // Verifica se o ID do jogo está na lista da biblioteca do usuário
     const isOwned = bibliotecaUsuario.includes(jogo.id);
     if (isOwned) temJogoPossuido = true;
 
+    // Definição visual por plataforma
+    let platStr = (jogo.platform || '').toLowerCase();
+    let classPlat = 'plat-default';
+    let iconPlat = 'fas fa-gamepad';
+    
+    if (platStr.includes('steam') || platStr.includes('pc')) { classPlat = 'plat-steam'; iconPlat = 'fab fa-steam'; }
+    else if (platStr.includes('playstation')) { classPlat = 'plat-playstation'; iconPlat = 'fab fa-playstation'; }
+    else if (platStr.includes('xbox')) { classPlat = 'plat-xbox'; iconPlat = 'fab fa-xbox'; }
+    else if (platStr.includes('nintendo')) { classPlat = 'plat-nintendo'; iconPlat = 'fas fa-gamepad'; }
+
     const div = document.createElement("div");
-    // Se possuir o jogo, aplica a classe visual de erro
-    div.className = isOwned ? "cart-item owned-item" : "cart-item";
+    // Combina a classe da plataforma com a classe do item
+    div.className = isOwned ? `cart-item owned-item ${classPlat}` : `cart-item ${classPlat}`;
 
     const imgSrc = jogo.cover || "img/site_logo.png";
-
     let precoFinal = parseFloat(jogo.preco);
     const temDesconto = jogo.desconto && parseFloat(jogo.desconto) > 0;
 
@@ -176,14 +189,14 @@ function renderizarCarrinho() {
       precoHTML = `<span class="cart-item-price">${formatPrice(precoFinal)}</span>`;
     }
 
-    // Alerta visual inserido sob o preço
     const warningHTML = isOwned 
-        ? `<div class="owned-warning"><i class="fas fa-exclamation-triangle"></i> Você já possui este jogo na biblioteca.</div>` 
+        ? `<div class="owned-warning"><i class="fas fa-exclamation-triangle"></i> Já possuis este jogo.</div>` 
         : "";
 
     div.innerHTML = `
             <img src="${imgSrc}" alt="${jogo.titulo}">
             <div class="cart-item-info">
+                <div class="plat-badge ${classPlat}"><i class="${iconPlat}"></i> ${jogo.platform || 'Outros'}</div>
                 <h3>${jogo.titulo}</h3>
                 ${precoHTML}
                 ${warningHTML}
@@ -224,15 +237,14 @@ function calcularTotal() {
   let totalFinal = Math.max(0, subtotal - desconto);
   document.getElementById("cart-total").innerText = formatPrice(totalFinal);
 
-  // Lógica para bloquear ou liberar o botão de finalizar
   const btnFinalizar = document.getElementById("btn-finalizar");
   if (btnFinalizar) {
     if (itensCarrinho.length === 0 || temJogoPossuido) {
       btnFinalizar.disabled = true;
       if (temJogoPossuido) {
-        btnFinalizar.innerText = "Remova Itens Duplicados";
+        btnFinalizar.innerText = "Remove Itens Duplicados";
       } else {
-        btnFinalizar.innerText = "Carrinho Vazio";
+        btnFinalizar.innerText = "O Carrinho está Vazio";
       }
     } else {
       btnFinalizar.disabled = false;
@@ -242,7 +254,7 @@ function calcularTotal() {
 }
 
 // ==========================================
-// AÇÕES DO USUÁRIO
+// AÇÕES DO UTILIZADOR
 // ==========================================
 async function removerDoCarrinho(idJogo) {
   try {
@@ -254,11 +266,10 @@ async function removerDoCarrinho(idJogo) {
 
     if (!response.ok) throw new Error("Falha ao remover item.");
 
-    // Recarrega os dados sem piscar a tela inteira
+    mostrarNotificacao("Jogo removido do carrinho.", "sucesso");
     await carregarDadosCarrinho();
   } catch (error) {
-    console.error(error);
-    alert("Erro ao remover o jogo do carrinho.");
+    mostrarNotificacao("Erro ao remover o jogo.", "erro");
   }
 }
 
@@ -268,10 +279,9 @@ async function finalizarCompra() {
   const select = document.getElementById("coupon-select");
   const idCupom = select.value ? parseInt(select.value) : null;
 
-  // Feedback visual para evitar múltiplos cliques
   const btnFinalizar = document.getElementById("btn-finalizar");
   const originalText = btnFinalizar.innerText;
-  btnFinalizar.innerText = "Processando...";
+  btnFinalizar.innerText = "A Processar...";
   btnFinalizar.disabled = true;
 
   try {
@@ -287,28 +297,30 @@ async function finalizarCompra() {
     const result = await response.json();
 
     if (!response.ok) {
-      alert(result.error || "Erro ao finalizar a compra.");
+      mostrarNotificacao(result.error || "Erro ao finalizar a compra.", "erro");
       btnFinalizar.innerText = originalText;
       btnFinalizar.disabled = false;
       return;
     }
 
-    // Atualiza a sessão local com os novos valores de saldo e pontos provenientes do DB
     if (result.saldoRestante !== undefined) usuarioLogado.saldo = result.saldoRestante;
     if (result.pontosAtuais !== undefined) usuarioLogado.pontos = result.pontosAtuais;
     localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
 
-    alert("Compra realizada com sucesso! Os jogos foram adicionados à sua biblioteca.");
-    window.location.href = "perfil.html";
+    mostrarNotificacao("Compra efetuada com sucesso! A transferir-te para a Biblioteca...", "sucesso");
+    
+    // Aguarda 2 segundos para o utilizador conseguir ler a notificação de sucesso e redireciona
+    setTimeout(() => {
+      window.location.href = "perfil.html";
+    }, 2000);
+
   } catch (error) {
-    console.error("Erro no checkout:", error);
-    alert("Erro interno ao processar a compra.");
+    mostrarNotificacao("Erro interno ao processar a compra.", "erro");
     btnFinalizar.innerText = originalText;
     btnFinalizar.disabled = false;
   }
 }
 
-// Inicialização
 window.onload = async () => {
   const autenticado = await verificarAutenticacao();
   if (autenticado) {

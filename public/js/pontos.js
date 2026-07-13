@@ -2,6 +2,7 @@ const BASE_API_URL = window.location.hostname === "localhost" ? "http://localhos
 
 let usuarioLogado = null;
 let idsMeusCupons = [];
+let cuponsInterval; // Variável global para armazenar o relógio dos cupons
 
 // ==========================================
 // CONFIGURAÇÃO DA ROLETA (CANVAS)
@@ -28,7 +29,6 @@ let currentRotation = 0;
 let isSpinning = false;
 let countdownInterval;
 
-// Desenha a roleta baseada no ângulo de rotação
 function drawWheel(rotation = 0) {
   if (!ctx) return;
   const centerX = canvas.width / 2;
@@ -41,7 +41,6 @@ function drawWheel(rotation = 0) {
   let currentAngle = rotation;
 
   segments.forEach((segment) => {
-    // Desenha a fatia
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
@@ -52,21 +51,19 @@ function drawWheel(rotation = 0) {
     ctx.lineWidth = 4;
     ctx.stroke();
 
-    // Desenha o texto
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate(currentAngle + sliceAngle / 2);
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = segment.points === 0 ? "#fff" : "#111"; // Contraste dinâmico
-    ctx.font = "bold 18px Inter"; // Fonte ajustada para 10 fatias
-    ctx.fillText(segment.label, radius * 0.72, 0); // Empurrado um pouco mais pra borda
+    ctx.fillStyle = segment.points === 0 ? "#fff" : "#111"; 
+    ctx.font = "bold 18px Inter"; 
+    ctx.fillText(segment.label, radius * 0.72, 0); 
     ctx.restore();
 
     currentAngle += sliceAngle;
   });
 
-  // Centro da roleta (bolinha menor)
   ctx.beginPath();
   ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
   ctx.fillStyle = "#1a1a2e";
@@ -78,7 +75,7 @@ function drawWheel(rotation = 0) {
 }
 
 // ==========================================
-// AUTENTICAÇÃO E RELÓGIO (COUNTDOWN)
+// AUTENTICAÇÃO E RELÓGIO DA ROLETA
 // ==========================================
 async function verificarAutenticacao() {
   const userStr = localStorage.getItem("usuarioLogado");
@@ -96,7 +93,7 @@ async function verificarAutenticacao() {
       usuarioLogado = await response.json();
       localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
       atualizarUIHeader(usuarioLogado);
-      verificarStatusRoleta(); // Checa se já rodou hoje
+      verificarStatusRoleta(); 
     }
   } catch (error) {
     console.error("Erro ao sincronizar usuário:", error);
@@ -138,7 +135,6 @@ async function atualizarContadorCarrinho() {
   } catch (e) {}
 }
 
-// Bloqueia e mostra o contador se já rodou hoje
 function verificarStatusRoleta() {
   if (!usuarioLogado.ultima_roleta) return;
 
@@ -162,7 +158,6 @@ function iniciarContador() {
   clearInterval(countdownInterval);
   countdownInterval = setInterval(() => {
     const now = new Date();
-    // Calcula meia-noite do dia seguinte (UTC para alinhar com servidor)
     const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
     const diff = tomorrow - now;
 
@@ -181,7 +176,7 @@ function iniciarContador() {
 }
 
 // ==========================================
-// LÓGICA DE GIRO (INTEGRAÇÃO COM API)
+// LÓGICA DE GIRO
 // ==========================================
 async function iniciarGiroRoleta() {
   if (isSpinning) return;
@@ -192,7 +187,6 @@ async function iniciarGiroRoleta() {
   isSpinning = true;
 
   try {
-    // 1. Pede o resultado para o servidor
     const response = await fetch(`${BASE_API_URL}/roleta/girar`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -204,38 +198,30 @@ async function iniciarGiroRoleta() {
     if (!response.ok) {
       mostrarModal("Roleta Bloqueada", result.error);
       isSpinning = false;
-      iniciarContador(); // Força o contador se tentou burlar
+      iniciarContador(); 
       return;
     }
 
-    // 2. Acha as fatias correspondentes ao prêmio que o backend enviou
     const winningIndices = [];
     segments.forEach((s, index) => {
       if (s.points === result.pontosGanhos) winningIndices.push(index);
     });
     
-    // Sorteia uma das fatias vencedoras para o visual não ficar repetitivo
     const winningIndex = winningIndices[Math.floor(Math.random() * winningIndices.length)];
-    
-    // 3. Calcula o ângulo final para parar na fatia correta (seta fica em 270º / -90º)
     const sliceAngle = (Math.PI * 2) / segments.length;
     const targetAngle = (winningIndex * sliceAngle) + (sliceAngle / 2);
     
-    // Rotação necessária + voltas completas para efeito dramático (ex: 5 voltas)
     const extraSpins = 5 * Math.PI * 2;
-    const randomOffset = (Math.random() - 0.5) * (sliceAngle * 0.6); // Pequeno desvio
+    const randomOffset = (Math.random() - 0.5) * (sliceAngle * 0.6); 
     const finalRotation = currentRotation + extraSpins + ((3 * Math.PI / 2) - targetAngle) + randomOffset;
 
-    // 4. Anima o Canvas
     const startTime = Date.now();
-    const duration = 4000; // 4 segundos de giro
+    const duration = 4000; 
     const startRotation = currentRotation;
 
     function animateWheel() {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
-      // Easing (desaceleração suave)
       const easeProgress = 1 - Math.pow(1 - progress, 4);
       
       currentRotation = startRotation + ((finalRotation - startRotation) * easeProgress);
@@ -259,8 +245,6 @@ async function iniciarGiroRoleta() {
 
 function finalizarGiro(result) {
   isSpinning = false;
-  
-  // Atualiza usuário com a data de hoje para travar a roleta no front
   usuarioLogado.ultima_roleta = new Date().toISOString(); 
   
   const titulo = result.pontosGanhos > 0 ? "Sorte Grande!" : "Que pena!";
@@ -270,14 +254,14 @@ function finalizarGiro(result) {
     usuarioLogado.pontos += result.pontosGanhos;
     localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
     atualizarUIHeader(usuarioLogado);
-    carregarCuponsLoja(); // Recarrega botões da loja
+    carregarCuponsLoja(); 
   }
   
-  iniciarContador(); // Bloqueia e inicia contagem
+  iniciarContador(); 
 }
 
 // ==========================================
-// LOJA DE CUPONS E RESGATE
+// LOJA DE CUPONS COM CONTAGEM REGRESSIVA
 // ==========================================
 async function carregarCuponsLoja() {
   const spinner = document.getElementById("loading-spinner");
@@ -298,9 +282,18 @@ async function carregarCuponsLoja() {
     const container = document.getElementById("cupons-loja-container");
     container.innerHTML = "";
 
+    const cuponsAtivos = []; // Array que alimentará nosso relógio ao vivo
+
     cupons.forEach((cupom) => {
       const card = document.createElement("div");
-      card.className = "coupon-card";
+      
+      // 1. Tratamento de Datas
+      const dataExpiracao = new Date(cupom.data_expiracao);
+      const dataAtual = new Date();
+      const expirado = dataExpiracao < dataAtual;
+
+      // 2. Aplicamos a classe "expirado" caso tenha passado do prazo
+      card.className = expirado ? "coupon-card expirado" : "coupon-card";
       
       const jaPossui = idsMeusCupons.includes(cupom.id);
       const saldoSuficiente = usuarioLogado.pontos >= cupom.custo_pontos;
@@ -308,7 +301,11 @@ async function carregarCuponsLoja() {
       let btnState = "";
       let btnText = "Resgatar Agora";
 
-      if (jaPossui) {
+      // Lógica de Travar o Botão
+      if (expirado) {
+        btnState = "disabled";
+        btnText = "Expirado";
+      } else if (jaPossui) {
         btnState = "disabled";
         btnText = "Já Resgatou";
       } else if (!saldoSuficiente) {
@@ -316,10 +313,26 @@ async function carregarCuponsLoja() {
         btnText = "Pontos Insuficientes";
       }
 
+      // Formata a data de validade para o layout BR (Ex: 31/12/2026 às 23:59)
+      const validadeBR = dataExpiracao.toLocaleDateString("pt-BR", { 
+        day: '2-digit', month: '2-digit', year: 'numeric', 
+        hour: '2-digit', minute: '2-digit' 
+      });
+
+      const timerId = `timer-cupom-${cupom.id}`;
+      if (!expirado) {
+        cuponsAtivos.push({ id: timerId, tempoFinal: dataExpiracao.getTime() });
+      }
+
       card.innerHTML = `
           <div>
               <h3>${cupom.nome}</h3>
-              <p style="color: #aaa;">${cupom.tipo}</p>
+              <p style="color: #a5b1c2; font-size: 0.9rem; margin-top: 5px;">Válido até: ${validadeBR}</p>
+              
+              <p class="coupon-timer" id="${timerId}">
+                ${expirado ? '<i class="fas fa-times-circle"></i> Encerrado' : '<i class="fas fa-clock"></i> Calculando...'}
+              </p>
+              
               <div class="discount">- R$ ${parseFloat(cupom.desconto).toFixed(2)}</div>
           </div>
           <div>
@@ -330,12 +343,49 @@ async function carregarCuponsLoja() {
       container.appendChild(card);
     });
 
+    // Inicia o contador global da loja de cupons
+    iniciarContadoresLoja(cuponsAtivos);
+
     if (content) content.style.display = "block";
   } catch (error) {
     console.error("Erro na Loja:", error);
   } finally {
     if (spinner) spinner.style.display = "none";
   }
+}
+
+// Relógio dinâmico que atualiza todos os cards ativos a cada 1 segundo
+function iniciarContadoresLoja(cupons) {
+  clearInterval(cuponsInterval);
+  
+  cuponsInterval = setInterval(() => {
+    const agora = new Date().getTime();
+    
+    cupons.forEach(c => {
+      const el = document.getElementById(c.id);
+      if (!el) return;
+
+      const tempoRestante = c.tempoFinal - agora;
+      
+      if (tempoRestante < 0) {
+        el.innerHTML = '<i class="fas fa-times-circle"></i> Expirou agora!';
+        el.style.color = "#ff4757";
+      } else {
+        const dias = Math.floor(tempoRestante / (1000 * 60 * 60 * 24));
+        const horas = Math.floor((tempoRestante % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutos = Math.floor((tempoRestante % (1000 * 60 * 60)) / (1000 * 60));
+        const segundos = Math.floor((tempoRestante % (1000 * 60)) / 1000);
+
+        if (dias > 0) {
+          el.innerHTML = `<i class="fas fa-clock"></i> Expira em: ${dias}d ${horas}h ${minutos}m`;
+          el.style.color = "#00ff88"; // Verde se estiver seguro
+        } else {
+          el.innerHTML = `<i class="fas fa-stopwatch"></i> Expira em: ${horas}h ${minutos}m ${segundos}s`;
+          el.style.color = "#ffaa00"; // Fica amarelo/laranja quando falta menos de 24h
+        }
+      }
+    });
+  }, 1000);
 }
 
 function confirmarResgate(idCupom, custo, nomeCupom) {
@@ -405,7 +455,7 @@ function fecharModal() { document.getElementById("custom-modal").style.display =
 
 // Inicialização
 window.onload = async () => {
-  drawWheel(); // Desenha a roleta no estado inicial
+  drawWheel(); 
   if (await verificarAutenticacao()) {
     carregarCuponsLoja();
   }

@@ -53,17 +53,29 @@
         <h1 class="game-title"></h1>
 
         <div class="game-details-container">
-          <div class="game-gallery">
-            <div class="main-view">
-              <button class="nav-arrow prev-img" onclick="moveGallery(-1)">
-                ❮
-              </button>
-              <img id="current-img" alt="Jogo" />
-              <button class="nav-arrow next-img" onclick="moveGallery(1)">
-                ❯
-              </button>
+          
+          <!-- NOVA DIV: Coluna da Esquerda -->
+          <div class="left-column">
+            <div class="game-gallery">
+              <div class="main-view">
+                <button class="nav-arrow prev-img" onclick="moveGallery(-1)">❮</button>
+                <img id="current-img" alt="Jogo" />
+                <button class="nav-arrow next-img" onclick="moveGallery(1)">❯</button>
+              </div>
+              <div class="thumb-list"></div>
             </div>
-            <div class="thumb-list"></div>
+
+            <!-- NOVA SEÇÃO: Descrição e Requisitos -->
+            <div class="game-info-sections">
+              <div class="game-description">
+                <h2>Sobre o Jogo</h2>
+                <p id="game-desc-text"></p>
+              </div>
+              <div class="game-requirements">
+                <h2>Requisitos do Sistema</h2>
+                <div id="game-req-text"></div>
+              </div>
+            </div>
           </div>
 
           <aside class="purchase-card">

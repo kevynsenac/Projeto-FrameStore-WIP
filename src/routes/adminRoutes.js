@@ -12,6 +12,12 @@ const imageUploadFields = upload.fields([
   { name: "screenshot3", maxCount: 1 },
 ]);
 
+// Middlewares de imagem para usuários
+const userUploadFields = upload.fields([
+  { name: "foto_perfil", maxCount: 1 },
+  { name: "fundo_perfil", maxCount: 1 },
+]);
+
 // Rotas de Jogos
 router.post("/jogos", verificarAdmin, imageUploadFields, adminController.criarJogo);
 router.put("/jogos/:id", verificarAdmin, imageUploadFields, adminController.atualizarJogo);
@@ -19,7 +25,8 @@ router.delete("/jogos/:id", verificarAdmin, adminController.deletarJogo);
 
 // Rotas de Usuários
 router.get("/usuarios", verificarAdmin, adminController.getUsuarios);
-router.put("/usuarios/:id", verificarAdmin, adminController.atualizarUsuario);
+// Rota atualizada com o middleware userUploadFields para suportar os BLOBs
+router.put("/usuarios/:id", verificarAdmin, userUploadFields, adminController.atualizarUsuario); 
 router.delete("/usuarios/:id", verificarAdmin, adminController.deletarUsuario);
 
 // Rotas de Cupons

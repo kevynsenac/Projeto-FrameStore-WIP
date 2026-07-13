@@ -13,7 +13,7 @@ async function getCuponsUsuario(req, res) {
   const { id } = req.params;
   try {
     const query = `
-      SELECT c.id, c.nome, c.tipo, c.desconto, uc.usado 
+      SELECT c.id, c.nome, c.data_expiracao, c.desconto, uc.usado 
       FROM USUARIO_CUPONS uc
       JOIN CUPONS c ON uc.id_cupom = c.id
       WHERE uc.id_usuario = ?
@@ -38,10 +38,15 @@ async function resgatarCupom(req, res) {
     }
 
     const [usuario] = await db.query("SELECT pontos FROM USUARIOS WHERE id = ?", [id_usuario]);
-    const [cupom] = await db.query("SELECT custo_pontos FROM CUPONS WHERE id = ?", [id_cupom]);
+    const [cupom] = await db.query("SELECT custo_pontos, data_expiracao FROM CUPONS WHERE id = ?", [id_cupom]);
 
     if (usuario.length === 0 || cupom.length === 0) {
       return res.status(404).json({ error: "Usuário ou Cupom não encontrado." });
+    }
+
+    // Verifica se o cupom já passou da data de expiração antes de permitir o resgate
+    if (new Date(cupom[0].data_expiracao) < new Date()) {
+      return res.status(400).json({ error: "Este cupom já expirou e não pode mais ser resgatado." });
     }
 
     const pontosUsuario = usuario[0].pontos;

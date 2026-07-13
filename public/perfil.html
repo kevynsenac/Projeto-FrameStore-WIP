@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FrameStore | Seu Perfil</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link rel="stylesheet" href="css/perfil.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="css/homepage.css" />
+    <link rel="stylesheet" href="css/perfil.css" />
     <link rel="icon" type="image/png" href="img/site_favicon.png" />
   </head>
   <body class="profile-page">
+    
+    <div id="page-background" class="page-background"></div>
+
     <header class="navbar">
       <div class="logo-container">
         <a href="homepage.html" class="logo-link">
@@ -25,30 +25,14 @@
     <div class="main-container">
       <aside class="sidebar-menu" id="sidebar">
         <div class="toggle-container">
-          <button class="menu-toggle" onclick="toggleMenu()">
-            <i class="fas fa-bars"></i>
-          </button>
+          <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
         </div>
         <ul>
-          <li>
-            <a href="homepage.html"
-              ><i class="fas fa-home"></i><span>Início</span></a
-            >
-          </li>
-          <li>
-            <a href="#"><i class="fas fa-tag"></i><span>Ofertas</span></a>
-          </li>
-          <li>
-            <a href="#"><i class="fas fa-desktop"></i><span>PC</span></a>
-          </li>
-          <li>
-            <a href="#"
-              ><i class="fab fa-playstation"></i><span>Playstation</span></a
-            >
-          </li>
-          <li>
-            <a href="#"><i class="fab fa-xbox"></i><span>Xbox</span></a>
-          </li>
+          <li><a href="homepage.html"><i class="fas fa-home"></i><span>Início</span></a></li>
+          <li><a href="#"><i class="fas fa-tag"></i><span>Ofertas</span></a></li>
+          <li><a href="#"><i class="fas fa-desktop"></i><span>PC</span></a></li>
+          <li><a href="#"><i class="fab fa-playstation"></i><span>PlayStation</span></a></li>
+          <li><a href="#"><i class="fab fa-xbox"></i><span>Xbox</span></a></li>
         </ul>
       </aside>
 
@@ -56,75 +40,105 @@
         <section class="profile-header">
           <div class="user-info-section">
             <div class="profile-avatar-container">
-              <img
-                src="img/site_logo.png"
-                alt="Avatar do Usuário"
-                class="profile-avatar"
-              />
+              <img src="img/site_logo.png" alt="Avatar do Usuário" class="profile-avatar" />
             </div>
             <div class="user-text-info">
               <h1 id="nome-usuario">Carregando...</h1>
-              <p id="email-usuario">
-                <i class="fas fa-user"></i> carregando...
-              </p>
+              <p id="email-usuario"><i class="fas fa-envelope"></i> carregando...</p>
+              <p id="bio-usuario" class="bio-text">Carregando bio...</p>
             </div>
           </div>
         </section>
 
         <section class="profile-tabs">
-          <button class="tab-profile active" onclick="switchTab('biblioteca')">
-            Biblioteca
-          </button>
-          <button class="tab-profile inactive" onclick="switchTab('carteira')">
-            Carteira
-          </button>
-          <button class="tab-profile inactive" onclick="switchTab('conta')">
-            Minha Conta
-          </button>
+          <button class="tab-profile active" onclick="switchTab('biblioteca')">Biblioteca</button>
+          <button class="tab-profile inactive" onclick="switchTab('carteira')">Carteira</button>
+          <button class="tab-profile inactive" onclick="switchTab('conta')">Minha Conta</button>
         </section>
 
         <section id="tab-biblioteca" class="tab-content active">
           <h2>Meus Jogos</h2>
-          <div class="games-grid" id="biblioteca-container">
-            <p>Carregando biblioteca...</p>
-          </div>
+          <div class="games-grid" id="biblioteca-container"><p>Carregando biblioteca...</p></div>
         </section>
 
         <section id="tab-carteira" class="tab-content">
           <div class="wallet-info">
-            <div class="wallet-card">
-              <h3>Saldo Disponível</h3>
-              <p id="saldo-usuario">R$ 0,00</p>
-            </div>
-            <div class="wallet-card">
-              <h3>Pontos Acumulados</h3>
-              <p id="pontos-usuario" style="color: #feca57">
-                0 <i class="fas fa-star" style="font-size: 1.2rem"></i>
-              </p>
-            </div>
+            <div class="wallet-card"><h3>Saldo Disponível</h3><p id="saldo-usuario">R$ 0,00</p></div>
+            <div class="wallet-card"><h3>Pontos Acumulados</h3><p id="pontos-usuario" style="color: #feca57">0 <i class="fas fa-star" style="font-size: 1.2rem"></i></p></div>
           </div>
-
           <h2>Meus Cupons</h2>
-          <ul class="coupon-list" id="cupons-container">
-            <p>Carregando cupons...</p>
-          </ul>
+          <ul class="coupon-list" id="cupons-container"><p>Carregando cupons...</p></ul>
         </section>
 
         <section id="tab-conta" class="tab-content">
-          <h2>Configurações da Conta</h2>
-          <br />
-          <div id="admin-panel-container" style="display: none">
-            <button
-              class="btn-admin"
-              onclick="window.location.href = 'admin.html'"
-            >
-              <i class="fas fa-cogs"></i> Painel Administrativo
-            </button>
-          </div>
-          <button class="btn-logout" onclick="fazerLogout()">
-            <i class="fas fa-sign-out-alt"></i> Sair da Conta
-          </button>
+          <h2>Configurações e Personalização</h2>
+          
+          <form id="form-edit-perfil" onsubmit="confirmarSalvamento(event)" class="edit-profile-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-nome"><i class="fas fa-user"></i> Nome de Jogador</label>
+                <input type="text" id="edit-nome" required />
+              </div>
+              <div class="form-group">
+                <label for="edit-email"><i class="fas fa-envelope"></i> E-mail</label>
+                <input type="email" id="edit-email" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-senha"><i class="fas fa-lock"></i> Nova Senha <span class="dica">(Deixe em branco se não quiser alterar)</span></label>
+              <input type="password" id="edit-senha" placeholder="********" />
+            </div>
+
+            <div class="form-group">
+              <label for="edit-bio"><i class="fas fa-quote-left"></i> Sua Biografia</label>
+              <textarea id="edit-bio" rows="3" placeholder="Apresente-se aos outros jogadores! Fale sobre seus jogos favoritos..."></textarea>
+            </div>
+
+            <div class="form-row file-row">
+              <div class="form-group color-picker-group">
+                <label for="edit-cor"><i class="fas fa-palette"></i> Cor do Tema (HEX)</label>
+                <div class="hex-input-wrapper">
+                  <span id="color-preview" class="color-preview"></span>
+                  <input type="text" id="edit-cor" maxlength="7" placeholder="#2a2aef" />
+                </div>
+              </div>
+
+              <div class="form-group file-group">
+                <label for="edit-foto" class="file-label" id="label-foto">
+                  <i class="fas fa-camera"></i> <span id="text-foto">Nova Foto</span>
+                </label>
+                <input type="file" id="edit-foto" accept="image/png, image/jpeg" />
+              </div>
+
+              <div class="form-group file-group">
+                <label for="edit-fundo" class="file-label" id="label-fundo">
+                  <i class="fas fa-image"></i> <span id="text-fundo">Novo Banner</span>
+                </label>
+                <input type="file" id="edit-fundo" accept="image/png, image/jpeg" />
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button type="submit" id="btn-salvar-perfil" class="btn-save"><i class="fas fa-save"></i> Salvar Alterações</button>
+              <button type="button" class="btn-logout" onclick="fazerLogout()"><i class="fas fa-sign-out-alt"></i> Sair da Conta</button>
+            </div>
+          </form>
         </section>
+
+        <div id="password-confirm-modal" class="modal-overlay" style="display: none">
+          <div class="modal-content small-modal">
+            <span class="close-modal" onclick="fecharModalSenha()">&times;</span>
+            <div class="modal-info" style="text-align: center;">
+              <h2><i class="fas fa-shield-alt" style="color: var(--cor-tema);"></i> Confirmação</h2>
+              <p>Por favor, insira sua <strong>senha atual</strong> para validar sua identidade e salvar suas alterações.</p>
+              <div class="form-group" style="margin: 20px 0;">
+                <input type="password" id="confirm-password-input" placeholder="********" style="text-align: center;" />
+              </div>
+              <button class="btn-save" onclick="validarEProcessarSalvamento()" style="width: 100%;">Confirmar e Salvar</button>
+            </div>
+          </div>
+        </div>
 
         <div id="library-modal" class="modal-overlay" style="display: none">
           <div class="modal-content">
@@ -132,23 +146,22 @@
             <div class="modal-body">
               <img id="modal-game-cover" src="" alt="Capa do Jogo" />
               <div class="modal-info">
-                <h2 id="modal-game-title">Título</h2>
+                <h2 id="modal-game-title">Título do Jogo</h2>
                 <p>Adquirido em: <span id="modal-game-date"></span></p>
-
                 <div class="code-box">
-                  <p>Chave de Ativação:</p>
-                  <strong id="modal-game-code">XX-XXXX-XXX-X</strong>
+                  <p>Chave de Ativação Oficial:</p>
+                  <strong id="modal-game-code">Carregando...</strong>
                 </div>
-
-                <button class="btn-play">
-                  <i class="fas fa-play"></i> Resgatar código de ativação
-                </button>
+                <button class="btn-play" onclick="copiarChaveAtivacao(this)"><i class="fas fa-copy"></i> Copiar Chave</button>
               </div>
             </div>
           </div>
         </div>
+
       </main>
     </div>
+    
+    <div id="toast-container"></div>
 
     <script src="js/perfil.js"></script>
   </body>

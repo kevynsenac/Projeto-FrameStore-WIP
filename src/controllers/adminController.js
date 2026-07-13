@@ -1,18 +1,18 @@
 const db = require("../config/db");
 
 async function criarJogo(req, res) {
-  const { titulo, preco, desconto, platform } = req.body;
-  const cover = req.files["cover"] ? req.files["cover"][0].buffer : null;
-  const screenshot1 = req.files["screenshot1"] ? req.files["screenshot1"][0].buffer : null;
-  const screenshot2 = req.files["screenshot2"] ? req.files["screenshot2"][0].buffer : null;
-  const screenshot3 = req.files["screenshot3"] ? req.files["screenshot3"][0].buffer : null;
+  const { titulo, preco, desconto, platform, descricao, requisitos } = req.body;
+  const cover = req.files && req.files["cover"] ? req.files["cover"][0].buffer : null;
+  const screenshot1 = req.files && req.files["screenshot1"] ? req.files["screenshot1"][0].buffer : null;
+  const screenshot2 = req.files && req.files["screenshot2"] ? req.files["screenshot2"][0].buffer : null;
+  const screenshot3 = req.files && req.files["screenshot3"] ? req.files["screenshot3"][0].buffer : null;
 
   try {
     const query = `
-      INSERT INTO JOGOS (titulo, preco, desconto, platform, cover, screenshot1, screenshot2, screenshot3) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO JOGOS (titulo, preco, desconto, platform, descricao, requisitos, cover, screenshot1, screenshot2, screenshot3) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    await db.query(query, [titulo, preco, desconto || null, platform, cover, screenshot1, screenshot2, screenshot3]);
+    await db.query(query, [titulo, preco, desconto || null, platform, descricao, requisitos, cover, screenshot1, screenshot2, screenshot3]);
     res.json({ message: "Jogo cadastrado com sucesso no banco de dados!" });
   } catch (error) {
     res.status(500).json({ error: "Erro ao cadastrar novo jogo." });
@@ -21,21 +21,21 @@ async function criarJogo(req, res) {
 
 async function atualizarJogo(req, res) {
   const { id } = req.params;
-  const { titulo, preco, desconto, platform } = req.body;
+  const { titulo, preco, desconto, platform, descricao, requisitos } = req.body;
 
   try {
-    await db.query("UPDATE JOGOS SET titulo = ?, preco = ?, desconto = ?, platform = ? WHERE id = ?", [titulo, preco, desconto || null, platform, id]);
+    await db.query("UPDATE JOGOS SET titulo = ?, preco = ?, desconto = ?, platform = ?, descricao = ?, requisitos = ? WHERE id = ?", [titulo, preco, desconto || null, platform, descricao, requisitos, id]);
 
-    if (req.files["cover"]) {
+    if (req.files && req.files["cover"]) {
       await db.query("UPDATE JOGOS SET cover = ? WHERE id = ?", [req.files["cover"][0].buffer, id]);
     }
-    if (req.files["screenshot1"]) {
+    if (req.files && req.files["screenshot1"]) {
       await db.query("UPDATE JOGOS SET screenshot1 = ? WHERE id = ?", [req.files["screenshot1"][0].buffer, id]);
     }
-    if (req.files["screenshot2"]) {
+    if (req.files && req.files["screenshot2"]) {
       await db.query("UPDATE JOGOS SET screenshot2 = ? WHERE id = ?", [req.files["screenshot2"][0].buffer, id]);
     }
-    if (req.files["screenshot3"]) {
+    if (req.files && req.files["screenshot3"]) {
       await db.query("UPDATE JOGOS SET screenshot3 = ? WHERE id = ?", [req.files["screenshot3"][0].buffer, id]);
     }
 
@@ -57,7 +57,7 @@ async function deletarJogo(req, res) {
 
 async function getUsuarios(req, res) {
   try {
-    const [usuarios] = await db.query("SELECT id, nome, email, senha, saldo, pontos, adm, ultima_roleta FROM USUARIOS");
+    const [usuarios] = await db.query("SELECT id, nome, email, senha, saldo, pontos, adm, ultima_roleta, bio, foto_perfil, fundo_perfil FROM USUARIOS");
     res.json(usuarios);
   } catch (error) {
     res.status(500).json({ error: "Erro ao listar usuários." });
@@ -66,9 +66,20 @@ async function getUsuarios(req, res) {
 
 async function atualizarUsuario(req, res) {
   const { id } = req.params;
-  const { nome, email, saldo, pontos, adm } = req.body;
+  const { nome, email, saldo, pontos, adm, bio } = req.body;
+  
   try {
-    await db.query("UPDATE USUARIOS SET nome = ?, email = ?, saldo = ?, pontos = ?, adm = ? WHERE id = ?", [nome, email, saldo, pontos, adm, id]);
+    // Atualiza os dados em texto primeiro
+    await db.query("UPDATE USUARIOS SET nome = ?, email = ?, saldo = ?, pontos = ?, adm = ?, bio = ? WHERE id = ?", [nome, email, saldo, pontos, adm, bio, id]);
+
+    // Atualiza as imagens caso tenham sido enviadas na requisição
+    if (req.files && req.files["foto_perfil"]) {
+      await db.query("UPDATE USUARIOS SET foto_perfil = ? WHERE id = ?", [req.files["foto_perfil"][0].buffer, id]);
+    }
+    if (req.files && req.files["fundo_perfil"]) {
+      await db.query("UPDATE USUARIOS SET fundo_perfil = ? WHERE id = ?", [req.files["fundo_perfil"][0].buffer, id]);
+    }
+
     res.json({ message: "Dados do usuário modificados com sucesso!" });
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
@@ -89,9 +100,9 @@ async function deletarUsuario(req, res) {
 }
 
 async function criarCupom(req, res) {
-  const { nome, tipo, desconto, custo_pontos } = req.body;
+  const { nome, data_expiracao, desconto, custo_pontos } = req.body;
   try {
-    await db.query("INSERT INTO CUPONS (nome, tipo, desconto, custo_pontos) VALUES (?, ?, ?, ?)", [nome, tipo, desconto, custo_pontos]);
+    await db.query("INSERT INTO CUPONS (nome, data_expiracao, desconto, custo_pontos) VALUES (?, ?, ?, ?)", [nome, data_expiracao, desconto, custo_pontos]);
     res.json({ message: "Cupom cadastrado com sucesso!" });
   } catch (error) {
     res.status(500).json({ error: "Erro ao criar cupom." });
@@ -100,9 +111,9 @@ async function criarCupom(req, res) {
 
 async function atualizarCupom(req, res) {
   const { id } = req.params;
-  const { nome, tipo, desconto, custo_pontos } = req.body;
+  const { nome, data_expiracao, desconto, custo_pontos } = req.body;
   try {
-    await db.query("UPDATE CUPONS SET nome = ?, tipo = ?, desconto = ?, custo_pontos = ? WHERE id = ?", [nome, tipo, desconto, custo_pontos, id]);
+    await db.query("UPDATE CUPONS SET nome = ?, data_expiracao = ?, desconto = ?, custo_pontos = ? WHERE id = ?", [nome, data_expiracao, desconto, custo_pontos, id]);
     res.json({ message: "Cupom atualizado com sucesso!" });
   } catch (error) {
     res.status(500).json({ error: "Erro ao modificar cupom." });

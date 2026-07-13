@@ -415,6 +415,9 @@ input[type="file"] {
 /* ==========================================
    ABA CARTEIRA (SALDO E PONTOS)
    ========================================== */
+/* ==========================================
+   ABA CARTEIRA (SALDO E PONTOS)
+   ========================================== */
 .wallet-info {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -422,39 +425,81 @@ input[type="file"] {
   margin-bottom: 40px;
 }
 
+/* O card agora é uma tag <a>, precisamos resetar estilos de link */
 .wallet-card {
-  background: linear-gradient(
-    135deg,
-    rgba(var(--cor-tema-rgb), 0.1) 0%,
-    #1a1a2e 100%
-  );
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(var(--cor-tema-rgb), 0.1) 0%, #1a1a2e 100%);
   padding: 30px;
   border-radius: 12px;
-  text-align: center;
-  border-top: 4px solid #00ff88;
+  text-decoration: none; /* Remove sublinhado do link */
+  color: var(--text-main);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-top: 4px solid transparent;
 }
-.wallet-card:last-child {
+
+.wallet-card.card-saldo {
+  border-top-color: #00ff88;
+}
+
+.wallet-card.card-pontos {
   border-top-color: #feca57;
 }
+
+/* Efeito Hover com brilho (Glow) dinâmico */
 .wallet-card:hover {
   transform: translateY(-5px);
 }
 
+.wallet-card.card-saldo:hover {
+  box-shadow: 0 8px 25px rgba(0, 255, 136, 0.2);
+}
+
+.wallet-card.card-pontos:hover {
+  box-shadow: 0 8px 25px rgba(254, 202, 87, 0.2);
+}
+
+/* Estilização da seta de navegação */
+.card-icon {
+  font-size: 1.8rem;
+  color: var(--text-muted);
+  opacity: 0.4;
+  transform: translateX(0);
+  transition: all 0.3s ease;
+}
+
+/* Anima a seta e muda a cor dela no hover */
+.wallet-card:hover .card-icon {
+  opacity: 1;
+  transform: translateX(5px);
+}
+.wallet-card.card-saldo:hover .card-icon {
+  color: #00ff88;
+}
+.wallet-card.card-pontos:hover .card-icon {
+  color: #feca57;
+}
+
+/* Textos internos */
 .wallet-card h3 {
   font-size: 1.2rem;
   color: var(--text-muted);
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
+
 .wallet-card p {
   font-size: 2.5rem;
   font-weight: bold;
   margin: 0;
 }
+
 #saldo-usuario {
   color: #00ff88;
 }
+
 #pontos-usuario {
   color: #feca57;
 }
@@ -677,4 +722,150 @@ input[type="file"] {
 @keyframes fadeOutToast {
   0% { transform: translateX(0); opacity: 1; }
   100% { transform: translateX(100%); opacity: 0; }
+}
+
+/* ==========================================
+   HEADER / NAVBAR DINÂMICO (CARRINHO, SALDO, LOGOUT)
+   ========================================== */
+.navbar {
+  display: flex;
+  justify-content: space-between; /* Afasta o logo dos itens do perfil */
+  align-items: center;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-user-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+
+/* Botão do Carrinho */
+.header-cart-btn {
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espaço entre o ícone e o texto */
+  padding: 8px 16px; /* Espaçamento interno no formato pílula */
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.header-cart-btn i {
+  font-size: 1.1rem; /* Ícone levemente maior que o texto */
+}
+
+.header-cart-btn:hover {
+  color: var(--cor-tema);
+  background: rgba(var(--cor-tema-rgb), 0.1);
+  border-color: rgba(var(--cor-tema-rgb), 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--cor-tema-rgb), 0.25);
+}
+
+/* Badge de Usuário */
+.header-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px 16px 6px 8px;
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.header-profile-badge:hover {
+  background: rgba(var(--cor-tema-rgb), 0.15);
+  border-color: var(--cor-tema);
+  box-shadow: 0 4px 15px rgba(var(--cor-tema-rgb), 0.3);
+}
+
+.header-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--cor-tema);
+}
+
+/* Botão Sair (Logout) no Header */
+.header-logout-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-logout-btn:hover {
+  color: #ff4757;
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 5px rgba(255, 71, 87, 0.5));
+}
+
+/* Ajustes responsivos para telas pequenas */
+@media (max-width: 768px) {
+  .header-user-info {
+    gap: 10px;
+  }
+  .header-profile-badge span {
+    display: none; /* Esconde o nome, mantendo apenas o avatar circular */
+  }
+  .header-profile-badge {
+    padding: 6px;
+  }
+  .header-cart-btn span {
+    display: none; /* Oculta a palavra "Carrinho" no mobile para poupar espaço */
+  }
+  .header-cart-btn {
+    padding: 8px 12px;
+  }
+}
+
+/* Wrapper do ícone para permitir o posicionamento absoluto do badge */
+.cart-icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Badge circular vermelho */
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #ff4757; /* Vermelho vibrante */
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: bold;
+  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  box-shadow: 0 0 8px rgba(255, 71, 87, 0.6);
+  border: 1px solid #0f0f1e; /* Borda para destacar do botão */
 }

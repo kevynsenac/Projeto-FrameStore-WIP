@@ -72,21 +72,59 @@ async function verificarAutenticacaoNavbar() {
   }
 }
 
+// Substitua a atualizarUIHeader atual por esta:
 function atualizarUIHeader(usuario) {
+  // 1. Atualiza Avatar, Banner no botão e Logout no auth-container
   const authContainer = document.getElementById("auth-container");
-  const navPontos = document.getElementById("nav-pontos");
-
-  if (navPontos) navPontos.innerText = usuario.pontos || 0;
-
   if (authContainer) {
-    const primeiroNome = usuario.nome.split(" ")[0];
+    const primeiroNome = usuario.nome ? usuario.nome.split(" ")[0] : "Usuário";
+    const fotoPerfil = usuario.foto_perfil || "img/site_logo.png";
+    
+    // Aplica o banner como background inline apenas no botão
+    let badgeStyle = "";
+    if (usuario.fundo_perfil) {
+      badgeStyle = `background-image: linear-gradient(to right, rgba(15, 15, 30, 0.95), rgba(15, 15, 30, 0.2)), url('${usuario.fundo_perfil}'); background-size: cover; background-position: center;`;
+    }
+
     authContainer.innerHTML = `
-      <a href="perfil.html" class="profile-badge">
-          <i class="fas fa-user-circle" style="font-size: 1.2rem;"></i>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="perfil.html" class="header-profile-badge" style="${badgeStyle}">
+          <img src="${fotoPerfil}" alt="Avatar" class="header-avatar" />
           <span>${primeiroNome}</span>
-      </a>
+        </a>
+        <button class="header-logout-btn" onclick="fazerLogout()" title="Sair da Conta">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
     `;
   }
+
+  // 2. Atualiza Pontos e Saldo
+  const navPontos = document.getElementById("nav-pontos");
+  const navSaldo = document.getElementById("nav-saldo");
+  const saldoPainel = document.getElementById("saldo-pontos");
+  
+  if (navPontos) navPontos.innerText = usuario.pontos || 0;
+  if (saldoPainel) saldoPainel.innerText = usuario.pontos || 0;
+  if (navSaldo) {
+    navSaldo.innerText = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(usuario.saldo || 0);
+  }
+
+  // 3. Aplica apenas a Cor do Tema globalmente
+  if (usuario.cor_tema) {
+    const hexToRgb = (hex) => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : "42, 42, 239";
+    };
+    document.documentElement.style.setProperty("--cor-tema", usuario.cor_tema);
+    document.documentElement.style.setProperty("--cor-tema-rgb", hexToRgb(usuario.cor_tema));
+  }
+}
+
+// Adicione a função de logout no final do homepage.js para funcionar globalmente
+function fazerLogout() {
+  localStorage.removeItem("usuarioLogado");
+  window.location.href = "login.html";
 }
 
 async function atualizarContadorCarrinho(id_usuario) {

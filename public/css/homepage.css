@@ -874,3 +874,63 @@ body[data-theme="nintendo"] {
 .promo-badge {
   top: 45px;
 }
+
+/* ==========================================
+   HEADER DINÂMICO GLOBAL (AVATAR, LOGOUT)
+   ========================================== */
+.header-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.05); /* Alterado para background-color */
+  padding: 6px 16px 6px 8px;
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.header-profile-badge:hover {
+  border-color: var(--cor-tema, #2a2aef);
+  box-shadow: 0 0 12px rgba(var(--cor-tema-rgb, 42, 42, 239), 0.5); /* Adicionado brilho */
+  transform: translateY(-2px); /* Efeito de elevação sutil */
+}
+
+.header-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--cor-tema, #2a2aef);
+}
+
+.header-logout-btn {
+  background: transparent;
+  border: none;
+  color: #a5b1c2;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-logout-btn:hover {
+  color: #ff4757;
+  transform: scale(1.15);
+}
+
+/* Esconde o texto do usuário no mobile para poupar espaço */
+@media (max-width: 768px) {
+  .header-profile-badge span {
+    display: none; 
+  }
+  .header-profile-badge {
+    padding: 6px;
+  }
+}

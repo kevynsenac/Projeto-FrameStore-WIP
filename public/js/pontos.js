@@ -103,24 +103,6 @@ async function verificarAutenticacao() {
   return true;
 }
 
-function atualizarUIHeader(usuario) {
-  const navPontos = document.getElementById("nav-pontos");
-  const navSaldo = document.getElementById("nav-saldo");
-  const saldoPainel = document.getElementById("saldo-pontos");
-  const authContainer = document.getElementById("auth-container");
-
-  if (navPontos) navPontos.innerText = usuario.pontos || 0;
-  if (saldoPainel) saldoPainel.innerText = usuario.pontos || 0;
-  
-  const saldoFormatado = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(usuario.saldo || 0);
-  if (navSaldo) navSaldo.innerText = saldoFormatado;
-
-  if (authContainer) {
-    const primeiroNome = usuario.nome.split(" ")[0];
-    authContainer.innerHTML = `<a href="perfil.html" class="profile-badge"><i class="fas fa-user-circle"></i> <span>${primeiroNome}</span></a>`;
-  }
-}
-
 async function atualizarContadorCarrinho() {
   try {
     const response = await fetch(`${BASE_API_URL}/carrinho/${usuarioLogado.id}`);

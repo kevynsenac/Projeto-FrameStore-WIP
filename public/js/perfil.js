@@ -138,6 +138,9 @@ async function carregarDadosUsuario() {
     console.error("Erro ao sincronizar dados:", error);
   }
 
+  atualizarUIHeader(usuarioLogado);
+  atualizarBadgeCarrinho();
+
   const corTema = usuarioLogado.cor_tema || getRandomColor();
   document.documentElement.style.setProperty("--cor-tema", corTema);
   document.documentElement.style.setProperty(
@@ -389,6 +392,57 @@ function copiarChaveAtivacao(btnElement) {
       console.error("Erro ao copiar: ", err);
       mostrarNotificacao("Erro ao tentar copiar a chave.", "erro");
     });
+}
+
+// Insira esta função em qualquer parte livre do seu perfil.js
+function atualizarUIHeader(usuario) {
+  const authContainer = document.getElementById("auth-container");
+  if (!authContainer) return;
+
+  const primeiroNome = usuario.nome.split(" ")[0];
+  const fotoPerfil = usuario.foto_perfil || "img/site_logo.png";
+
+  authContainer.innerHTML = `
+    <div class="header-user-info">
+      <a href="carrinho.html" class="header-cart-btn" title="Ver Carrinho">
+        <div class="cart-icon-wrapper">
+          <i class="fas fa-shopping-cart"></i>
+          <span id="cart-badge" class="cart-badge hidden">0</span>
+        </div>
+        <span>Carrinho</span>
+      </a>
+      
+      <a href="perfil.html" class="header-profile-badge">
+        <img src="${fotoPerfil}" alt="Avatar" class="header-avatar" />
+        <span>${primeiroNome}</span>
+      </a>
+      
+      <button class="header-logout-btn" onclick="fazerLogout()" title="Sair da Conta">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  `;
+}
+
+// Função para buscar a quantidade de itens no carrinho e atualizar o indicador
+async function atualizarBadgeCarrinho() {
+  const badge = document.getElementById("cart-badge");
+  if (!badge || !usuarioLogado) return;
+
+  try {
+    const response = await fetch(`${API_URL}/carrinho/${usuarioLogado.id}`);
+    if (response.ok) {
+      const itens = await response.json();
+      if (itens.length > 0) {
+        badge.innerText = itens.length;
+        badge.classList.remove("hidden");
+      } else {
+        badge.classList.add("hidden");
+      }
+    }
+  } catch (error) {
+    console.error("Erro ao atualizar o badge do carrinho:", error);
+  }
 }
 
 function fecharModalJogo() {

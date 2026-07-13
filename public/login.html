@@ -44,7 +44,7 @@
           </button>
         </div>
 
-        <div id="form-login" class="active">
+        <div id="form-login" class="active form-section">
           <h1>Acesse sua conta</h1>
           <p>
             Faça login na conta Frame para começar a comprar e acumular pontos!
@@ -56,7 +56,7 @@
               <input
                 type="email"
                 id="login-email"
-                placeholder="* Email"
+                placeholder="Email"
                 required
               />
             </div>
@@ -65,7 +65,7 @@
               <input
                 type="password"
                 id="login-password"
-                placeholder="* Senha"
+                placeholder="Senha"
                 required
               />
               <i
@@ -79,18 +79,28 @@
           </form>
         </div>
 
-        <div id="form-register" class="hidden">
+        <div id="form-register" class="hidden form-section">
           <h1>Crie sua conta</h1>
           <p>
             Rápido e fácil, cadastre-se para começar a economizar nos jogos!
           </p>
+
           <form onsubmit="realizarCadastro(event)">
+            <div class="input-group">
+              <i class="fa-solid fa-user"></i>
+              <input
+                type="text"
+                id="register-nome"
+                placeholder="Nome de Usuário"
+                required
+              />
+            </div>
             <div class="input-group">
               <i class="fa-solid fa-envelope"></i>
               <input
                 type="email"
                 id="register-email"
-                placeholder="* Email"
+                placeholder="Email"
                 required
               />
             </div>
@@ -99,7 +109,7 @@
               <input
                 type="password"
                 id="register-password"
-                placeholder="* Senha"
+                placeholder="Senha"
                 required
               />
               <i
@@ -108,6 +118,26 @@
                 onclick="togglePassword('register-password', 'register-eye')"
               ></i>
             </div>
+            <div class="input-group">
+              <i class="fa-solid fa-lock"></i>
+              <input
+                type="password"
+                id="register-confirm-password"
+                placeholder="Confirmar Senha"
+                required
+              />
+              <i
+                class="fa-regular fa-eye eye-icon"
+                id="register-confirm-eye"
+                onclick="
+                  togglePassword(
+                    'register-confirm-password',
+                    'register-confirm-eye',
+                  )
+                "
+              ></i>
+            </div>
+
             <div class="password-tips">
               <h3>Siga essas dicas:</h3>
               <ul>

@@ -172,7 +172,7 @@ async function carregarDadosUsuario() {
   if (bioEl)
     bioEl.innerText =
       usuarioLogado.bio ||
-      "Nenhuma bio informada. Vá em 'Minha Conta' para se apresentar!";
+      "Perfil sem bio. Vá em 'Minha Conta' para alterar!";
 
   document.getElementById("saldo-usuario").innerText = formatPrice(
     usuarioLogado.saldo,

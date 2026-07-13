@@ -307,7 +307,7 @@ async function finalizarCompra() {
     if (result.pontosAtuais !== undefined) usuarioLogado.pontos = result.pontosAtuais;
     localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
 
-    mostrarNotificacao("Compra efetuada com sucesso! A transferir-te para a Biblioteca...", "sucesso");
+    mostrarNotificacao("Compra efetuada com sucesso! Redirecionando para a sua biblioteca...", "sucesso");
     
     // Aguarda 2 segundos para o utilizador conseguir ler a notificação de sucesso e redireciona
     setTimeout(() => {

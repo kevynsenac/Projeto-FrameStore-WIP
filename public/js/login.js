@@ -1,7 +1,35 @@
-// Substitua o hardcode por isso:
 const API_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000/api' 
     : '/api';
+
+// ==========================================
+// SISTEMA DE NOTIFICAÇÕES (TOASTS)
+// ==========================================
+function mostrarNotificacao(mensagem, tipo = 'sucesso') {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${tipo}`;
+  
+  const icone = tipo === 'sucesso' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+  toast.innerHTML = `<i class="${icone}"></i> <span>${mensagem}</span>`;
+  
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('hide');
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+// ==========================================
+// UI E NAVEGAÇÃO
+// ==========================================
 function showTab(tabName) {
   const loginForm = document.getElementById("form-login");
   const registerForm = document.getElementById("form-register");
@@ -34,11 +62,13 @@ function togglePassword(inputId, eyeId) {
   }
 }
 
-// Lógica de Autenticação na API
+// ==========================================
+// AUTENTICAÇÃO
+// ==========================================
 async function realizarLogin(event) {
   event.preventDefault(); 
 
-  const email = document.getElementById("login-email").value;
+  const email = document.getElementById("login-email").value.trim();
   const senha = document.getElementById("login-password").value;
 
   try {
@@ -51,34 +81,51 @@ async function realizarLogin(event) {
     const data = await response.json();
 
     if (!response.ok) {
-      alert(data.error || "Credenciais inválidas. Tente novamente.");
+      mostrarNotificacao(data.error || "Credenciais inválidas. Tente novamente.", "erro");
       return;
     }
 
-    // Salva a sessão corretamente
+    mostrarNotificacao("Login efetuado com sucesso!", "sucesso");
     localStorage.setItem("usuarioLogado", JSON.stringify(data.user));
-    window.location.href = "homepage.html";
+    
+    // Aguarda 1.5s para o utilizador ver o toast antes de redirecionar
+    setTimeout(() => {
+      window.location.href = "homepage.html";
+    }, 1500);
+
   } catch (error) {
     console.error("Erro de conexão:", error);
-    alert("Não foi possível conectar ao servidor. Verifique se a API está rodando.");
+    mostrarNotificacao("Não foi possível conectar ao servidor. Verifique se a API está a correr.", "erro");
   }
 }
 
-// Função de Cadastro com Login Automático
 async function realizarCadastro(event) {
   event.preventDefault();
 
-  const email = document.getElementById("register-email").value;
+  // Captura correta de todos os campos do HTML atualizado
+  const nome = document.getElementById("register-nome").value.trim();
+  const email = document.getElementById("register-email").value.trim();
   const senha = document.getElementById("register-password").value;
-  const nome = email.split("@")[0];
+  const confirmacaoSenha = document.getElementById("register-confirm-password").value;
+
+  // Validações
+  if (!nome) {
+    mostrarNotificacao("O nome de usuário é obrigatório.", "erro");
+    return;
+  }
 
   if (senha.length < 6) {
-    alert("A senha deve ter no mínimo 6 caracteres.");
+    mostrarNotificacao("A senha deve ter no mínimo 6 caracteres.", "erro");
+    return;
+  }
+
+  if (senha !== confirmacaoSenha) {
+    mostrarNotificacao("As senhas não coincidem. Verifique e tente novamente.", "erro");
     return;
   }
 
   try {
-    // 1. Realiza o cadastro do usuário
+    // 1. Cadastro
     const responseRegister = await fetch(`${API_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -88,13 +135,13 @@ async function realizarCadastro(event) {
     const dataRegister = await responseRegister.json();
 
     if (!responseRegister.ok) {
-      alert(dataRegister.error || "Erro ao criar conta.");
+      mostrarNotificacao(dataRegister.error || "Erro ao criar conta.", "erro");
       return;
     }
 
-    alert("Conta criada com sucesso! Entrando automaticamente...");
+    mostrarNotificacao("Conta criada! A entrar automaticamente...", "sucesso");
     
-    // 2. Realiza o login automático com as credenciais recém-criadas
+    // 2. Login Automático
     const responseLogin = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -104,20 +151,21 @@ async function realizarCadastro(event) {
     const dataLogin = await responseLogin.json();
 
     if (!responseLogin.ok) {
-      // Fallback de segurança: se o login falhar por algum motivo bizarro, manda pra aba de login
-      alert("Conta criada, mas ocorreu um erro no login automático. Faça o login manualmente.");
-      document.getElementById("register-email").value = "";
-      document.getElementById("register-password").value = "";
+      mostrarNotificacao("Conta criada, mas ocorreu um erro no login automático. Faça o login manualmente.", "erro");
+      document.getElementById("form-register").reset();
       showTab("login"); 
       return;
     }
 
-    // 3. Salva a sessão no localStorage e redireciona para a Home
+    // 3. Salva sessão e redireciona
     localStorage.setItem("usuarioLogado", JSON.stringify(dataLogin.user));
-    window.location.href = "homepage.html";
+    
+    setTimeout(() => {
+      window.location.href = "homepage.html";
+    }, 2000);
 
   } catch (error) {
     console.error("Erro de conexão:", error);
-    alert("Não foi possível conectar ao servidor.");
+    mostrarNotificacao("Não foi possível conectar ao servidor.", "erro");
   }
 }

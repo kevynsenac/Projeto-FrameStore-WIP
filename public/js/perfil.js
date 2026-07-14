@@ -323,7 +323,7 @@ async function carregarCupons() {
       const li = document.createElement("li");
       li.className = `coupon-item ${cupom.usado ? "usado" : ""}`;
       li.innerHTML = `
-        <div><strong>${cupom.nome}</strong><p style="font-size: 0.9rem; color: #ccc;">Válido e Pronto</p></div>
+        <div><strong>${cupom.nome}</strong><p style="font-size: 0.9rem; color: #ccc;">Desconto</p></div>
         <div style="text-align: right;">
             <span style="display: block; font-size: 1.2rem; color: #fff; font-weight: bold;">- R$ ${cupom.desconto}</span>
             <span style="font-size: 0.8rem;">Status: ${cupom.usado ? "Usado" : "Disponível"}</span>

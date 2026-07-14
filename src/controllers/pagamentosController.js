@@ -81,4 +81,27 @@ async function adicionarSaldo(req, res) {
   }
 }
 
-module.exports = { getCartoes, addCartao, adicionarSaldo };
+async function deleteCartao(req, res) {
+  const { id } = req.params;
+  try {
+    await db.query("DELETE FROM CARTOES WHERE id = ?", [id]);
+    res.json({ message: "Cartão removido com sucesso!" });
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao remover cartão." });
+  }
+}
+
+async function updateCartao(req, res) {
+  const { id } = req.params;
+  const { nome_titular, vencimento } = req.body;
+  try {
+    await db.query("UPDATE CARTOES SET nome_titular = ?, vencimento = ? WHERE id = ?", 
+    [nome_titular, vencimento, id]);
+    res.json({ message: "Cartão atualizado com sucesso!" });
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao atualizar cartão." });
+  }
+}
+
+// Lembre-se de exportar as novas funções:
+module.exports = { getCartoes, addCartao, adicionarSaldo, deleteCartao, updateCartao };

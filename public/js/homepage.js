@@ -2,6 +2,7 @@ let currentSlide = 0;
 let bannerInterval;
 let todosJogos = [];
 let jogosNaBiblioteca = []; // Variável global para armazenar os IDs dos jogos comprados
+let currentFilter = 'todos'; // Adicione isto aqui
 
 function protegerPagina() {
   const userStr = localStorage.getItem("usuarioLogado");
@@ -169,16 +170,42 @@ async function fetchBiblioteca(id_usuario) {
 // ==========================================
 // BUSCA, PESQUISA E FILTROS DE PLATAFORMA
 // ==========================================
+function aplicarFiltros() {
+  const termoBusca = document.getElementById("search-input").value.toLowerCase();
+  
+  // 1. Filtrar pela Plataforma (com base no currentFilter)
+  let jogosFiltrados = [];
+  if (currentFilter === 'todos') {
+    jogosFiltrados = todosJogos;
+  } else if (currentFilter === 'ofertas') {
+    jogosFiltrados = todosJogos.filter(game => {
+      const desconto = parseFloat(game.desconto);
+      return desconto > 0 && desconto < 100;
+    });
+  } else {
+    jogosFiltrados = todosJogos.filter((game) => {
+      if (!game.platform) return false;
+      const platStr = game.platform.toLowerCase();
+      if (currentFilter === 'steam') return platStr.includes('steam') || platStr.includes('pc');
+      return platStr.includes(currentFilter.toLowerCase());
+    });
+  }
+
+  // 2. Filtrar pelo Termo de Busca (refina os resultados da plataforma)
+  jogosFiltrados = jogosFiltrados.filter((game) =>
+    game.titulo.toLowerCase().includes(termoBusca)
+  );
+
+  // 3. Renderizar
+  renderGames(jogosFiltrados);
+}
+
 function configurarBusca() {
   const searchInput = document.getElementById("search-input");
   if (!searchInput) return;
 
-  searchInput.addEventListener("input", (e) => {
-    const termoDigitado = e.target.value.toLowerCase();
-    const jogosFiltrados = todosJogos.filter((game) =>
-      game.titulo.toLowerCase().includes(termoDigitado)
-    );
-    renderGames(jogosFiltrados);
+  searchInput.addEventListener("input", () => {
+    aplicarFiltros(); // Chama a função unificada ao digitar
   });
 }
 
@@ -207,16 +234,15 @@ function filtrarPlataforma(plataforma) {
     document.body.setAttribute('data-theme', plataforma);
   }
 
-  // 2. Limpa o input de busca
-  const searchInput = document.getElementById("search-input");
-  if (searchInput) searchInput.value = "";
+  // 2. REMOVIDO: O input não deve ser limpo para permitir 
+  // que o usuário busque algo dentro da plataforma escolhida.
 
   // 3. Atualiza os textos do gatilho do Dropdown
   const filterName = document.getElementById("filter-name");
   const filterIcon = document.getElementById("filter-icon");
   
   const configFiltros = {
-    todos: { nome: "Todos", icone: "fas fa-home" }, // Nome encurtado para caber perfeitamente
+    todos: { nome: "Todos", icone: "fas fa-home" },
     ofertas: { nome: "Ofertas", icone: "fas fa-tag" },
     steam: { nome: "Steam / PC", icone: "fab fa-steam" },
     playstation: { nome: "PlayStation", icone: "fab fa-playstation" },
@@ -240,29 +266,9 @@ function filtrarPlataforma(plataforma) {
     }
   });
 
-  // 5. Lógica de Filtragem de Dados
-  let jogosFiltrados = [];
-
-  if (plataforma === 'todos') {
-    jogosFiltrados = todosJogos;
-  } else if (plataforma === 'ofertas') {
-    jogosFiltrados = todosJogos.filter(game => {
-      const desconto = parseFloat(game.desconto);
-      return desconto > 0 && desconto < 100;
-    });
-  } else {
-    jogosFiltrados = todosJogos.filter((game) => {
-      if (!game.platform) return false;
-      const platStr = game.platform.toLowerCase();
-      
-      if (plataforma === 'steam') {
-        return platStr.includes('steam') || platStr.includes('pc');
-      }
-      return platStr.includes(plataforma.toLowerCase());
-    });
-  }
-
-  renderGames(jogosFiltrados);
+  // 5. NOVA LÓGICA DE FILTRAGEM UNIFICADA
+  currentFilter = plataforma; // Atualiza a variável global
+  aplicarFiltros();           // Chama a função central que faz todo o trabalho
 }
 
 // ==========================================

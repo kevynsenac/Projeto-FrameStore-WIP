@@ -59,6 +59,20 @@ function abrirModalCartao() {
 function fecharModalCartao() {
   document.getElementById("modal-novo-cartao").style.display = "none";
   document.getElementById("form-novo-cartao").reset();
+  
+  // Limpa o estado
+  idCartaoEditando = null;
+  
+  // Reabilita tudo
+  document.getElementById("novo-cartao-numero").disabled = false;
+  document.getElementById("novo-cartao-cvv").disabled = false;
+  document.getElementById("novo-cartao-bandeira").disabled = false;
+  
+  // Esconde a dica visual
+  const dica = document.getElementById("label-bloqueado");
+  if (dica) dica.style.display = "none";
+
+  document.querySelector(".modal-content h2").innerText = "Cadastrar Novo Cartão";
 }
 
 function formatarVencimento(input) {
@@ -81,31 +95,23 @@ async function carregarCartoes() {
 }
 
 function renderizarCartoes() {
+  // 1. Atualiza o GRID de cartões (o que você já tinha)
   const container = document.getElementById("lista-cartoes");
-  const select = document.getElementById("select-cartao");
-  if (!container || !select) return;
-
   container.innerHTML = "";
-  select.innerHTML = '<option value="">Selecione um cartão...</option>';
+
+  // 2. Atualiza o SELECT de seleção (A parte que faltava)
+  const selectCartao = document.getElementById("select-cartao");
+  selectCartao.innerHTML = '<option value="">Selecione um cartão</option>';
 
   if (cartoesUsuario.length === 0) {
-    container.innerHTML = "<p style='color:#a5b1c2; font-size: 0.9rem;'>Nenhum cartão cadastrado.</p>";
+    container.innerHTML = "<p>Nenhum cartão cadastrado.</p>";
     return;
   }
 
   cartoesUsuario.forEach(cartao => {
-    const bandeiraUpper = cartao.bandeira.charAt(0).toUpperCase() + cartao.bandeira.slice(1);
-    
-    const option = document.createElement("option");
-    option.value = cartao.id;
-    option.text = `${bandeiraUpper} - ${cartao.numero_mascarado}`;
-    select.appendChild(option);
-
-    // Ícones corretos das bandeiras usando fa-brands
-    let icon = "fas fa-credit-card";
-    if (cartao.bandeira === "visa") icon = "fa-brands fa-cc-visa";
-    if (cartao.bandeira === "mastercard") icon = "fa-brands fa-cc-mastercard";
-    if (cartao.bandeira === "amex") icon = "fa-brands fa-cc-amex";
+    // --- Renderização do GRID ---
+    let icon = (cartao.bandeira === "visa") ? "fa-brands fa-cc-visa" : 
+               (cartao.bandeira === "mastercard") ? "fa-brands fa-cc-mastercard" : "fas fa-credit-card";
 
     const div = document.createElement("div");
     div.className = "card-item";
@@ -113,49 +119,127 @@ function renderizarCartoes() {
       <div class="card-icon"><i class="${icon}"></i></div>
       <div class="card-info">
         <strong>${cartao.numero_mascarado}</strong>
-        <p>${cartao.nome_titular} &bull; Válido: ${cartao.vencimento}</p>
-        <small style="color:#00ff88;">Limite Disponível: R$ ${cartao.saldo_cartao}</small>
+        <p>${cartao.nome_titular} • Válido: ${cartao.vencimento}</p>
+        <small style="color:#00ff88;">Limite: R$ ${cartao.saldo_cartao}</small>
+      </div>
+      <div class="card-actions">
+        <button class="btn-icon" onclick="prepararEdicao(${cartao.id})" title="Editar"><i class="fas fa-edit"></i></button>
+        <button class="btn-icon delete" onclick="removerCartao(${cartao.id})" title="Remover"><i class="fas fa-trash-alt"></i></button>
       </div>
     `;
     container.appendChild(div);
+
+    // --- Renderização das OPTIONS do Select ---
+    const option = document.createElement("option");
+    option.value = cartao.id;
+    // Exibe o número mascarado e o saldo disponível no cartão
+    option.textContent = `${cartao.numero_mascarado} (Saldo: R$ ${cartao.saldo_cartao})`;
+    selectCartao.appendChild(option);
   });
+}
+
+async function removerCartao(idCartao) {
+  if (!confirm("Tem certeza que deseja remover este cartão?")) return;
+
+  try {
+    const res = await fetch(`${BASE_API_URL}/cartoes/${idCartao}`, { method: 'DELETE' });
+    if (res.ok) {
+      mostrarNotificacao("Cartão removido!", "sucesso");
+      await carregarCartoes();
+    } else {
+      mostrarNotificacao("Erro ao remover.", "erro");
+    }
+  } catch (error) {
+    mostrarNotificacao("Erro de conexão.", "erro");
+  }
+}
+
+// --- 3. EDITAR CARTÃO (Prepara o Modal) ---
+let idCartaoEditando = null;
+
+function prepararEdicao(idCartao) {
+  const cartao = cartoesUsuario.find(c => c.id === idCartao);
+  if (!cartao) return;
+
+  idCartaoEditando = idCartao;
+  
+  // Preenche os dados
+  document.getElementById("novo-cartao-nome").value = cartao.nome_titular;
+  document.getElementById("novo-cartao-vencimento").value = cartao.vencimento;
+  
+  // Bloqueia campos e MOSTRA a dica visual
+  const camposBloqueados = ["novo-cartao-numero", "novo-cartao-cvv", "novo-cartao-bandeira"];
+  camposBloqueados.forEach(id => {
+      document.getElementById(id).disabled = true;
+  });
+
+  // Exibe o aviso de bloqueado na label (se você adicionou o span com ID label-bloqueado)
+  const dica = document.getElementById("label-bloqueado");
+  if (dica) dica.style.display = "inline";
+
+  document.querySelector(".modal-content h2").innerText = "Editar Cartão";
+  abrirModalCartao();
 }
 
 async function cadastrarCartao(event) {
   event.preventDefault();
+
+  // 1. Coleta dos dados
   const numero = document.getElementById("novo-cartao-numero").value.replace(/\s/g, '');
   const nome = document.getElementById("novo-cartao-nome").value;
   const vencimento = document.getElementById("novo-cartao-vencimento").value;
   const cvv = document.getElementById("novo-cartao-cvv").value;
   const bandeira = document.getElementById("novo-cartao-bandeira").value;
 
-  if (numero.length < 13) return mostrarNotificacao("Número de cartão inválido.", "erro");
-  if (vencimento.length < 5) return mostrarNotificacao("Vencimento inválido.", "erro");
-  if (cvv.length < 3) return mostrarNotificacao("CVV inválido.", "erro");
-
   const btn = document.getElementById("btn-salvar-cartao");
   btn.disabled = true;
-  btn.innerText = "Salvando...";
+  btn.innerText = idCartaoEditando ? "Atualizando..." : "Salvando...";
 
   try {
-    const res = await fetch(`${BASE_API_URL}/cartoes`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id_usuario: usuarioLogado.id, numero, nome_titular: nome, vencimento, cvv, bandeira })
-    });
+    let response;
     
-    if (res.ok) {
-      mostrarNotificacao("Cartão adicionado com sucesso!", "sucesso");
-      fecharModalCartao();
-      await carregarCartoes();
+    // 2. Lógica Condicional: Editar (PUT) ou Cadastrar (POST)
+    if (idCartaoEditando) {
+      // Requisição de Edição
+      response = await fetch(`${BASE_API_URL}/cartoes/${idCartaoEditando}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome_titular: nome, vencimento })
+      });
     } else {
-      mostrarNotificacao("Erro ao cadastrar cartão.", "erro");
+      // Requisição de Cadastro Novo (Original)
+      if (numero.length < 13) throw new Error("Número de cartão inválido.");
+      if (vencimento.length < 5) throw new Error("Vencimento inválido.");
+      if (cvv.length < 3) throw new Error("CVV inválido.");
+      if (!bandeira) throw new Error("Selecione uma bandeira.");
+
+      response = await fetch(`${BASE_API_URL}/cartoes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_usuario: usuarioLogado.id, numero, nome_titular: nome, vencimento, cvv, bandeira })
+      });
     }
+
+    if (!response.ok) throw new Error("Erro na comunicação com o servidor.");
+
+    // 3. Sucesso
+    mostrarNotificacao(idCartaoEditando ? "Cartão atualizado!" : "Cartão adicionado!", "sucesso");
+    
+    // 4. Limpeza e Reset
+    fecharModalCartao();
+    await carregarCartoes();
+
   } catch (error) {
-    mostrarNotificacao("Erro de conexão.", "erro");
+    mostrarNotificacao(error.message || "Erro ao salvar cartão.", "erro");
   } finally {
     btn.disabled = false;
-    btn.innerHTML = `Confirmar e Salvar`;
+    btn.innerText = "Confirmar e Salvar";
+    idCartaoEditando = null; // Limpa o estado de edição
+    
+    // Reabilita campos caso tenham sido bloqueados pela função de prepararEdicao
+    document.getElementById("novo-cartao-numero").disabled = false;
+    document.getElementById("novo-cartao-cvv").disabled = false;
+    document.getElementById("novo-cartao-bandeira").disabled = false;
   }
 }
 

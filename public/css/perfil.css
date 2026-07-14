@@ -869,3 +869,7 @@ input[type="file"] {
   box-shadow: 0 0 8px rgba(255, 71, 87, 0.6);
   border: 1px solid #0f0f1e; /* Borda para destacar do botão */
 }
+
+.hidden {
+  display: none !important;
+}

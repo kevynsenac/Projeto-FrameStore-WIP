@@ -100,7 +100,7 @@ async function checkout(req, res) {
 
     if (saldo < totalCompra) throw new Error("Saldo virtual insuficiente.");
 
-    const novosPontosGanhos = Math.floor(totalCompra * 0.1);
+    const novosPontosGanhos = Math.floor(totalCompra);
     const novoSaldo = saldo - totalCompra;
     const novosPontosTotais = pontos + novosPontosGanhos;
 

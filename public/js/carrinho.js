@@ -133,7 +133,7 @@ function renderizarCarrinho() {
   temJogoPossuido = false;
 
   if (itensCarrinho.length === 0) {
-    container.innerHTML = "<p style='color: #a5b1c2; font-size: 1.1rem; padding: 20px 0;'>O teu carrinho encontra-se vazio.</p>";
+    container.innerHTML = "<p style='color: #a5b1c2; font-size: 1.1rem; padding: 20px 0;'>O carrinho está vazio...</p>";
     return;
   }
 
@@ -172,7 +172,7 @@ function renderizarCarrinho() {
     }
 
     const warningHTML = isOwned 
-        ? `<div class="owned-warning"><i class="fas fa-exclamation-triangle"></i> Já possuis este jogo.</div>` 
+        ? `<div class="owned-warning"><i class="fas fa-exclamation-triangle"></i> Já está na biblioteca. Remova este jogo do carrinho!</div>` 
         : "";
 
     div.innerHTML = `
@@ -224,13 +224,18 @@ function calcularTotal() {
     if (itensCarrinho.length === 0 || temJogoPossuido) {
       btnFinalizar.disabled = true;
       if (temJogoPossuido) {
-        btnFinalizar.innerText = "Remove Itens Duplicados";
+        btnFinalizar.innerText = "Remova os Itens Duplicados";
       } else {
         btnFinalizar.innerText = "O Carrinho está Vazio";
       }
-    } else {
+    } else if (usuarioLogado.saldo < totalFinal) {
+      // SALDO INSUFICIENTE: O botão vira o atalho para depositar fundos
       btnFinalizar.disabled = false;
-      btnFinalizar.innerText = "Finalizar Compra";
+      btnFinalizar.innerHTML = '<i class="fas fa-wallet"></i> Adicionar Fundos';
+    } else {
+      // TUDO CERTO PARA COMPRAR
+      btnFinalizar.disabled = false;
+      btnFinalizar.innerHTML = 'Finalizar Compra';
     }
   }
 }
@@ -258,12 +263,19 @@ async function removerDoCarrinho(idJogo) {
 async function finalizarCompra() {
   if (itensCarrinho.length === 0 || temJogoPossuido) return;
 
+  const btnFinalizar = document.getElementById("btn-finalizar");
+
+  // SE O BOTÃO FOR O DE FUNDOS, APENAS REDIRECIONA SEM FAZER REQUISIÇÃO
+  if (btnFinalizar.innerText.includes("Adicionar Fundos")) {
+    window.location.href = "saldos.html";
+    return;
+  }
+
   const select = document.getElementById("coupon-select");
   const idCupom = select.value ? parseInt(select.value) : null;
 
-  const btnFinalizar = document.getElementById("btn-finalizar");
-  const originalText = btnFinalizar.innerText;
-  btnFinalizar.innerText = "A Processar...";
+  const originalText = btnFinalizar.innerHTML;
+  btnFinalizar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A Processar...';
   btnFinalizar.disabled = true;
 
   try {
@@ -279,17 +291,19 @@ async function finalizarCompra() {
     const result = await response.json();
 
     if (!response.ok) {
-      // NOVA LÓGICA DE SALDO INSUFICIENTE AQUI 👇
       if (result.error && result.error.includes("Saldo virtual insuficiente")) {
-        mostrarNotificacao("Saldo insuficiente. A redirecionar para Adicionar Fundos...", "erro");
         setTimeout(() => {
           window.location.href = "saldos.html";
-        }, 2500);
+        }, 1000);
+        
+        // O RETURN AQUI É O QUE RESOLVE O BUG DO LOADING SUMINDO ANTES DA HORA
+        return; 
       } else {
         mostrarNotificacao(result.error || "Erro ao finalizar a compra.", "erro");
       }
       
-      btnFinalizar.innerText = originalText;
+      // Apenas volta ao normal se for um erro comum e não fomos redirecionar
+      btnFinalizar.innerHTML = originalText;
       btnFinalizar.disabled = false;
       return;
     }
@@ -298,7 +312,7 @@ async function finalizarCompra() {
     if (result.pontosAtuais !== undefined) usuarioLogado.pontos = result.pontosAtuais;
     localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
 
-    mostrarNotificacao("Compra efetuada com sucesso! A redirecionar para a sua biblioteca...", "sucesso");
+    mostrarNotificacao("Compra efetuada com sucesso! Redirecionando para a sua biblioteca...", "sucesso");
     
     setTimeout(() => {
       window.location.href = "perfil.html";
@@ -306,7 +320,7 @@ async function finalizarCompra() {
 
   } catch (error) {
     mostrarNotificacao("Erro interno ao processar a compra.", "erro");
-    btnFinalizar.innerText = originalText;
+    btnFinalizar.innerHTML = originalText;
     btnFinalizar.disabled = false;
   }
 }

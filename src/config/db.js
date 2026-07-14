@@ -10,7 +10,7 @@ const pool = mysql.createPool({
   ssl: {
     rejectUnauthorized: false, // Necessário para aceitar o SSL do Aiven
   },
-  connectTimeout: 30000, // Tempo limite de 30 segundos para evitar ETIMEDOUT
+  connectTimeout: 30000,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

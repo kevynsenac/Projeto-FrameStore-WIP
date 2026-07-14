@@ -1,114 +1,98 @@
-# 🎮 Projeto FrameStore (Outdated - Este arquivo precisa ser atualizado mais tarde)
+# 🎮 Projeto FrameStore
 
 Este documento detalha o funcionamento, a arquitetura e o planejamento do projeto **FrameStore**, uma loja virtual de jogos digitais.
 
-**Aviso Importante:** Este é um projeto escolar de cunho demonstrativo. Todas as transações financeiras (compras, saldo, resgate de cupons) são **100% simuladas**. O saldo dos usuários é injetado e gerenciado diretamente via Banco de Dados (DB) para demonstrar a lógica de e-commerce sem envolver gateways de pagamento reais.
+**Aviso Importante:** Este é um projeto escolar de cunho demonstrativo. Todas as transações financeiras (compras, adição de saldo, resgate de cupons) são **100% simuladas**. O saldo dos usuários é gerido diretamente via Banco de Dados (DB) para demonstrar a lógica de e-commerce sem envolver gateways de pagamento reais.
 
 ---
 
 ## 🌟 Sobre o Projeto
 
-A FrameStore é uma plataforma simulada de e-commerce voltada para a comercialização de jogos digitais. O sistema permite que usuários se cadastrem, explorem um catálogo de jogos, gerenciem um carrinho de compras, finalizem transações usando saldo virtual e resgatem códigos de ativação para os jogos adquiridos. O projeto conta também com um painel administrativo completo para a gestão do catálogo, usuários e promoções.
+A FrameStore é uma plataforma simulada de e-commerce voltada para a comercialização de jogos digitais. O sistema permite que os usuários se cadastrem, explorem um catálogo detalhado de jogos, gerenciem um carrinho de compras, adicionem fundos à carteira e finalizem transações.
 
-## 🏆 Por que comprar na FrameStore?
+## 🏆 Ecossistema e Recompensas
 
-Nosso sistema foi desenhado para recompensar o usuário continuamente através de um ecossistema integrado:
+Nosso sistema recompensa o utilizador continuamente através de um ecossistema integrado:
 
-- **Cashback Automático (Sistema de Pontos):** A cada compra finalizada, 10% do valor gasto é convertido automaticamente em pontos na sua conta.
-- **Loja de Cupons:** Os pontos acumulados podem ser trocados na aba "Pontos" por cupons de desconto fixo, que podem ser aplicados diretamente no carrinho para baratear compras futuras.
-- **Biblioteca Digital Permanente:** Todos os jogos adquiridos ficam salvos na sua aba "Biblioteca" dentro do Perfil.
-- **Resgate Imediato:** Ao acessar sua biblioteca, é possível gerar instantaneamente a chave de ativação única do jogo para instalação.
-
----
-
-## 🏗️ 1. Arquitetura e Tecnologias
-
-- **Frontend:** HTML, CSS, JavaScript.
-- **Backend:** Node.js (com Express).
-- **Banco de Dados:** SQL (MySQL) para garantir relacionamento consistente.
-- **Configuração:** Todas as variáveis sensíveis (dados de conexão com DB, segredos de autenticação, portas) são gerenciadas via arquivo `.env`, garantindo segurança e separação de ambientes.
+*   **Cashback Automático:** A cada compra finalizada, 100% do valor gasto é convertido em pontos na conta do utilizador.
+*   **Roleta Diária:** Um sistema de sorteio que permite ao utilizador ganhar até 250 pontos diariamente.
+*   **Loja de Cupons:** Os pontos podem ser trocados por cupons de desconto para aplicar no carrinho.
+*   **Simulação de Pagamentos:** Adição de saldo através de simulações de Cartão de Crédito (com gestão de cartões salvos), PIX e Boleto Bancário (OBS: Somente a opção de cartão realmente adiciona saldo a conta do usuário, as outras opções são apenas demonstrativas).
+*   **Biblioteca Digital:** Jogos adquiridos ficam salvos no perfil, permitindo o resgate imediato da chave de ativação única (OBS: Chaves também simuladas).
 
 ---
 
-## 🗄️ 2. Modelagem do Banco de Dados
+## 🏗️ Arquitetura e Tecnologias
 
-Para evitar dependências externas de armazenamento, as imagens são armazenadas diretamente no banco de dados.
+O projeto adota uma arquitetura clássica com separação clara entre cliente e servidor.
+
+*   **Frontend:** HTML5, CSS3, JavaScript Vanilla.
+*   **Backend:** Node.js com o framework Express.
+*   **Banco de Dados:** MySQL para garantir a integridade relacional.
+*   **Uploads de Arquivos:** Utilização do `multer` para gestão e armazenamento de imagens diretamente como binários (`LONGBLOB`) no banco de dados.
+*   **Configuração:** Variáveis sensíveis gerenciadas via arquivo `.env`.
+
+---
+
+## 🗄️ Modelagem do Banco de Dados
+
+As imagens são armazenadas diretamente no banco de dados para evitar dependências externas de armazenamento.
 
 ### Tabelas Principais
 
-- **`USUARIOS`:**
-- `id`: (PK) Identificador único.
-- `nome`: Nome para display no perfil.
-- `email`: Credencial de login.
-- `senha`: Hash da senha (criptografada).
-- `saldo`: (Decimal) Dinheiro virtual.
-- `pontos`: (Inteiro) Moeda secundária.
-- `adm`: (Boolean) Define privilégios de acesso ao Painel Administrativo.
+*   **`USUARIOS`**: Armazena as credenciais, saldo financeiro (`DECIMAL`), pontos acumulados, personalização de perfil (cor de tema, avatar) e privilégios administrativos (`adm`) que podem ser utilizados posteriormente caso um "painel administrativo" seja desenvolvido.
+*   **`JOGOS`**: Catálogo contendo `titulo`, `preco`, `desconto`, `platform`, `descricao`, `requisitos` e arquivos binários de imagens (`cover` e screenshots).
+*   **`CUPONS`**: Define os cupons disponíveis na loja de pontos, com seus descontos e custos.
 
-- **`JOGOS`:**
-- `id`: (PK) Identificador único.
-- `titulo`: Nome do jogo.
-- `preco`: (Decimal) Preço cheio.
-- `desconto`: (Decimal/Null) Porcentagem de desconto.
-- `platform`: Steam, PlayStation, Xbox, etc.
-- `cover`: (LONGBLOB) Imagem principal convertida em binário.
-- `screenshot1`: (LONGBLOB) Imagem da galeria 1.
-- `screenshot2`: (LONGBLOB) Imagem da galeria 2.
-- `screenshot3`: (LONGBLOB) Imagem da galeria 3.
+### Tabelas Relacionais e Auxiliares
 
-- **`CUPONS`:**
-- `id`: (PK) Identificador único.
-- `nome`: Código do cupom.
-- `tipo`: Tipo de benefício.
-- `desconto`: (Decimal) Valor abatido.
-- `custo_pontos`: (Inteiro) Custo em pontos.
-
-### Tabelas Relacionais
-
-- **`CARRINHO`:** (`id_usuario`, `id_jogo`)
-- **`BIBLIOTECA`:** (`id_usuario`, `id_jogo`, `data_compra`)
-- **`USUARIO_CUPONS`:** (`id_usuario`, `id_cupom`, `usado`)
+*   **`CARRINHO`**: Relaciona `id_usuario` e `id_jogo`.
+*   **`BIBLIOTECA`**: Armazena os jogos adquiridos pelo utilizador e o respectivo `codigo_resgate` gerado.
+*   **`USUARIO_CUPONS`**: Regista os cupons resgatados e se já foram ou não utilizados (`usado`).
+*   **`CARTOES`**: Guarda os cartões de crédito simulados cadastrados pelos utilizadores para adição de saldo.
 
 ---
 
-## ⚙️ 3. Lógica de Negócio e Funcionalidades
+## ⚙️ Como Executar o Projeto Localmente
 
-### A. Autenticação e Perfil
+Siga os passos abaixo para preparar o ambiente de desenvolvimento.
 
-1. Login via `email` e `senha`.
-2. No `perfil.html`, se a coluna `adm` do usuário for `true`, o frontend renderiza o botão "Painel Administrativo".
-3. A aba "Biblioteca" renderiza os jogos adquiridos com modal interativo para exibição da chave de ativação.
+**1. Instalação de Dependências**
+Execute o comando na raiz do projeto para instalar pacotes como `express`, `mysql2`, `bcrypt` e `multer`:
+```bash
+npm install
 
-### B. Sistema de Compras
+```
 
-1. Adição de itens na tabela `CARRINHO` de forma dinâmica.
-2. **Checkout:** Validação de saldo (via `USUARIOS`), atualização de saldo com subtração do total, inserção em `BIBLIOTECA`, remoção de `CARRINHO` e incremento de `pontos` baseados em 10% do valor da transação.
+**2. Configuração do Banco de Dados**
+Crie um arquivo `.env` na raiz do projeto com as credenciais do seu banco MySQL (consule template de arquivo .env em "src/templates").
+Consulte "query.sql" em "src/templates" para saber quais tables devem ser criadas para compatibilidade com este projeto.
 
-### C. Sistema de Pontos e Cupons
+**3. Popular o Catálogo (Seed)**
+A aplicação conta com um script automático que insere dezenas de jogos com descrições, requisitos e converte as imagens locais (src/templates/assets) para `LONGBLOB`. Para executá-lo:
 
-1. Resgate de cupons deduz o valor na tabela de `pontos` do usuário e salva o cupom na carteira.
-2. Aplicação do cupom reduz o preço total no momento do checkout, atualizando seu status para "Usado".
+```bash
+npm run seed
 
-### D. Painel Administrativo (Área Restrita)
+```
 
-1. **Segurança:** As rotas administrativas são protegidas por um middleware no Express, que verifica no banco de dados se o usuário logado possui a flag `adm = true` antes de processar qualquer requisição.
-2. **Gestão de Jogos:**
+**4. Iniciar o Servidor**
+Para rodar a aplicação em modo de desenvolvimento (com `nodemon` atualizando em tempo real):
 
-- Adicionar novos jogos (incluindo upload das imagens via `Multer` direto como `LONGBLOB`).
-- Editar informações e imagens de jogos existentes.
-- Deletar jogos do catálogo.
+```bash
+npm run dev
 
-3. **Gestão de Usuários:**
+```
 
-- Listagem de usuários cadastrados.
-- Edição direta de `saldo` e `pontos` de qualquer usuário (útil para injeção de saldo nas simulações).
+Para rodar em modo padrão:
 
-4. **Gestão de Cupons:**
+```bash
+npm start
 
-- Adicionar novos cupons para a loja de recompensas.
-- Editar cupons existentes.
-- Remover cupons do sistema.
+```
 
----
+Acesse `http://localhost:3000` (ou a porta definida no seu `.env`) para explorar a FrameStore.
 
-> **Desenvolvido para fins didáticos e apresentativos de conclusão de curso.**
+```
+
+```

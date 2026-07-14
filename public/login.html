@@ -1,156 +1,100 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FrameStore | Sign Up/In</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link rel="stylesheet" href="css/login.css" />
-    <link rel="icon" type="image/png" href="img/site_favicon.png" />
-  </head>
-  <body>
-    <header class="navbar">
-      <div class="logo-container">
-        <a href="homepage.html" class="logo-link">
-          <img src="img/site_logo.png" alt="Logo" class="logo-unico" />
-          <img src="img/site_nome.png" alt="FrameStore" class="logo-nome" />
-        </a>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FrameStore | Sign Up/In</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="icon" type="image/png" href="img/site_favicon.png">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="logo-container">
+      <a href="homepage.html" class="logo-link">
+        <img src="img/site_logo.png" alt="Logo" class="logo-unico">
+        <img src="img/site_nome.png" alt="FrameStore" class="logo-nome">
+      </a>
+    </div>
+  </header>
+
+  <main class="login-wrapper">
+    <div class="login-container">
+      
+      <div class="tabs">
+        <button id="btn-login" class="tab-btn active" onclick="showTab('login')">
+          Entrar
+        </button>
+        <button id="btn-register" class="tab-btn inactive" onclick="showTab('register')">
+          Criar Conta
+        </button>
       </div>
-    </header>
 
-    <main class="login-wrapper">
-      <div class="login-container">
-        <div class="tabs">
-          <button
-            id="btn-login"
-            class="tab-btn active"
-            onclick="showTab('login')"
-          >
-            Entrar
-          </button>
-          <button
-            id="btn-register"
-            class="tab-btn inactive"
-            onclick="showTab('register')"
-          >
-            Criar Conta
-          </button>
-        </div>
+      <div id="form-login" class="active form-section">
+        <h1>Acesse sua conta</h1>
+        <p>Faça login na conta Frame para começar a comprar e acumular pontos!</p>
 
-        <div id="form-login" class="active form-section">
-          <h1>Acesse sua conta</h1>
-          <p>
-            Faça login na conta Frame para começar a comprar e acumular pontos!
-          </p>
+        <form onsubmit="realizarLogin(event)">
+          <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="login-email" placeholder="Email" required>
+          </div>
+          
+          <div class="input-group">
+            <i class="fa-solid fa-key"></i>
+            <input type="password" id="login-password" placeholder="Senha" required>
+            <i class="fa-regular fa-eye eye-icon" id="login-eye" onclick="togglePassword('login-password', 'login-eye')"></i>
+          </div>
 
-          <form onsubmit="realizarLogin(event)">
-            <div class="input-group">
-              <i class="fa-solid fa-envelope"></i>
-              <input
-                type="email"
-                id="login-email"
-                placeholder="Email"
-                required
-              />
-            </div>
-            <div class="input-group">
-              <i class="fa-solid fa-key"></i>
-              <input
-                type="password"
-                id="login-password"
-                placeholder="Senha"
-                required
-              />
-              <i
-                class="fa-regular fa-eye eye-icon"
-                id="login-eye"
-                onclick="togglePassword('login-password', 'login-eye')"
-              ></i>
-            </div>
-
-            <button type="submit" class="btn-access">Acessar</button>
-          </form>
-        </div>
-
-        <div id="form-register" class="hidden form-section">
-          <h1>Crie sua conta</h1>
-          <p>
-            Rápido e fácil, cadastre-se para começar a economizar nos jogos!
-          </p>
-
-          <form onsubmit="realizarCadastro(event)">
-            <div class="input-group">
-              <i class="fa-solid fa-user"></i>
-              <input
-                type="text"
-                id="register-nome"
-                placeholder="Nome de Usuário"
-                required
-              />
-            </div>
-            <div class="input-group">
-              <i class="fa-solid fa-envelope"></i>
-              <input
-                type="email"
-                id="register-email"
-                placeholder="Email"
-                required
-              />
-            </div>
-            <div class="input-group">
-              <i class="fa-solid fa-key"></i>
-              <input
-                type="password"
-                id="register-password"
-                placeholder="Senha"
-                required
-              />
-              <i
-                class="fa-regular fa-eye eye-icon"
-                id="register-eye"
-                onclick="togglePassword('register-password', 'register-eye')"
-              ></i>
-            </div>
-            <div class="input-group">
-              <i class="fa-solid fa-lock"></i>
-              <input
-                type="password"
-                id="register-confirm-password"
-                placeholder="Confirmar Senha"
-                required
-              />
-              <i
-                class="fa-regular fa-eye eye-icon"
-                id="register-confirm-eye"
-                onclick="
-                  togglePassword(
-                    'register-confirm-password',
-                    'register-confirm-eye',
-                  )
-                "
-              ></i>
-            </div>
-
-            <div class="password-tips">
-              <h3>Siga essas dicas:</h3>
-              <ul>
-                <li>Mínimo 6 caracteres</li>
-                <li>Use letras e números</li>
-              </ul>
-            </div>
-            <button type="submit" class="btn-access">Criar</button>
-          </form>
-        </div>
+          <button type="submit" class="btn-access">Acessar</button>
+        </form>
       </div>
-    </main>
 
-    <script src="js/login.js"></script>
-  </body>
+      <div id="form-register" class="hidden form-section">
+        <h1>Crie sua conta</h1>
+        <p>Rápido e fácil, cadastre-se para começar a economizar nos jogos!</p>
+
+        <form onsubmit="realizarCadastro(event)">
+          <div class="input-group">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="register-nome" placeholder="Nome de Usuário" required>
+          </div>
+          
+          <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="register-email" placeholder="Email" required>
+          </div>
+          
+          <div class="input-group">
+            <i class="fa-solid fa-key"></i>
+            <input type="password" id="register-password" placeholder="Senha" required>
+            <i class="fa-regular fa-eye eye-icon" id="register-eye" onclick="togglePassword('register-password', 'register-eye')"></i>
+          </div>
+          
+          <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="register-confirm-password" placeholder="Confirmar Senha" required>
+            <i class="fa-regular fa-eye eye-icon" id="register-confirm-eye" onclick="togglePassword('register-confirm-password', 'register-confirm-eye')"></i>
+          </div>
+
+          <div class="password-tips">
+            <h3>Siga essas dicas:</h3>
+            <ul>
+              <li>Mínimo 6 caracteres</li>
+              <li>Use letras e números</li>
+            </ul>
+          </div>
+          
+          <button type="submit" class="btn-access">Criar</button>
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/login.js"></script>
+</body>
 </html>

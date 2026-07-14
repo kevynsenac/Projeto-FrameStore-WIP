@@ -1,35 +1,16 @@
+const BASE_API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+
 let galeria = [];
 let imagemAtualIndex = 0;
 let jogoAtual = null;
 
-const BASE_API_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000/api' 
-    : '/api';
-
-// ==========================================
-// SISTEMA DE NOTIFICAÇÕES (TOASTS)
-// ==========================================
-function mostrarNotificacao(mensagem, tipo = 'sucesso') {
-  let container = document.getElementById('toast-container');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'toast-container';
-    document.body.appendChild(container);
+window.onload = () => {
+  if (typeof verificarAutenticacaoNavbar === "function") {
+    verificarAutenticacaoNavbar();
   }
-  const toast = document.createElement('div');
-  toast.className = `toast ${tipo}`;
-  const icone = tipo === 'sucesso' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
-  toast.innerHTML = `<i class="${icone}"></i> <span>${mensagem}</span>`;
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.classList.add('hide');
-    setTimeout(() => toast.remove(), 300);
-  }, 3500);
-}
+  carregarDetalhesJogo();
+};
 
-// ==========================================
-// LÓGICA PRINCIPAL DO JOGO
-// ==========================================
 async function carregarDetalhesJogo() {
   const urlParams = new URLSearchParams(window.location.search);
   const jogoId = urlParams.get("id");
@@ -64,10 +45,6 @@ async function carregarDetalhesJogo() {
   }
 }
 
-function formatPrice(value) {
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
-}
-
 async function renderizarDetalhes(game) {
   document.querySelector(".game-title").innerText = game.titulo;
 
@@ -84,7 +61,9 @@ async function renderizarDetalhes(game) {
   const descElement = document.getElementById("game-desc-text");
   const reqElement = document.getElementById("game-req-text");
 
-  if (descElement) descElement.innerText = game.descricao || "Descrição não disponível para este jogo.";
+  if (descElement) {
+    descElement.innerText = game.descricao || "Descrição não disponível para este jogo.";
+  }
   
   if (reqElement) {
     if (game.requisitos) {
@@ -94,9 +73,9 @@ async function renderizarDetalhes(game) {
     }
   }
 
-  // 1. CHECAGEM SE O USUÁRIO JÁ POSSUI O JOGO
   let usuarioTemJogo = false;
   const userStr = localStorage.getItem("usuarioLogado");
+  
   if (userStr) {
     const usuarioLogado = JSON.parse(userStr);
     try {
@@ -110,40 +89,38 @@ async function renderizarDetalhes(game) {
     }
   }
 
-  // 2. LÓGICA DO BOTÃO E PREÇOS
   if (usuarioTemJogo) {
     priceSection.innerHTML = `<span class="value" style="color: #aaa; font-size: 2rem;">Na Biblioteca</span>`;
     if (btnPurchase) {
-        btnPurchase.disabled = true;
-        btnPurchase.style.background = "#444";
-        btnPurchase.style.color = "#aaa";
-        btnPurchase.style.cursor = "not-allowed";
-        btnPurchase.innerHTML = `<i class="fas fa-check-circle"></i> Já Adquirido`;
+      btnPurchase.disabled = true;
+      btnPurchase.style.background = "#444";
+      btnPurchase.style.color = "#aaa";
+      btnPurchase.style.cursor = "not-allowed";
+      btnPurchase.innerHTML = `<i class="fas fa-check-circle"></i> Já Adquirido`;
     }
   } else if (isEmBreve) {
     priceSection.innerHTML = `<span class="value" style="color: #ffaa00; font-size: 2rem;">Em Breve</span>`;
     if (btnPurchase) {
-        btnPurchase.disabled = true;
-        btnPurchase.style.opacity = "0.5";
-        btnPurchase.style.cursor = "not-allowed";
-        btnPurchase.innerHTML = `<i class="fas fa-clock"></i> Indisponível`;
+      btnPurchase.disabled = true;
+      btnPurchase.style.opacity = "0.5";
+      btnPurchase.style.cursor = "not-allowed";
+      btnPurchase.innerHTML = `<i class="fas fa-clock"></i> Indisponível`;
     }
   } else if (isGratis) {
     priceSection.innerHTML = `<span class="value" style="color: #00ff88;">Grátis</span>`;
     if (btnPurchase) {
-        btnPurchase.innerHTML = `<i class="fas fa-cart-plus"></i> Adicionar à Conta`;
+      btnPurchase.innerHTML = `<i class="fas fa-cart-plus"></i> Adicionar à Conta`;
     }
   } else if (temDesconto) {
     precoFinal -= precoFinal * (desconto / 100);
     priceSection.innerHTML = `
-            <span style="text-decoration: line-through; font-size: 0.6em; color: #aaa; display: block;">${formatPrice(precoOriginal)}</span>
-            <span class="value">${formatPrice(precoFinal)}</span>
-        `;
+      <span style="text-decoration: line-through; font-size: 0.6em; color: #aaa; display: block;">${formatPrice(precoOriginal)}</span>
+      <span class="value">${formatPrice(precoFinal)}</span>
+    `;
   } else {
     priceSection.innerHTML = `<span class="value">${formatPrice(precoFinal)}</span>`;
   }
 
-  // 3. TEMA DA PLATAFORMA
   const platformCard = document.getElementById("platform-card");
   const platformIcon = document.getElementById("platform-icon");
   const platformName = document.getElementById("game-platform");
@@ -153,34 +130,33 @@ async function renderizarDetalhes(game) {
     platformCard.className = "platform-info-card"; 
 
     if (platformStr.includes("pc") || platformStr.includes("steam")) {
-        document.body.setAttribute('data-theme', 'steam');
-        platformCard.classList.add("bg-steam");
-        platformIcon.className = "fab fa-steam";
-        platformName.innerText = game.platform || "Steam / PC";
+      document.body.setAttribute('data-theme', 'steam');
+      platformCard.classList.add("bg-steam");
+      platformIcon.className = "fab fa-steam";
+      platformName.innerText = game.platform || "Steam / PC";
     } else if (platformStr.includes("playstation")) {
-        document.body.setAttribute('data-theme', 'playstation');
-        platformCard.classList.add("bg-playstation");
-        platformIcon.className = "fab fa-playstation";
-        platformName.innerText = game.platform || "PlayStation";
+      document.body.setAttribute('data-theme', 'playstation');
+      platformCard.classList.add("bg-playstation");
+      platformIcon.className = "fab fa-playstation";
+      platformName.innerText = game.platform || "PlayStation";
     } else if (platformStr.includes("xbox")) {
-        document.body.setAttribute('data-theme', 'xbox');
-        platformCard.classList.add("bg-xbox");
-        platformIcon.className = "fab fa-xbox";
-        platformName.innerText = game.platform || "Xbox";
+      document.body.setAttribute('data-theme', 'xbox');
+      platformCard.classList.add("bg-xbox");
+      platformIcon.className = "fab fa-xbox";
+      platformName.innerText = game.platform || "Xbox";
     } else if (platformStr.includes("nintendo")) {
-        document.body.setAttribute('data-theme', 'nintendo');
-        platformCard.classList.add("bg-nintendo");
-        platformIcon.className = "fas fa-gamepad";
-        platformName.innerText = game.platform || "Nintendo";
+      document.body.setAttribute('data-theme', 'nintendo');
+      platformCard.classList.add("bg-nintendo");
+      platformIcon.className = "fas fa-gamepad";
+      platformName.innerText = game.platform || "Nintendo";
     } else {
-        document.body.removeAttribute('data-theme');
-        platformCard.classList.add("bg-default");
-        platformIcon.className = "fas fa-gamepad";
-        platformName.innerText = game.platform || "Outros";
+      document.body.removeAttribute('data-theme');
+      platformCard.classList.add("bg-default");
+      platformIcon.className = "fas fa-gamepad";
+      platformName.innerText = game.platform || "Outros";
     }
   }
 
-  // 4. GALERIA
   galeria = [game.cover, game.screenshot1, game.screenshot2, game.screenshot3].filter((img) => img != null && img !== "");
   if (galeria.length === 0) galeria = ["img/site_logo.png"]; 
 
@@ -194,27 +170,8 @@ async function renderizarDetalhes(game) {
     img.onclick = () => selectImg(imgSrc, index);
     thumbContainer.appendChild(img);
   });
+  
   selectImg(galeria[0], 0);
-}
-
-function selectImg(src, index) {
-  const mainImg = document.getElementById("current-img");
-  if (mainImg) {
-    mainImg.src = src;
-    imagemAtualIndex = index;
-
-    const thumbs = document.querySelectorAll(".thumb");
-    thumbs.forEach((t) => t.classList.remove("active"));
-    if (thumbs[index]) thumbs[index].classList.add("active");
-  }
-}
-
-function moveGallery(step) {
-  if (galeria.length === 0) return;
-  imagemAtualIndex += step;
-  if (imagemAtualIndex >= galeria.length) imagemAtualIndex = 0;
-  if (imagemAtualIndex < 0) imagemAtualIndex = galeria.length - 1;
-  selectImg(galeria[imagemAtualIndex], imagemAtualIndex);
 }
 
 async function adicionarAoCarrinho() {
@@ -222,12 +179,14 @@ async function adicionarAoCarrinho() {
 
   const precoOriginal = parseFloat(jogoAtual.preco);
   const desconto = jogoAtual.desconto ? parseFloat(jogoAtual.desconto) : 0;
+  
   if (precoOriginal === 0 && desconto !== 100) {
-      mostrarNotificacao("Este jogo ainda está 'Em Breve' e não pode ser adicionado.", "erro");
-      return;
+    mostrarNotificacao("Este jogo ainda está 'Em Breve' e não pode ser adicionado.", "erro");
+    return;
   }
 
   const userStr = localStorage.getItem("usuarioLogado");
+  
   if (!userStr) {
     mostrarNotificacao("Precisa de fazer login para adicionar jogos ao carrinho.", "erro");
     setTimeout(() => window.location.href = "login.html", 2000);
@@ -257,7 +216,6 @@ async function adicionarAoCarrinho() {
       return;
     }
 
-    // Altera o botão permanentemente na página atual
     btnPurchase.style.background = "#444";
     btnPurchase.style.color = "#aaa";
     btnPurchase.style.cursor = "not-allowed";
@@ -268,7 +226,6 @@ async function adicionarAoCarrinho() {
     if (typeof atualizarContadorCarrinho === "function") {
       atualizarContadorCarrinho(usuarioLogado.id);
     }
-
   } catch (error) {
     console.error("Erro no fetch do carrinho:", error);
     mostrarNotificacao("Erro interno ao processar a requisição.", "erro");
@@ -284,13 +241,13 @@ function atualizarModalCarrinhoVisual() {
   const listaItens = document.getElementById("cart-items-list");
 
   listaItens.innerHTML = `
-      <div class="cart-item" style="display: flex; align-items: center; gap: 15px; padding: 15px 0;">
-          <img src="${imagem}" alt="${titulo}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;">
-          <div>
-              <p style="margin: 0; font-size: 1.2rem;"><strong>${titulo}</strong></p>
-              <p style="color: #00ff00; margin: 5px 0 0 0; font-weight: bold;">${precoText}</p>
-          </div>
+    <div class="cart-item" style="display: flex; align-items: center; gap: 15px; padding: 15px 0;">
+      <img src="${imagem}" alt="${titulo}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;">
+      <div>
+        <p style="margin: 0; font-size: 1.2rem;"><strong>${titulo}</strong></p>
+        <p style="color: #00ff00; margin: 5px 0 0 0; font-weight: bold;">${precoText}</p>
       </div>
+    </div>
   `;
 
   document.getElementById("cart-modal").style.display = "block";
@@ -300,9 +257,53 @@ function fecharCarrinho() {
   document.getElementById("cart-modal").style.display = "none";
 }
 
-window.onload = () => {
-  if (typeof verificarAutenticacaoNavbar === "function") {
-    verificarAutenticacaoNavbar();
+function selectImg(src, index) {
+  const mainImg = document.getElementById("current-img");
+  
+  if (mainImg) {
+    mainImg.src = src;
+    imagemAtualIndex = index;
+
+    const thumbs = document.querySelectorAll(".thumb");
+    thumbs.forEach((t) => t.classList.remove("active"));
+    if (thumbs[index]) thumbs[index].classList.add("active");
   }
-  carregarDetalhesJogo();
-};
+}
+
+function moveGallery(step) {
+  if (galeria.length === 0) return;
+  
+  imagemAtualIndex += step;
+  
+  if (imagemAtualIndex >= galeria.length) imagemAtualIndex = 0;
+  if (imagemAtualIndex < 0) imagemAtualIndex = galeria.length - 1;
+  
+  selectImg(galeria[imagemAtualIndex], imagemAtualIndex);
+}
+
+function mostrarNotificacao(mensagem, tipo = 'sucesso') {
+  let container = document.getElementById('toast-container');
+  
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+  
+  const toast = document.createElement('div');
+  toast.className = `toast ${tipo}`;
+  
+  const icone = tipo === 'sucesso' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+  toast.innerHTML = `<i class="${icone}"></i> <span>${mensagem}</span>`;
+  
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('hide');
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+function formatPrice(value) {
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+}

@@ -2,16 +2,11 @@ const BASE_API_URL = window.location.hostname === "localhost" ? "http://localhos
 
 let usuarioLogado = null;
 let idsMeusCupons = [];
-let cuponsInterval; // Variável global para armazenar o relógio dos cupons
+let cuponsInterval; 
 
-// ==========================================
-// CONFIGURAÇÃO DA ROLETA (CANVAS)
-// ==========================================
 const canvas = document.getElementById('wheelCanvas');
 const ctx = canvas ? canvas.getContext('2d') : null;
 
-// 10 Segmentos intercalados refletindo as probabilidades do Back-end
-// 10% (1 fatia 250) | 20% (2 fatias 100) | 30% (3 fatias 50) | 40% (4 fatias 0)
 const segments = [
   { points: 250, color: "#feca57", label: "250" },
   { points: 0,   color: "#444466", label: "0" },
@@ -29,8 +24,62 @@ let currentRotation = 0;
 let isSpinning = false;
 let countdownInterval;
 
+window.onload = async () => {
+  drawWheel(); 
+  if (await verificarAutenticacao()) {
+    carregarCuponsLoja();
+  }
+};
+
+async function verificarAutenticacao() {
+  const userStr = localStorage.getItem("usuarioLogado");
+  
+  if (!userStr) {
+    window.location.href = "login.html";
+    return false;
+  }
+  
+  usuarioLogado = JSON.parse(userStr);
+  atualizarUIHeader(usuarioLogado);
+  verificarStatusRoleta();
+
+  try {
+    const response = await fetch(`${BASE_API_URL}/usuarios/${usuarioLogado.id}`);
+    if (response.ok) {
+      usuarioLogado = await response.json();
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
+      atualizarUIHeader(usuarioLogado);
+      verificarStatusRoleta(); 
+    }
+  } catch (error) {
+    console.error("Erro ao sincronizar usuário:", error);
+  }
+
+  atualizarContadorCarrinho();
+  return true;
+}
+
+async function atualizarContadorCarrinho() {
+  try {
+    const response = await fetch(`${BASE_API_URL}/carrinho/${usuarioLogado.id}`);
+    
+    if (response.ok) {
+      const itens = await response.json();
+      const cartCount = document.getElementById("cart-count");
+      
+      if (cartCount) {
+        cartCount.innerText = itens.length;
+        cartCount.style.display = itens.length > 0 ? "flex" : "none";
+      }
+    }
+  } catch (e) {
+    console.error("Erro ao atualizar contador do carrinho:", e);
+  }
+}
+
 function drawWheel(rotation = 0) {
   if (!ctx) return;
+  
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
   const radius = 140;
@@ -68,53 +117,11 @@ function drawWheel(rotation = 0) {
   ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
   ctx.fillStyle = "#1a1a2e";
   ctx.fill();
+  
   ctx.beginPath();
   ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
   ctx.fillStyle = "#333355";
   ctx.fill();
-}
-
-// ==========================================
-// AUTENTICAÇÃO E RELÓGIO DA ROLETA
-// ==========================================
-async function verificarAutenticacao() {
-  const userStr = localStorage.getItem("usuarioLogado");
-  if (!userStr) {
-    window.location.href = "login.html";
-    return false;
-  }
-  usuarioLogado = JSON.parse(userStr);
-  atualizarUIHeader(usuarioLogado);
-  verificarStatusRoleta();
-
-  try {
-    const response = await fetch(`${BASE_API_URL}/usuarios/${usuarioLogado.id}`);
-    if (response.ok) {
-      usuarioLogado = await response.json();
-      localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
-      atualizarUIHeader(usuarioLogado);
-      verificarStatusRoleta(); 
-    }
-  } catch (error) {
-    console.error("Erro ao sincronizar usuário:", error);
-  }
-
-  atualizarContadorCarrinho();
-  return true;
-}
-
-async function atualizarContadorCarrinho() {
-  try {
-    const response = await fetch(`${BASE_API_URL}/carrinho/${usuarioLogado.id}`);
-    if (response.ok) {
-      const itens = await response.json();
-      const cartCount = document.getElementById("cart-count");
-      if (cartCount) {
-        cartCount.innerText = itens.length;
-        cartCount.style.display = itens.length > 0 ? "flex" : "none";
-      }
-    }
-  } catch (e) {}
 }
 
 function verificarStatusRoleta() {
@@ -157,9 +164,6 @@ function iniciarContador() {
   }, 1000);
 }
 
-// ==========================================
-// LÓGICA DE GIRO
-// ==========================================
 async function iniciarGiroRoleta() {
   if (isSpinning) return;
   
@@ -215,6 +219,7 @@ async function iniciarGiroRoleta() {
         finalizarGiro(result);
       }
     }
+    
     animateWheel();
 
   } catch (error) {
@@ -242,9 +247,6 @@ function finalizarGiro(result) {
   iniciarContador(); 
 }
 
-// ==========================================
-// LOJA DE CUPONS COM CONTAGEM REGRESSIVA
-// ==========================================
 async function carregarCuponsLoja() {
   const spinner = document.getElementById("loading-spinner");
   const content = document.getElementById("loja-content");
@@ -254,7 +256,8 @@ async function carregarCuponsLoja() {
 
   try {
     const resMeusCupons = await fetch(`${BASE_API_URL}/usuarios/${usuarioLogado.id}/cupons`);
-    if(resMeusCupons.ok) {
+    
+    if (resMeusCupons.ok) {
       const meusCupons = await resMeusCupons.json();
       idsMeusCupons = meusCupons.map((c) => c.id_cupom || c.id);
     }
@@ -264,17 +267,14 @@ async function carregarCuponsLoja() {
     const container = document.getElementById("cupons-loja-container");
     container.innerHTML = "";
 
-    const cuponsAtivos = []; // Array que alimentará nosso relógio ao vivo
+    const cuponsAtivos = []; 
 
     cupons.forEach((cupom) => {
       const card = document.createElement("div");
-      
-      // 1. Tratamento de Datas
       const dataExpiracao = new Date(cupom.data_expiracao);
       const dataAtual = new Date();
       const expirado = dataExpiracao < dataAtual;
 
-      // 2. Aplicamos a classe "expirado" caso tenha passado do prazo
       card.className = expirado ? "coupon-card expirado" : "coupon-card";
       
       const jaPossui = idsMeusCupons.includes(cupom.id);
@@ -283,7 +283,6 @@ async function carregarCuponsLoja() {
       let btnState = "";
       let btnText = "Resgatar Agora";
 
-      // Lógica de Travar o Botão
       if (expirado) {
         btnState = "disabled";
         btnText = "Expirado";
@@ -295,37 +294,35 @@ async function carregarCuponsLoja() {
         btnText = "Pontos Insuficientes";
       }
 
-      // Formata a data de validade para o layout BR (Ex: 31/12/2026 às 23:59)
       const validadeBR = dataExpiracao.toLocaleDateString("pt-BR", { 
         day: '2-digit', month: '2-digit', year: 'numeric', 
         hour: '2-digit', minute: '2-digit' 
       });
 
       const timerId = `timer-cupom-${cupom.id}`;
+      
       if (!expirado) {
         cuponsAtivos.push({ id: timerId, tempoFinal: dataExpiracao.getTime() });
       }
 
       card.innerHTML = `
-          <div>
-              <h3>${cupom.nome}</h3>
-              <p style="color: #a5b1c2; font-size: 0.9rem; margin-top: 5px;">Válido até: ${validadeBR}</p>
-              
-              <p class="coupon-timer" id="${timerId}">
-                ${expirado ? '<i class="fas fa-times-circle"></i> Encerrado' : '<i class="fas fa-clock"></i> Calculando...'}
-              </p>
-              
-              <div class="discount">- R$ ${parseFloat(cupom.desconto).toFixed(2)}</div>
-          </div>
-          <div>
-              <div class="cost"><i class="fas fa-star"></i> ${cupom.custo_pontos} pontos</div>
-              <button class="btn-redeem" ${btnState} onclick="confirmarResgate(${cupom.id}, ${cupom.custo_pontos}, '${cupom.nome}')">${btnText}</button>
-          </div>
+        <div>
+          <h3>${cupom.nome}</h3>
+          <p style="color: #a5b1c2; font-size: 0.9rem; margin-top: 5px;">Válido até: ${validadeBR}</p>
+          <p class="coupon-timer" id="${timerId}">
+            ${expirado ? '<i class="fas fa-times-circle"></i> Encerrado' : '<i class="fas fa-clock"></i> Calculando...'}
+          </p>
+          <div class="discount">- R$ ${parseFloat(cupom.desconto).toFixed(2)}</div>
+        </div>
+        <div>
+          <div class="cost"><i class="fas fa-star"></i> ${cupom.custo_pontos} pontos</div>
+          <button class="btn-redeem" ${btnState} onclick="confirmarResgate(${cupom.id}, ${cupom.custo_pontos}, '${cupom.nome}')">${btnText}</button>
+        </div>
       `;
+      
       container.appendChild(card);
     });
 
-    // Inicia o contador global da loja de cupons
     iniciarContadoresLoja(cuponsAtivos);
 
     if (content) content.style.display = "block";
@@ -336,7 +333,6 @@ async function carregarCuponsLoja() {
   }
 }
 
-// Relógio dinâmico que atualiza todos os cards ativos a cada 1 segundo
 function iniciarContadoresLoja(cupons) {
   clearInterval(cuponsInterval);
   
@@ -360,10 +356,10 @@ function iniciarContadoresLoja(cupons) {
 
         if (dias > 0) {
           el.innerHTML = `<i class="fas fa-clock"></i> Expira em: ${dias}d ${horas}h ${minutos}m`;
-          el.style.color = "#00ff88"; // Verde se estiver seguro
+          el.style.color = "#00ff88"; 
         } else {
           el.innerHTML = `<i class="fas fa-stopwatch"></i> Expira em: ${horas}h ${minutos}m ${segundos}s`;
-          el.style.color = "#ffaa00"; // Fica amarelo/laranja quando falta menos de 24h
+          el.style.color = "#ffaa00"; 
         }
       }
     });
@@ -386,6 +382,7 @@ async function processarResgate(idCupom, custo) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id_usuario: usuarioLogado.id, id_cupom: idCupom }),
     });
+    
     const result = await response.json();
 
     if (!response.ok) {
@@ -403,12 +400,10 @@ async function processarResgate(idCupom, custo) {
   }
 }
 
-// ==========================================
-// MODAL PERSONALIZADO
-// ==========================================
 function mostrarModal(titulo, mensagem, isConfirmacao = false, acaoConfirmar = null) {
   document.getElementById("modal-title").innerText = titulo;
   document.getElementById("modal-msg").innerText = mensagem;
+  
   const actionsDiv = document.getElementById("modal-actions");
   actionsDiv.innerHTML = "";
 
@@ -421,7 +416,10 @@ function mostrarModal(titulo, mensagem, isConfirmacao = false, acaoConfirmar = n
     const btnConfirm = document.createElement("button");
     btnConfirm.className = "btn-modal btn-confirm";
     btnConfirm.innerText = "Confirmar";
-    btnConfirm.onclick = () => { fecharModal(); if (acaoConfirmar) acaoConfirmar(); };
+    btnConfirm.onclick = () => { 
+      fecharModal(); 
+      if (acaoConfirmar) acaoConfirmar(); 
+    };
 
     actionsDiv.append(btnCancel, btnConfirm);
   } else {
@@ -429,16 +427,13 @@ function mostrarModal(titulo, mensagem, isConfirmacao = false, acaoConfirmar = n
     btnOk.className = "btn-modal btn-confirm";
     btnOk.innerText = "Entendi";
     btnOk.onclick = fecharModal;
+    
     actionsDiv.appendChild(btnOk);
   }
+  
   document.getElementById("custom-modal").style.display = "flex";
 }
-function fecharModal() { document.getElementById("custom-modal").style.display = "none"; }
 
-// Inicialização
-window.onload = async () => {
-  drawWheel(); 
-  if (await verificarAutenticacao()) {
-    carregarCuponsLoja();
-  }
-};
+function fecharModal() { 
+  document.getElementById("custom-modal").style.display = "none"; 
+}

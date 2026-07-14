@@ -3,8 +3,9 @@ const { formatarImagem } = require("../utils/imageFormat");
 
 async function getJogos(req, res) {
   try {
-    // Adicionadas as colunas 'descricao' e 'requisitos' na listagem geral do catálogo
-    const [jogos] = await db.query("SELECT id, titulo, preco, desconto, platform, descricao, requisitos, cover FROM JOGOS");
+    const [jogos] = await db.query(
+      "SELECT id, titulo, preco, desconto, platform, descricao, requisitos, cover FROM JOGOS"
+    );
     
     const jogosFormatados = jogos.map((jogo) => ({
       ...jogo,
@@ -21,7 +22,6 @@ async function getJogoById(req, res) {
   try {
     const { id } = req.params;
     
-    // O SELECT * já engloba automaticamente os novos campos de 'descricao' e 'requisitos'
     const [rows] = await db.query("SELECT * FROM JOGOS WHERE id = ?", [id]);
     
     if (rows.length === 0) {
@@ -29,6 +29,7 @@ async function getJogoById(req, res) {
     }
     
     const jogo = rows[0];
+    
     const jogoFormatado = {
       ...jogo,
       cover: formatarImagem(jogo.cover),
@@ -43,4 +44,7 @@ async function getJogoById(req, res) {
   }
 }
 
-module.exports = { getJogos, getJogoById };
+module.exports = { 
+  getJogos, 
+  getJogoById 
+};

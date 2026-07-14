@@ -1,21 +1,8 @@
 const db = require("../config/db");
 
-async function getCartoes(req, res) {
-  const { id_usuario } = req.params;
-  try {
-    const [cartoes] = await db.query(
-      "SELECT * FROM CARTOES WHERE id_usuario = ?",
-      [id_usuario],
-    );
-    res.json(cartoes);
-  } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar cartões." });
-  }
-}
-
 async function addCartao(req, res) {
-  const { id_usuario, numero, nome_titular, vencimento, cvv, bandeira } =
-    req.body;
+  const { id_usuario, numero, nome_titular, vencimento, cvv, bandeira } = req.body;
+  
   try {
     const ultimosDigitos = numero.slice(-4);
     const numero_mascarado = `**** **** **** ${ultimosDigitos}`;
@@ -23,20 +10,57 @@ async function addCartao(req, res) {
 
     await db.query(
       "INSERT INTO CARTOES (id_usuario, numero_mascarado, nome_titular, vencimento, bandeira, saldo_cartao) VALUES (?, ?, ?, ?, ?, ?)",
-      [
-        id_usuario,
-        numero_mascarado,
-        nome_titular,
-        vencimento,
-        bandeira,
-        saldoFicticio,
-      ],
+      [id_usuario, numero_mascarado, nome_titular, vencimento, bandeira, saldoFicticio]
     );
+    
     res.status(201).json({ message: "Cartão cadastrado com sucesso!" });
   } catch (error) {
     res.status(500).json({ error: "Erro ao cadastrar cartão." });
   }
 }
+
+async function getCartoes(req, res) {
+  const { id_usuario } = req.params;
+  
+  try {
+    const [cartoes] = await db.query(
+      "SELECT * FROM CARTOES WHERE id_usuario = ?",
+      [id_usuario]
+    );
+    
+    res.json(cartoes);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar cartões." });
+  }
+}
+
+async function updateCartao(req, res) {
+  const { id } = req.params;
+  const { nome_titular, vencimento } = req.body;
+  
+  try {
+    await db.query(
+      "UPDATE CARTOES SET nome_titular = ?, vencimento = ? WHERE id = ?", 
+      [nome_titular, vencimento, id]
+    );
+    
+    res.json({ message: "Cartão atualizado com sucesso!" });
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao atualizar cartão." });
+  }
+}
+
+async function deleteCartao(req, res) {
+  const { id } = req.params;
+  
+  try {
+    await db.query("DELETE FROM CARTOES WHERE id = ?", [id]);
+    res.json({ message: "Cartão removido com sucesso!" });
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao remover cartão." });
+  }
+}
+
 async function adicionarSaldo(req, res) {
   const { id_usuario, valor, metodo, id_cartao } = req.body;
   const connection = await db.getConnection();
@@ -47,28 +71,35 @@ async function adicionarSaldo(req, res) {
     if (metodo === "cartao") {
       const [cartao] = await connection.query(
         "SELECT saldo_cartao FROM CARTOES WHERE id = ? AND id_usuario = ? FOR UPDATE",
-        [id_cartao, id_usuario],
+        [id_cartao, id_usuario]
       );
-      if (cartao.length === 0) throw new Error("Cartão não encontrado.");
-      if (cartao[0].saldo_cartao < valor)
+      
+      if (cartao.length === 0) {
+        throw new Error("Cartão não encontrado.");
+      }
+      
+      if (cartao[0].saldo_cartao < valor) {
         throw new Error("O cartão selecionado não possui limite suficiente.");
+      }
 
       await connection.query(
         "UPDATE CARTOES SET saldo_cartao = saldo_cartao - ? WHERE id = ?",
-        [valor, id_cartao],
+        [valor, id_cartao]
       );
     }
 
     await connection.query(
       "UPDATE USUARIOS SET saldo = saldo + ? WHERE id = ?",
-      [valor, id_usuario],
+      [valor, id_usuario]
     );
+    
     const [usuario] = await connection.query(
       "SELECT saldo FROM USUARIOS WHERE id = ?",
-      [id_usuario],
+      [id_usuario]
     );
 
     await connection.commit();
+    
     res.json({
       message: "Saldo adicionado com sucesso!",
       novoSaldo: usuario[0].saldo,
@@ -81,27 +112,10 @@ async function adicionarSaldo(req, res) {
   }
 }
 
-async function deleteCartao(req, res) {
-  const { id } = req.params;
-  try {
-    await db.query("DELETE FROM CARTOES WHERE id = ?", [id]);
-    res.json({ message: "Cartão removido com sucesso!" });
-  } catch (error) {
-    res.status(500).json({ error: "Erro ao remover cartão." });
-  }
-}
-
-async function updateCartao(req, res) {
-  const { id } = req.params;
-  const { nome_titular, vencimento } = req.body;
-  try {
-    await db.query("UPDATE CARTOES SET nome_titular = ?, vencimento = ? WHERE id = ?", 
-    [nome_titular, vencimento, id]);
-    res.json({ message: "Cartão atualizado com sucesso!" });
-  } catch (error) {
-    res.status(500).json({ error: "Erro ao atualizar cartão." });
-  }
-}
-
-// Lembre-se de exportar as novas funções:
-module.exports = { getCartoes, addCartao, adicionarSaldo, deleteCartao, updateCartao };
+module.exports = { 
+  getCartoes, 
+  addCartao, 
+  updateCartao, 
+  deleteCartao, 
+  adicionarSaldo 
+};

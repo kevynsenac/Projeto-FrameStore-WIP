@@ -1,87 +1,73 @@
+const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+
 let currentSlide = 0;
 let bannerInterval;
 let todosJogos = [];
-let jogosNaBiblioteca = []; // Variável global para armazenar os IDs dos jogos comprados
-let currentFilter = 'todos'; // Adicione isto aqui
+let jogosNaBiblioteca = [];
+let currentFilter = 'todos';
+
+if (!window.location.pathname.includes("jogo.html")) {
+  document.addEventListener("DOMContentLoaded", () => {
+    protegerPagina();
+    verificarAutenticacaoNavbar();
+    configurarBusca();
+    fetchGames();
+  });
+}
+
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted && typeof verificarAutenticacaoNavbar === "function") {
+    verificarAutenticacaoNavbar();
+  }
+});
+
+document.addEventListener("click", () => {
+  const display = document.getElementById("active-filter-display");
+  if (display) {
+    display.classList.remove("open");
+  }
+});
 
 function protegerPagina() {
   const userStr = localStorage.getItem("usuarioLogado");
-  // Se não houver nada no localStorage, redireciona para o login
+  
   if (!userStr) {
     window.location.href = "login.html";
   }
 }
 
-function changeSlide(direction) {
-  const slides = document.querySelectorAll(".slide");
-  if (!slides.length) return;
-
-  slides[currentSlide].classList.remove("active");
-  currentSlide += direction;
-
-  if (currentSlide >= slides.length) currentSlide = 0;
-  else if (currentSlide < 0) currentSlide = slides.length - 1;
-
-  slides[currentSlide].classList.add("active");
-}
-
-function startBannerInterval() {
-  clearInterval(bannerInterval);
-  bannerInterval = setInterval(() => changeSlide(1), 5000);
-}
-
-// ==========================================
-// INTEGRAÇÃO COM API
-// ==========================================
-const API_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000/api' 
-    : '/api';
-
-// ==========================================
-// AUTENTICAÇÃO HEADER, CARRINHO, BIBLIOTECA
-// ==========================================
 async function verificarAutenticacaoNavbar() {
   const userStr = localStorage.getItem("usuarioLogado");
 
   if (userStr) {
     let usuario = JSON.parse(userStr);
     
-    // Atualiza a UI imediatamente com o cache local para evitar "pulos" visuais
     atualizarUIHeader(usuario);
-
-    // Busca a biblioteca de jogos do usuário
     fetchBiblioteca(usuario.id);
 
-    // Busca os dados reais e atualizados do Banco de Dados
     try {
       const response = await fetch(`${API_URL}/usuarios/${usuario.id}`);
+      
       if (response.ok) {
         const usuarioAtualizado = await response.json();
-        
-        // Sobrescreve o localStorage com os dados corretos (pontos/saldo novos)
         localStorage.setItem("usuarioLogado", JSON.stringify(usuarioAtualizado));
-        
-        // Atualiza a interface com os pontos reais
         atualizarUIHeader(usuarioAtualizado);
       }
     } catch (error) {
       console.error("Erro ao sincronizar dados atualizados do usuário:", error);
     }
 
-    // Busca a quantidade de itens no carrinho (sempre atualizado do DB)
     atualizarContadorCarrinho(usuario.id);
   }
 }
 
-// Substitua a atualizarUIHeader atual por esta:
 function atualizarUIHeader(usuario) {
-  // 1. Atualiza Avatar, Banner no botão e Logout no auth-container
   const authContainer = document.getElementById("auth-container");
+  
   if (authContainer) {
     const primeiroNome = usuario.nome ? usuario.nome.split(" ")[0] : "Usuário";
     const fotoPerfil = usuario.foto_perfil || "img/site_logo.png";
     
-    // Aplica o banner como background inline apenas no botão
     let badgeStyle = "";
     if (usuario.fundo_perfil) {
       badgeStyle = `background-image: linear-gradient(to right, rgba(15, 15, 30, 0.95), rgba(15, 15, 30, 0.2)), url('${usuario.fundo_perfil}'); background-size: cover; background-position: center;`;
@@ -100,180 +86,33 @@ function atualizarUIHeader(usuario) {
     `;
   }
 
-  // 2. Atualiza Pontos e Saldo
   const navPontos = document.getElementById("nav-pontos");
   const navSaldo = document.getElementById("nav-saldo");
   const saldoPainel = document.getElementById("saldo-pontos");
   
   if (navPontos) navPontos.innerText = usuario.pontos || 0;
   if (saldoPainel) saldoPainel.innerText = usuario.pontos || 0;
+  
   if (navSaldo) {
     navSaldo.innerText = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(usuario.saldo || 0);
   }
 
-  // 3. Aplica apenas a Cor do Tema globalmente
   if (usuario.cor_tema) {
     const hexToRgb = (hex) => {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
       return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : "42, 42, 239";
     };
+    
     document.documentElement.style.setProperty("--cor-tema", usuario.cor_tema);
     document.documentElement.style.setProperty("--cor-tema-rgb", hexToRgb(usuario.cor_tema));
   }
 }
 
-// Adicione a função de logout no final do homepage.js para funcionar globalmente
 function fazerLogout() {
   localStorage.removeItem("usuarioLogado");
   window.location.href = "login.html";
 }
 
-async function atualizarContadorCarrinho(id_usuario) {
-  try {
-    const response = await fetch(`${API_URL}/carrinho/${id_usuario}`);
-    if (response.ok) {
-      const itens = await response.json();
-      const cartCount = document.getElementById("cart-count");
-      
-      if (cartCount) {
-        if (itens.length > 0) {
-          cartCount.innerText = itens.length;
-          cartCount.style.display = "flex";
-        } else {
-          cartCount.style.display = "none";
-        }
-      }
-    }
-  } catch (error) {
-    console.error("Erro ao atualizar contador do carrinho:", error);
-  }
-}
-
-async function fetchBiblioteca(id_usuario) {
-  try {
-    const response = await fetch(`${API_URL}/usuarios/${id_usuario}/biblioteca`);
-    if (response.ok) {
-      const bibliotecaData = await response.json();
-      // Mapeia o array de objetos para salvar apenas os IDs dos jogos na memória
-      jogosNaBiblioteca = bibliotecaData.map(jogo => jogo.id); 
-      
-      // Se os jogos do catálogo já carregaram, re-renderiza para aplicar os estilos de "Na Biblioteca"
-      if (todosJogos.length > 0) {
-        renderGames(todosJogos);
-      }
-    }
-  } catch (error) {
-    console.error("Erro ao buscar biblioteca:", error);
-  }
-}
-
-// ==========================================
-// BUSCA, PESQUISA E FILTROS DE PLATAFORMA
-// ==========================================
-function aplicarFiltros() {
-  const termoBusca = document.getElementById("search-input").value.toLowerCase();
-  
-  // 1. Filtrar pela Plataforma (com base no currentFilter)
-  let jogosFiltrados = [];
-  if (currentFilter === 'todos') {
-    jogosFiltrados = todosJogos;
-  } else if (currentFilter === 'ofertas') {
-    jogosFiltrados = todosJogos.filter(game => {
-      const desconto = parseFloat(game.desconto);
-      return desconto > 0 && desconto < 100;
-    });
-  } else {
-    jogosFiltrados = todosJogos.filter((game) => {
-      if (!game.platform) return false;
-      const platStr = game.platform.toLowerCase();
-      if (currentFilter === 'steam') return platStr.includes('steam') || platStr.includes('pc');
-      return platStr.includes(currentFilter.toLowerCase());
-    });
-  }
-
-  // 2. Filtrar pelo Termo de Busca (refina os resultados da plataforma)
-  jogosFiltrados = jogosFiltrados.filter((game) =>
-    game.titulo.toLowerCase().includes(termoBusca)
-  );
-
-  // 3. Renderizar
-  renderGames(jogosFiltrados);
-}
-
-function configurarBusca() {
-  const searchInput = document.getElementById("search-input");
-  if (!searchInput) return;
-
-  searchInput.addEventListener("input", () => {
-    aplicarFiltros(); // Chama a função unificada ao digitar
-  });
-}
-
-// Controle de abertura do Dropdown interno
-function toggleDropdown(event) {
-  if (event) event.stopPropagation(); // Impede o clique de propagar para o document
-  const display = document.getElementById("active-filter-display");
-  if (display) {
-    display.classList.toggle("open");
-  }
-}
-
-// Fecha o dropdown automaticamente se o usuário clicar em qualquer outro lugar da tela
-document.addEventListener("click", () => {
-  const display = document.getElementById("active-filter-display");
-  if (display) {
-    display.classList.remove("open");
-  }
-});
-
-function filtrarPlataforma(plataforma) {
-  // 1. Atualiza o tema visual
-  if (plataforma === 'todos' || plataforma === 'ofertas') {
-    document.body.removeAttribute('data-theme');
-  } else {
-    document.body.setAttribute('data-theme', plataforma);
-  }
-
-  // 2. REMOVIDO: O input não deve ser limpo para permitir 
-  // que o usuário busque algo dentro da plataforma escolhida.
-
-  // 3. Atualiza os textos do gatilho do Dropdown
-  const filterName = document.getElementById("filter-name");
-  const filterIcon = document.getElementById("filter-icon");
-  
-  const configFiltros = {
-    todos: { nome: "Todos", icone: "fas fa-home" },
-    ofertas: { nome: "Ofertas", icone: "fas fa-tag" },
-    steam: { nome: "Steam / PC", icone: "fab fa-steam" },
-    playstation: { nome: "PlayStation", icone: "fab fa-playstation" },
-    xbox: { nome: "Xbox", icone: "fab fa-xbox" },
-    nintendo: { nome: "Nintendo", icone: "fas fa-gamepad" }
-  };
-
-  if (filterName && filterIcon && configFiltros[plataforma]) {
-    filterName.innerText = configFiltros[plataforma].nome;
-    filterIcon.className = configFiltros[plataforma].icone;
-  }
-
-  // 4. Atualiza a classe ativa dentro da lista do dropdown
-  const dropdownLinks = document.querySelectorAll("#filter-dropdown li");
-  dropdownLinks.forEach(li => {
-    li.classList.remove("active-filter");
-    const link = li.querySelector("a");
-    const onclickAttr = link ? link.getAttribute("onclick") : null;
-    if (onclickAttr && onclickAttr.includes(`'${plataforma}'`)) {
-      li.classList.add("active-filter");
-    }
-  });
-
-  // 5. NOVA LÓGICA DE FILTRAGEM UNIFICADA
-  currentFilter = plataforma; // Atualiza a variável global
-  aplicarFiltros();           // Chama a função central que faz todo o trabalho
-}
-
-// ==========================================
-// RENDERIZAÇÃO DE JOGOS E BANNER COM LOADING
-// ==========================================
 async function fetchGames() {
   const spinner = document.getElementById("loading-spinner");
   const container = document.getElementById("games-container");
@@ -299,11 +138,43 @@ async function fetchGames() {
   }
 }
 
-function formatPrice(value) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value);
+async function fetchBiblioteca(id_usuario) {
+  try {
+    const response = await fetch(`${API_URL}/usuarios/${id_usuario}/biblioteca`);
+    
+    if (response.ok) {
+      const bibliotecaData = await response.json();
+      jogosNaBiblioteca = bibliotecaData.map(jogo => jogo.id);
+      
+      if (todosJogos.length > 0) {
+        renderGames(todosJogos);
+      }
+    }
+  } catch (error) {
+    console.error("Erro ao buscar biblioteca:", error);
+  }
+}
+
+async function atualizarContadorCarrinho(id_usuario) {
+  try {
+    const response = await fetch(`${API_URL}/carrinho/${id_usuario}`);
+    
+    if (response.ok) {
+      const itens = await response.json();
+      const cartCount = document.getElementById("cart-count");
+      
+      if (cartCount) {
+        if (itens.length > 0) {
+          cartCount.innerText = itens.length;
+          cartCount.style.display = "flex";
+        } else {
+          cartCount.style.display = "none";
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Erro ao atualizar contador do carrinho:", error);
+  }
 }
 
 function renderBanner(jogos) {
@@ -371,13 +242,11 @@ function renderGames(jogos) {
     const card = document.createElement("div");
     card.className = "game-card";
 
-    // 1. CHECAGEM DE BIBLIOTECA
     const usuarioTemJogo = jogosNaBiblioteca.includes(game.id);
     if (usuarioTemJogo) {
       card.classList.add("na-biblioteca");
     }
 
-    // 2. FAIXA DA PLATAFORMA
     const plataformaStr = game.platform ? game.platform.toLowerCase() : '';
     let classePlataforma = "platform-default";
     let nomePlataforma = game.platform || "Outros";
@@ -389,7 +258,6 @@ function renderGames(jogos) {
 
     const faixaPlataformaHTML = `<div class="platform-banner ${classePlataforma}">${nomePlataforma}</div>`;
 
-    // 3. CÁLCULO DE PREÇO
     const preco = parseFloat(game.preco);
     const desconto = game.desconto ? parseFloat(game.desconto) : 0;
     const temDesconto = desconto > 0;
@@ -397,7 +265,6 @@ function renderGames(jogos) {
 
     const isEmBreve = preco === 0 && desconto !== 100;
 
-    // Configuração do clique no card
     if (!isEmBreve) {
       card.style.cursor = "pointer";
       card.onclick = () => { window.location.href = `jogo.html?id=${game.id}`; };
@@ -409,7 +276,6 @@ function renderGames(jogos) {
     let badgeHTML = "";
     let precoHTML = "";
 
-    // 4. LÓGICA DO TEXTO (Muda se tiver na biblioteca)
     if (usuarioTemJogo) {
        precoHTML = `<p class="price"><i class="fas fa-check-circle"></i> Na Biblioteca</p>`;
     } else if (preco === 0) {
@@ -423,48 +289,135 @@ function renderGames(jogos) {
     } else if (temDesconto) {
       badgeHTML = `<span class="promo-badge">-${desconto}%</span>`;
       precoHTML = `
-                <span style="text-decoration: line-through; font-size: 0.9em; color: #aaa;">
-                    ${formatPrice(preco)}
-                </span>
-                <p class="price">${formatPrice(precoFinal)}</p>
-            `;
+        <span style="text-decoration: line-through; font-size: 0.9em; color: #aaa;">
+          ${formatPrice(preco)}
+        </span>
+        <p class="price">${formatPrice(precoFinal)}</p>
+      `;
     } else {
       precoHTML = `<p class="price">${formatPrice(preco)}</p>`;
     }
 
     const imgSrc = game.cover || "img/site_logo.png";
 
-    // 5. MONTAGEM FINAL DO CARD
-    // Atualizei o border-radius da imagem para ficar plano no topo, juntando com a faixa da plataforma
     card.innerHTML = `
-            ${faixaPlataformaHTML}
-            ${badgeHTML}
-            <img src="${imgSrc}" alt="${game.titulo}" style="width: 100%; border-radius: 0 0 8px 8px;">
-            <h3>${game.titulo}</h3>
-            ${precoHTML}
-        `;
+      ${faixaPlataformaHTML}
+      ${badgeHTML}
+      <img src="${imgSrc}" alt="${game.titulo}" style="width: 100%; border-radius: 0 0 8px 8px;">
+      <h3>${game.titulo}</h3>
+      ${precoHTML}
+    `;
 
     container.appendChild(card);
   });
 }
 
-// Inicialização
-if (!window.location.pathname.includes("jogo.html")) {
-  document.addEventListener("DOMContentLoaded", () => {
-    protegerPagina(); // Verifica a autenticação primeiro
-    verificarAutenticacaoNavbar();
-    configurarBusca();
-    fetchGames();
-  });
-} 
+function changeSlide(direction) {
+  const slides = document.querySelectorAll(".slide");
+  if (!slides.length) return;
 
-// O evento "pageshow" garante que o header será atualizado mesmo 
-// se o utilizador clicar no botão "Voltar" do navegador.
-window.addEventListener("pageshow", (event) => {
-  // event.persisted é true se a página foi recuperada do cache do navegador
-  if (event.persisted) {
-    if (typeof verificarAutenticacaoNavbar === "function") {
-      verificarAutenticacaoNavbar();
-    }
+  slides[currentSlide].classList.remove("active");
+  currentSlide += direction;
+
+  if (currentSlide >= slides.length) currentSlide = 0;
+  else if (currentSlide < 0) currentSlide = slides.length - 1;
+
+  slides[currentSlide].classList.add("active");
+}
+
+function startBannerInterval() {
+  clearInterval(bannerInterval);
+  bannerInterval = setInterval(() => changeSlide(1), 5000);
+}
+
+function configurarBusca() {
+  const searchInput = document.getElementById("search-input");
+  if (!searchInput) return;
+
+  searchInput.addEventListener("input", () => {
+    aplicarFiltros();
+  });
+}
+
+function aplicarFiltros() {
+  const termoBusca = document.getElementById("search-input").value.toLowerCase();
+  let jogosFiltrados = [];
+  
+  if (currentFilter === 'todos') {
+    jogosFiltrados = todosJogos;
+  } else if (currentFilter === 'ofertas') {
+    jogosFiltrados = todosJogos.filter(game => {
+      const desconto = parseFloat(game.desconto);
+      return desconto > 0 && desconto < 100;
+    });
+  } else {
+    jogosFiltrados = todosJogos.filter((game) => {
+      if (!game.platform) return false;
+      const platStr = game.platform.toLowerCase();
+      if (currentFilter === 'steam') return platStr.includes('steam') || platStr.includes('pc');
+      return platStr.includes(currentFilter.toLowerCase());
+    });
   }
-});
+
+  jogosFiltrados = jogosFiltrados.filter((game) =>
+    game.titulo.toLowerCase().includes(termoBusca)
+  );
+
+  renderGames(jogosFiltrados);
+}
+
+function toggleDropdown(event) {
+  if (event) event.stopPropagation();
+  const display = document.getElementById("active-filter-display");
+  
+  if (display) {
+    display.classList.toggle("open");
+  }
+}
+
+function filtrarPlataforma(plataforma) {
+  if (plataforma === 'todos' || plataforma === 'ofertas') {
+    document.body.removeAttribute('data-theme');
+  } else {
+    document.body.setAttribute('data-theme', plataforma);
+  }
+
+  const filterName = document.getElementById("filter-name");
+  const filterIcon = document.getElementById("filter-icon");
+  
+  const configFiltros = {
+    todos: { nome: "Todos", icone: "fas fa-home" },
+    ofertas: { nome: "Ofertas", icone: "fas fa-tag" },
+    steam: { nome: "Steam / PC", icone: "fab fa-steam" },
+    playstation: { nome: "PlayStation", icone: "fab fa-playstation" },
+    xbox: { nome: "Xbox", icone: "fab fa-xbox" },
+    nintendo: { nome: "Nintendo", icone: "fas fa-gamepad" }
+  };
+
+  if (filterName && filterIcon && configFiltros[plataforma]) {
+    filterName.innerText = configFiltros[plataforma].nome;
+    filterIcon.className = configFiltros[plataforma].icone;
+  }
+
+  const dropdownLinks = document.querySelectorAll("#filter-dropdown li");
+  
+  dropdownLinks.forEach(li => {
+    li.classList.remove("active-filter");
+    const link = li.querySelector("a");
+    const onclickAttr = link ? link.getAttribute("onclick") : null;
+    
+    if (onclickAttr && onclickAttr.includes(`'${plataforma}'`)) {
+      li.classList.add("active-filter");
+    }
+  });
+
+  currentFilter = plataforma;
+  aplicarFiltros();
+}
+
+function formatPrice(value) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value);
+}

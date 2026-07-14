@@ -8,7 +8,6 @@ const authRoutes = require("./routes/authRoutes");
 const jogosRoutes = require("./routes/jogosRoutes");
 const carrinhoRoutes = require("./routes/carrinhoRoutes");
 const cuponsRoutes = require("./routes/cuponsRoutes");
-const adminRoutes = require("./routes/adminRoutes");
 const pagamentosRoutes = require("./routes/pagamentosRoutes");
 
 const app = express();
@@ -30,7 +29,6 @@ app.use("/api", authRoutes);
 app.use("/api", jogosRoutes);
 app.use("/api", carrinhoRoutes);
 app.use("/api", cuponsRoutes);
-app.use("/api/admin", adminRoutes);
 app.use("/api", pagamentosRoutes);
 
 app.listen(port, () => {

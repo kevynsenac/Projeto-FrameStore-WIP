@@ -1,31 +1,24 @@
 const BASE_API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
 let usuarioLogado = null;
 let cartoesUsuario = [];
+let idCartaoEditando = null;
 
-function mostrarNotificacao(mensagem, tipo = 'sucesso') {
-  let container = document.getElementById('toast-container');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'toast-container';
-    document.body.appendChild(container);
+window.onload = async () => {
+  switchPagamentoTab('cartao');
+  
+  if (await verificarAutenticacao()) {
+    carregarCartoes();
   }
-  const toast = document.createElement('div');
-  toast.className = `toast ${tipo}`;
-  const icone = tipo === 'sucesso' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
-  toast.innerHTML = `<i class="${icone}"></i> <span>${mensagem}</span>`;
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.classList.add('hide');
-    setTimeout(() => toast.remove(), 300);
-  }, 3500);
-}
+};
 
 async function verificarAutenticacao() {
   const userStr = localStorage.getItem("usuarioLogado");
+  
   if (!userStr) {
     window.location.href = "login.html";
     return false;
   }
+  
   usuarioLogado = JSON.parse(userStr);
   atualizarUIHeaderLocal();
   return true;
@@ -33,13 +26,17 @@ async function verificarAutenticacao() {
 
 function atualizarUIHeaderLocal() {
   const navSaldo = document.getElementById("nav-saldo");
-  if (navSaldo) navSaldo.innerText = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(usuarioLogado.saldo || 0);
-  
   const displaySaldoAtual = document.getElementById("display-saldo-atual");
-  if (displaySaldoAtual) displaySaldoAtual.innerText = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(usuarioLogado.saldo || 0);
+  
+  if (navSaldo) {
+    navSaldo.innerText = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(usuarioLogado.saldo || 0);
+  }
+  
+  if (displaySaldoAtual) {
+    displaySaldoAtual.innerText = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(usuarioLogado.saldo || 0);
+  }
 }
 
-// Controle de Abas
 function switchPagamentoTab(metodo) {
   document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -51,7 +48,6 @@ function switchPagamentoTab(metodo) {
   if (btnAtivo) btnAtivo.classList.add('active');
 }
 
-// Controle de Modal de Cartão
 function abrirModalCartao() {
   document.getElementById("modal-novo-cartao").style.display = "flex";
 }
@@ -60,15 +56,12 @@ function fecharModalCartao() {
   document.getElementById("modal-novo-cartao").style.display = "none";
   document.getElementById("form-novo-cartao").reset();
   
-  // Limpa o estado
   idCartaoEditando = null;
   
-  // Reabilita tudo
   document.getElementById("novo-cartao-numero").disabled = false;
   document.getElementById("novo-cartao-cvv").disabled = false;
   document.getElementById("novo-cartao-bandeira").disabled = false;
   
-  // Esconde a dica visual
   const dica = document.getElementById("label-bloqueado");
   if (dica) dica.style.display = "none";
 
@@ -77,14 +70,18 @@ function fecharModalCartao() {
 
 function formatarVencimento(input) {
   let value = input.value.replace(/\D/g, "");
-  if (value.length > 2) value = value.substring(0, 2) + "/" + value.substring(2, 4);
+  
+  if (value.length > 2) {
+    value = value.substring(0, 2) + "/" + value.substring(2, 4);
+  }
+  
   input.value = value;
 }
 
-// Gerenciamento de Cartões
 async function carregarCartoes() {
   try {
     const response = await fetch(`${BASE_API_URL}/usuarios/${usuarioLogado.id}/cartoes`);
+    
     if (response.ok) {
       cartoesUsuario = await response.json();
       renderizarCartoes();
@@ -95,11 +92,9 @@ async function carregarCartoes() {
 }
 
 function renderizarCartoes() {
-  // 1. Atualiza o GRID de cartões (o que você já tinha)
   const container = document.getElementById("lista-cartoes");
   container.innerHTML = "";
 
-  // 2. Atualiza o SELECT de seleção (A parte que faltava)
   const selectCartao = document.getElementById("select-cartao");
   selectCartao.innerHTML = '<option value="">Selecione um cartão</option>';
 
@@ -109,12 +104,12 @@ function renderizarCartoes() {
   }
 
   cartoesUsuario.forEach(cartao => {
-    // --- Renderização do GRID ---
     let icon = (cartao.bandeira === "visa") ? "fa-brands fa-cc-visa" : 
                (cartao.bandeira === "mastercard") ? "fa-brands fa-cc-mastercard" : "fas fa-credit-card";
 
     const div = document.createElement("div");
     div.className = "card-item";
+    
     div.innerHTML = `
       <div class="card-icon"><i class="${icon}"></i></div>
       <div class="card-info">
@@ -127,35 +122,15 @@ function renderizarCartoes() {
         <button class="btn-icon delete" onclick="removerCartao(${cartao.id})" title="Remover"><i class="fas fa-trash-alt"></i></button>
       </div>
     `;
+    
     container.appendChild(div);
 
-    // --- Renderização das OPTIONS do Select ---
     const option = document.createElement("option");
     option.value = cartao.id;
-    // Exibe o número mascarado e o saldo disponível no cartão
     option.textContent = `${cartao.numero_mascarado} (Saldo: R$ ${cartao.saldo_cartao})`;
     selectCartao.appendChild(option);
   });
 }
-
-async function removerCartao(idCartao) {
-  if (!confirm("Tem certeza que deseja remover este cartão?")) return;
-
-  try {
-    const res = await fetch(`${BASE_API_URL}/cartoes/${idCartao}`, { method: 'DELETE' });
-    if (res.ok) {
-      mostrarNotificacao("Cartão removido!", "sucesso");
-      await carregarCartoes();
-    } else {
-      mostrarNotificacao("Erro ao remover.", "erro");
-    }
-  } catch (error) {
-    mostrarNotificacao("Erro de conexão.", "erro");
-  }
-}
-
-// --- 3. EDITAR CARTÃO (Prepara o Modal) ---
-let idCartaoEditando = null;
 
 function prepararEdicao(idCartao) {
   const cartao = cartoesUsuario.find(c => c.id === idCartao);
@@ -163,17 +138,14 @@ function prepararEdicao(idCartao) {
 
   idCartaoEditando = idCartao;
   
-  // Preenche os dados
   document.getElementById("novo-cartao-nome").value = cartao.nome_titular;
   document.getElementById("novo-cartao-vencimento").value = cartao.vencimento;
   
-  // Bloqueia campos e MOSTRA a dica visual
   const camposBloqueados = ["novo-cartao-numero", "novo-cartao-cvv", "novo-cartao-bandeira"];
   camposBloqueados.forEach(id => {
-      document.getElementById(id).disabled = true;
+    document.getElementById(id).disabled = true;
   });
 
-  // Exibe o aviso de bloqueado na label (se você adicionou o span com ID label-bloqueado)
   const dica = document.getElementById("label-bloqueado");
   if (dica) dica.style.display = "inline";
 
@@ -184,7 +156,6 @@ function prepararEdicao(idCartao) {
 async function cadastrarCartao(event) {
   event.preventDefault();
 
-  // 1. Coleta dos dados
   const numero = document.getElementById("novo-cartao-numero").value.replace(/\s/g, '');
   const nome = document.getElementById("novo-cartao-nome").value;
   const vencimento = document.getElementById("novo-cartao-vencimento").value;
@@ -198,16 +169,13 @@ async function cadastrarCartao(event) {
   try {
     let response;
     
-    // 2. Lógica Condicional: Editar (PUT) ou Cadastrar (POST)
     if (idCartaoEditando) {
-      // Requisição de Edição
       response = await fetch(`${BASE_API_URL}/cartoes/${idCartaoEditando}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nome_titular: nome, vencimento })
       });
     } else {
-      // Requisição de Cadastro Novo (Original)
       if (numero.length < 13) throw new Error("Número de cartão inválido.");
       if (vencimento.length < 5) throw new Error("Vencimento inválido.");
       if (cvv.length < 3) throw new Error("CVV inválido.");
@@ -222,41 +190,46 @@ async function cadastrarCartao(event) {
 
     if (!response.ok) throw new Error("Erro na comunicação com o servidor.");
 
-    // 3. Sucesso
     mostrarNotificacao(idCartaoEditando ? "Cartão atualizado!" : "Cartão adicionado!", "sucesso");
     
-    // 4. Limpeza e Reset
     fecharModalCartao();
     await carregarCartoes();
-
   } catch (error) {
     mostrarNotificacao(error.message || "Erro ao salvar cartão.", "erro");
   } finally {
     btn.disabled = false;
     btn.innerText = "Confirmar e Salvar";
-    idCartaoEditando = null; // Limpa o estado de edição
+    idCartaoEditando = null;
     
-    // Reabilita campos caso tenham sido bloqueados pela função de prepararEdicao
     document.getElementById("novo-cartao-numero").disabled = false;
     document.getElementById("novo-cartao-cvv").disabled = false;
     document.getElementById("novo-cartao-bandeira").disabled = false;
   }
 }
 
-// Funções de Copiar
-function copiarTexto(elementId) {
-  const texto = document.getElementById(elementId).innerText;
-  navigator.clipboard.writeText(texto).then(() => {
-    mostrarNotificacao("Código copiado com sucesso!", "sucesso");
-  }).catch(() => {
-    mostrarNotificacao("Erro ao tentar copiar.", "erro");
-  });
+async function removerCartao(idCartao) {
+  if (!confirm("Tem certeza que deseja remover este cartão?")) return;
+
+  try {
+    const res = await fetch(`${BASE_API_URL}/cartoes/${idCartao}`, { method: 'DELETE' });
+    
+    if (res.ok) {
+      mostrarNotificacao("Cartão removido!", "sucesso");
+      await carregarCartoes();
+    } else {
+      mostrarNotificacao("Erro ao remover.", "erro");
+    }
+  } catch (error) {
+    mostrarNotificacao("Erro de conexão.", "erro");
+  }
 }
 
-// Simulação de Pagamentos Didáticos
 function gerarPix() {
   const valorInput = document.getElementById("valor-pix").value;
-  if (!valorInput || valorInput <= 0) return mostrarNotificacao("Insira um valor válido.", "erro");
+  
+  if (!valorInput || valorInput <= 0) {
+    return mostrarNotificacao("Insira um valor válido.", "erro");
+  }
 
   const qrcodeContainer = document.getElementById("pix-qrcode-container");
   qrcodeContainer.style.display = "block";
@@ -276,7 +249,10 @@ function gerarPix() {
 
 function gerarBoleto() {
   const valorInput = document.getElementById("valor-boleto").value;
-  if (!valorInput || valorInput <= 0) return mostrarNotificacao("Insira um valor válido.", "erro");
+  
+  if (!valorInput || valorInput <= 0) {
+    return mostrarNotificacao("Insira um valor válido.", "erro");
+  }
 
   const boletoContainer = document.getElementById("boleto-container");
   boletoContainer.style.display = "block";
@@ -330,12 +306,10 @@ async function processarAdicaoSaldo(metodo, valor, idCartao = null) {
       
       if (metodo === 'cartao') {
         await carregarCartoes();
-        // Limpa também o campo do CVV após o uso
         document.getElementById("cvv-confirmacao").value = "";
       }
       
       document.getElementById("valor-cartao").value = "";
-
     } else {
       mostrarNotificacao(data.error || "Erro ao processar saldo.", "erro");
     }
@@ -344,9 +318,35 @@ async function processarAdicaoSaldo(metodo, valor, idCartao = null) {
   }
 }
 
-window.onload = async () => {
-  switchPagamentoTab('cartao'); // Força a renderização inicial
-  if (await verificarAutenticacao()) {
-    carregarCartoes();
+function copiarTexto(elementId) {
+  const texto = document.getElementById(elementId).innerText;
+  
+  navigator.clipboard.writeText(texto).then(() => {
+    mostrarNotificacao("Código copiado com sucesso!", "sucesso");
+  }).catch(() => {
+    mostrarNotificacao("Erro ao tentar copiar.", "erro");
+  });
+}
+
+function mostrarNotificacao(mensagem, tipo = 'sucesso') {
+  let container = document.getElementById('toast-container');
+  
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
   }
-};
+  
+  const toast = document.createElement('div');
+  toast.className = `toast ${tipo}`;
+  
+  const icone = tipo === 'sucesso' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+  toast.innerHTML = `<i class="${icone}"></i> <span>${mensagem}</span>`;
+  
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('hide');
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}

@@ -1,9 +1,8 @@
--- Cria o banco de dados e as tables iniciais compatíveis com o projeto
+-- Cria o banco de dados e as tables compatíveis com o projeto
 CREATE DATABASE IF NOT EXISTS framestore;
 
 USE framestore;
 
--- Tabela de Usuários
 CREATE TABLE IF NOT EXISTS USUARIOS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL UNIQUE,
@@ -19,12 +18,11 @@ CREATE TABLE IF NOT EXISTS USUARIOS (
     cor_tema VARCHAR(7) DEFAULT '#2a2aef'
 );
 
--- Tabela de Jogos
 CREATE TABLE IF NOT EXISTS JOGOS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(150) NOT NULL,
     preco DECIMAL(10, 2) NOT NULL,
-    desconto DECIMAL(5, 2) NULL, -- Porcentagem de desconto
+    desconto DECIMAL(5, 2) NULL,
     platform VARCHAR(100),
     descricao TEXT,
     requisitos TEXT,
@@ -34,7 +32,6 @@ CREATE TABLE IF NOT EXISTS JOGOS (
     screenshot3 LONGBLOB
 );
 
--- Tabela de Cupons
 CREATE TABLE IF NOT EXISTS CUPONS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50) NOT NULL UNIQUE,
@@ -43,7 +40,6 @@ CREATE TABLE IF NOT EXISTS CUPONS (
     custo_pontos INT NOT NULL
 );
 
--- Tabela de Carrinho
 CREATE TABLE IF NOT EXISTS CARRINHO (
     id_usuario INT NOT NULL,
     id_jogo INT NOT NULL,
@@ -52,7 +48,6 @@ CREATE TABLE IF NOT EXISTS CARRINHO (
     FOREIGN KEY (id_jogo) REFERENCES JOGOS (id) ON DELETE CASCADE
 );
 
--- Tabela de Biblioteca
 CREATE TABLE IF NOT EXISTS BIBLIOTECA (
     id_usuario INT NOT NULL,
     id_jogo INT NOT NULL,
@@ -63,7 +58,6 @@ CREATE TABLE IF NOT EXISTS BIBLIOTECA (
     FOREIGN KEY (id_jogo) REFERENCES JOGOS (id) ON DELETE CASCADE
 );
 
--- Tabela de Usuário Cupons
 CREATE TABLE IF NOT EXISTS USUARIO_CUPONS (
     id_usuario INT NOT NULL,
     id_cupom INT NOT NULL,

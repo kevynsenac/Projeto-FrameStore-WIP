@@ -86,12 +86,25 @@ function getRandomColor() {
   return color;
 }
 
-// Listener para exibir qual arquivo de FOTO foi selecionado
+// Listener para exibir qual arquivo de FOTO foi selecionado e validar tamanho
 document.getElementById("edit-foto").addEventListener("change", function (e) {
   const label = document.getElementById("label-foto");
   const text = document.getElementById("text-foto");
+  
   if (e.target.files.length > 0) {
-    text.innerText = e.target.files[0].name;
+    const file = e.target.files[0];
+    
+    // Validação de segurança: Limite de 2MB (2 * 1024 * 1024 bytes)
+    if (file.size > 2 * 1024 * 1024) {
+      mostrarNotificacao("A foto de perfil deve ter no máximo 2MB.", "erro");
+      e.target.value = ""; // Esvazia o input para cancelar o envio
+      text.innerText = "Nova Foto";
+      label.style.borderColor = "var(--cor-tema)";
+      label.style.color = "#fff";
+      return; // Interrompe a execução aqui
+    }
+
+    text.innerText = file.name;
     label.style.borderColor = "#00ff88"; // Feedback de sucesso visual
     label.style.color = "#00ff88";
   } else {
@@ -101,12 +114,25 @@ document.getElementById("edit-foto").addEventListener("change", function (e) {
   }
 });
 
-// Listener para exibir qual arquivo de BANNER foi selecionado
+// Listener para exibir qual arquivo de BANNER foi selecionado e validar tamanho
 document.getElementById("edit-fundo").addEventListener("change", function (e) {
   const label = document.getElementById("label-fundo");
   const text = document.getElementById("text-fundo");
+  
   if (e.target.files.length > 0) {
-    text.innerText = e.target.files[0].name;
+    const file = e.target.files[0];
+    
+    // Validação de segurança: Limite de 2MB (2 * 1024 * 1024 bytes)
+    if (file.size > 2 * 1024 * 1024) {
+      mostrarNotificacao("O banner do perfil deve ter no máximo 2MB.", "erro");
+      e.target.value = ""; // Esvazia o input para cancelar o envio
+      text.innerText = "Novo Banner";
+      label.style.borderColor = "var(--cor-tema)";
+      label.style.color = "#fff";
+      return; // Interrompe a execução aqui
+    }
+
+    text.innerText = file.name;
     label.style.borderColor = "#00ff88"; // Feedback de sucesso visual
     label.style.color = "#00ff88";
   } else {

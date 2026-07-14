@@ -44,21 +44,19 @@ async function register(req, res) {
 async function login(req, res) {
   const { email, senha } = req.body;
   try {
+    // 1. Removemos 'foto_perfil' e 'fundo_perfil' do SELECT
     const [rows] = await db.query(
-      // ADICIONAMOS O cor_tema AQUI NO SELECT:
-      "SELECT id, nome, email, saldo, pontos, adm, ultima_roleta, bio, cor_tema, foto_perfil, fundo_perfil FROM USUARIOS WHERE email = ? AND senha = ?",
+      "SELECT id, nome, email, saldo, pontos, adm, ultima_roleta, bio, cor_tema FROM USUARIOS WHERE email = ? AND senha = ?",
       [email, senha],
     );
+    
     if (rows.length === 0) {
       return res.status(401).json({ error: "Credenciais inválidas." });
     }
 
-    // Formatando as imagens do usuário para facilitar o envio pro front-end
-    const user = {
-      ...rows[0],
-      foto_perfil: formatarImagem(rows[0].foto_perfil),
-      fundo_perfil: formatarImagem(rows[0].fundo_perfil),
-    };
+    // 2. Não precisamos mais do bloco de 'formatarImagem' aqui. 
+    // Pegamos apenas os dados leves (textos e números)
+    const user = rows[0];
 
     res.json({ message: "Login efetuado com sucesso!", user });
   } catch (error) {

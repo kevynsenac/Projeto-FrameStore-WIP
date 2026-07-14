@@ -92,7 +92,3 @@ npm start
 ```
 
 Acesse `http://localhost:3000` (ou a porta definida no seu `.env`) para explorar a FrameStore.
-
-```
-
-```

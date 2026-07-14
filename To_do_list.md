@@ -5,4 +5,3 @@ ALTERAÇÕES:
 
 BUGS:
 - Barra de pesquisa deve funcionar somente com os jogos do respectivo filtro ativo
-- Ao fechar modal de compra confirmada, o "adicionar ao carrinho" não é atualizado e há alerts

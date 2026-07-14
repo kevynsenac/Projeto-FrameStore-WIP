@@ -451,3 +451,14 @@ if (!window.location.pathname.includes("jogo.html")) {
     fetchGames();
   });
 } 
+
+// O evento "pageshow" garante que o header será atualizado mesmo 
+// se o utilizador clicar no botão "Voltar" do navegador.
+window.addEventListener("pageshow", (event) => {
+  // event.persisted é true se a página foi recuperada do cache do navegador
+  if (event.persisted) {
+    if (typeof verificarAutenticacaoNavbar === "function") {
+      verificarAutenticacaoNavbar();
+    }
+  }
+});

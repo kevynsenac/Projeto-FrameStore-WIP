@@ -2,12 +2,34 @@ let galeria = [];
 let imagemAtualIndex = 0;
 let jogoAtual = null;
 
-// Usamos um nome de constante diferente (BASE_API_URL) para evitar o erro de SyntaxError 
-// de conflito com o "const API_URL" que já existe no homepage.js carregado no mesmo HTML
 const BASE_API_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000/api' 
     : '/api';
 
+// ==========================================
+// SISTEMA DE NOTIFICAÇÕES (TOASTS)
+// ==========================================
+function mostrarNotificacao(mensagem, tipo = 'sucesso') {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  toast.className = `toast ${tipo}`;
+  const icone = tipo === 'sucesso' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+  toast.innerHTML = `<i class="${icone}"></i> <span>${mensagem}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('hide');
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+// ==========================================
+// LÓGICA PRINCIPAL DO JOGO
+// ==========================================
 async function carregarDetalhesJogo() {
   const urlParams = new URLSearchParams(window.location.search);
   const jogoId = urlParams.get("id");
@@ -15,7 +37,6 @@ async function carregarDetalhesJogo() {
   const spinner = document.getElementById("loading-spinner");
   const content = document.getElementById("game-content");
 
-  // Se não houver ID na URL
   if (!jogoId) {
     document.querySelector(".game-title").innerText = "Jogo não encontrado.";
     if (spinner) spinner.style.display = "none";
@@ -23,7 +44,6 @@ async function carregarDetalhesJogo() {
     return;
   }
 
-  // Inicia o estado de Loading
   if (spinner) spinner.style.display = "flex";
   if (content) content.style.display = "none";
 
@@ -34,24 +54,18 @@ async function carregarDetalhesJogo() {
     jogoAtual = await response.json();
     await renderizarDetalhes(jogoAtual);
     
-    // Mostra o conteúdo do jogo em caso de sucesso
     if (content) content.style.display = "block";
   } catch (error) {
     console.error("Erro:", error);
     document.querySelector(".game-title").innerText = "Erro ao carregar os dados.";
-    // Mostra o conteúdo para exibir a mensagem de erro no título
     if (content) content.style.display = "block";
   } finally {
-    // Finaliza o estado de Loading
     if (spinner) spinner.style.display = "none";
   }
 }
 
 function formatPrice(value) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value);
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 }
 
 async function renderizarDetalhes(game) {
@@ -67,23 +81,14 @@ async function renderizarDetalhes(game) {
 
   const priceSection = document.querySelector(".price-section");
   const btnPurchase = document.querySelector(".btn-purchase-green");
-
   const descElement = document.getElementById("game-desc-text");
   const reqElement = document.getElementById("game-req-text");
 
-  // Injeta a descrição
-  if (descElement) {
-    descElement.innerText = game.descricao || "Descrição não disponível para este jogo.";
-  }
-
-  // Injeta os requisitos formatando as vírgulas como quebras de linha
+  if (descElement) descElement.innerText = game.descricao || "Descrição não disponível para este jogo.";
+  
   if (reqElement) {
     if (game.requisitos) {
-      // Divide o texto onde tem vírgula, remove os espaços sobrando (trim) e monta uma lista HTML
-      reqElement.innerHTML = game.requisitos
-        .split(',')
-        .map(requisito => `<p><i class="fas fa-microchip"></i> ${requisito.trim()}</p>`)
-        .join('');
+      reqElement.innerHTML = game.requisitos.split(',').map(requisito => `<p><i class="fas fa-microchip"></i> ${requisito.trim()}</p>`).join('');
     } else {
       reqElement.innerHTML = "<p>Requisitos não especificados.</p>";
     }
@@ -138,14 +143,14 @@ async function renderizarDetalhes(game) {
     priceSection.innerHTML = `<span class="value">${formatPrice(precoFinal)}</span>`;
   }
 
-  // 3. LÓGICA DO CARD DA PLATAFORMA E TEMA DA PÁGINA
+  // 3. TEMA DA PLATAFORMA
   const platformCard = document.getElementById("platform-card");
   const platformIcon = document.getElementById("platform-icon");
   const platformName = document.getElementById("game-platform");
 
   if (platformCard && platformIcon && platformName) {
     const platformStr = game.platform ? game.platform.toLowerCase() : '';
-    platformCard.className = "platform-info-card"; // Reseta as classes
+    platformCard.className = "platform-info-card"; 
 
     if (platformStr.includes("pc") || platformStr.includes("steam")) {
         document.body.setAttribute('data-theme', 'steam');
@@ -176,16 +181,8 @@ async function renderizarDetalhes(game) {
   }
 
   // 4. GALERIA
-  galeria = [
-    game.cover,
-    game.screenshot1,
-    game.screenshot2,
-    game.screenshot3,
-  ].filter((img) => img != null && img !== "");
-
-  if (galeria.length === 0) {
-    galeria = ["img/site_logo.png"]; 
-  }
+  galeria = [game.cover, game.screenshot1, game.screenshot2, game.screenshot3].filter((img) => img != null && img !== "");
+  if (galeria.length === 0) galeria = ["img/site_logo.png"]; 
 
   const thumbContainer = document.querySelector(".thumb-list");
   thumbContainer.innerHTML = "";
@@ -197,7 +194,6 @@ async function renderizarDetalhes(game) {
     img.onclick = () => selectImg(imgSrc, index);
     thumbContainer.appendChild(img);
   });
-
   selectImg(galeria[0], 0);
 }
 
@@ -215,60 +211,69 @@ function selectImg(src, index) {
 
 function moveGallery(step) {
   if (galeria.length === 0) return;
-
   imagemAtualIndex += step;
   if (imagemAtualIndex >= galeria.length) imagemAtualIndex = 0;
   if (imagemAtualIndex < 0) imagemAtualIndex = galeria.length - 1;
-
   selectImg(galeria[imagemAtualIndex], imagemAtualIndex);
 }
 
 async function adicionarAoCarrinho() {
   if (!jogoAtual) return;
 
-  // Bloqueio extra: Impede a compra de jogos que não lançaram se tentarem burlar o HTML
   const precoOriginal = parseFloat(jogoAtual.preco);
   const desconto = jogoAtual.desconto ? parseFloat(jogoAtual.desconto) : 0;
   if (precoOriginal === 0 && desconto !== 100) {
-      alert("Este jogo ainda está 'Em Breve' e não pode ser adicionado.");
+      mostrarNotificacao("Este jogo ainda está 'Em Breve' e não pode ser adicionado.", "erro");
       return;
   }
 
   const userStr = localStorage.getItem("usuarioLogado");
   if (!userStr) {
-    alert("Você precisa fazer login para adicionar jogos ao carrinho.");
-    window.location.href = "login.html";
+    mostrarNotificacao("Precisa de fazer login para adicionar jogos ao carrinho.", "erro");
+    setTimeout(() => window.location.href = "login.html", 2000);
     return;
   }
+  
   const usuarioLogado = JSON.parse(userStr);
+  const btnPurchase = document.querySelector(".btn-purchase-green");
+  const originalText = btnPurchase.innerHTML;
+  
+  btnPurchase.innerHTML = `<i class="fas fa-spinner fa-spin"></i> A Processar...`;
+  btnPurchase.disabled = true;
 
   try {
     const response = await fetch(`${BASE_API_URL}/carrinho`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id_usuario: usuarioLogado.id,
-        id_jogo: jogoAtual.id,
-      }),
+      body: JSON.stringify({ id_usuario: usuarioLogado.id, id_jogo: jogoAtual.id }),
     });
 
     const result = await response.json();
 
     if (!response.ok) {
-      alert(result.error || "Erro ao adicionar jogo ao carrinho.");
+      mostrarNotificacao(result.error || "Erro ao adicionar jogo ao carrinho.", "erro");
+      btnPurchase.innerHTML = originalText;
+      btnPurchase.disabled = false;
       return;
     }
 
+    // Altera o botão permanentemente na página atual
+    btnPurchase.style.background = "#444";
+    btnPurchase.style.color = "#aaa";
+    btnPurchase.style.cursor = "not-allowed";
+    btnPurchase.innerHTML = `<i class="fas fa-check"></i> No Carrinho`;
+
     atualizarModalCarrinhoVisual();
 
-    // Atualiza o contador de itens no header (função que vem do homepage.js)
     if (typeof atualizarContadorCarrinho === "function") {
       atualizarContadorCarrinho(usuarioLogado.id);
     }
 
   } catch (error) {
     console.error("Erro no fetch do carrinho:", error);
-    alert("Erro interno ao processar a requisição.");
+    mostrarNotificacao("Erro interno ao processar a requisição.", "erro");
+    btnPurchase.innerHTML = originalText;
+    btnPurchase.disabled = false;
   }
 }
 
@@ -278,7 +283,6 @@ function atualizarModalCarrinhoVisual() {
   const imagem = galeria[0];
   const listaItens = document.getElementById("cart-items-list");
 
-  // Limpa o conteúdo e exibe apenas o jogo que acabou de ser adicionado
   listaItens.innerHTML = `
       <div class="cart-item" style="display: flex; align-items: center; gap: 15px; padding: 15px 0;">
           <img src="${imagem}" alt="${titulo}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;">
@@ -297,7 +301,6 @@ function fecharCarrinho() {
 }
 
 window.onload = () => {
-  // Dispara a verificação de sessão do header declarada em homepage.js e atualiza dados do DB
   if (typeof verificarAutenticacaoNavbar === "function") {
     verificarAutenticacaoNavbar();
   }

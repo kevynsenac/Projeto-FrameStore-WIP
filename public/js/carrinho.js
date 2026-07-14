@@ -279,7 +279,16 @@ async function finalizarCompra() {
     const result = await response.json();
 
     if (!response.ok) {
-      mostrarNotificacao(result.error || "Erro ao finalizar a compra.", "erro");
+      // NOVA LÓGICA DE SALDO INSUFICIENTE AQUI 👇
+      if (result.error && result.error.includes("Saldo virtual insuficiente")) {
+        mostrarNotificacao("Saldo insuficiente. A redirecionar para Adicionar Fundos...", "erro");
+        setTimeout(() => {
+          window.location.href = "saldos.html";
+        }, 2500);
+      } else {
+        mostrarNotificacao(result.error || "Erro ao finalizar a compra.", "erro");
+      }
+      
       btnFinalizar.innerText = originalText;
       btnFinalizar.disabled = false;
       return;
@@ -289,9 +298,8 @@ async function finalizarCompra() {
     if (result.pontosAtuais !== undefined) usuarioLogado.pontos = result.pontosAtuais;
     localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
 
-    mostrarNotificacao("Compra efetuada com sucesso! Redirecionando para a sua biblioteca...", "sucesso");
+    mostrarNotificacao("Compra efetuada com sucesso! A redirecionar para a sua biblioteca...", "sucesso");
     
-    // Aguarda 2 segundos para o utilizador conseguir ler a notificação de sucesso e redireciona
     setTimeout(() => {
       window.location.href = "perfil.html";
     }, 2000);

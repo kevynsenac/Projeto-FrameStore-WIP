@@ -9,6 +9,7 @@ const jogosRoutes = require("./routes/jogosRoutes");
 const carrinhoRoutes = require("./routes/carrinhoRoutes");
 const cuponsRoutes = require("./routes/cuponsRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const pagamentosRoutes = require("./routes/pagamentosRoutes");
 
 const app = express();
 const port = process.env.PORT || 3000; // Se desejar usar outra porta, adicione a várivavel de ambiente "PORT" no arquivo .env
@@ -30,6 +31,7 @@ app.use("/api", jogosRoutes);
 app.use("/api", carrinhoRoutes);
 app.use("/api", cuponsRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api", pagamentosRoutes);
 
 app.listen(port, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${port}`);

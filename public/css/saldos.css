@@ -1,6 +1,3 @@
-/* ==========================================
-   1. VARIÁVEIS E ANIMAÇÕES GERAIS
-   ========================================== */
 :root {
   --cor-tema: #2a2aef;
   --cor-sucesso: #00ff88;
@@ -35,9 +32,28 @@
   }
 }
 
-/* ==========================================
-   2. ESTRUTURA PRINCIPAL (Saldos)
-   ========================================== */
+@keyframes slideInToast {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOutToast {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
 .saldos-wrapper {
   max-width: 1000px;
   margin: 40px auto;
@@ -51,11 +67,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(
-    135deg,
-    rgba(26, 26, 46, 0.9),
-    rgba(10, 10, 20, 0.9)
-  );
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(10, 10, 20, 0.9));
   padding: 30px;
   border-radius: 12px;
   margin-bottom: 35px;
@@ -83,9 +95,6 @@
   text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
 }
 
-/* ==========================================
-   3. ABAS DE NAVEGAÇÃO
-   ========================================== */
 .tabs-container {
   display: flex;
   gap: 15px;
@@ -136,9 +145,6 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
-/* ==========================================
-   4. FORMULÁRIOS E INPUTS
-   ========================================== */
 .pagamento-form-section h2,
 .tab-content h2 {
   font-size: 1.5rem;
@@ -179,16 +185,21 @@
   box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
 }
 
-/* Remover setas nativas do input type number */
+input:disabled, 
+select:disabled {
+  background-color: #0c0c16 !important;
+  border: 1px dashed #444 !important;
+  color: #666 !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* ==========================================
-   5. BOTÕES
-   ========================================== */
 .btn-action {
   width: 100%;
   padding: 16px;
@@ -225,9 +236,28 @@ input[type="number"]::-webkit-outer-spin-button {
   box-shadow: 0 5px 15px rgba(42, 42, 239, 0.4);
 }
 
-/* ==========================================
-   6. LISTA DE CARTÕES
-   ========================================== */
+.btn-icon {
+  background: #2a2aef;
+  border: none;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-icon:hover {
+  background: #3d3dff;
+}
+
+.btn-icon.delete {
+  background: #333355;
+}
+
+.btn-icon.delete:hover {
+  background: #ff4757;
+}
+
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -243,9 +273,7 @@ input[type="number"]::-webkit-outer-spin-button {
   display: flex;
   align-items: center;
   gap: 15px;
-  transition:
-    transform 0.3s ease,
-    border-color 0.3s ease;
+  transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
 .card-item:hover {
@@ -274,9 +302,13 @@ input[type="number"]::-webkit-outer-spin-button {
   text-transform: uppercase;
 }
 
-/* ==========================================
-   7. RESULTADOS (PIX E BOLETO)
-   ========================================== */
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: auto;
+}
+
 .box-resultado {
   background: var(--bg-input);
   padding: 30px;
@@ -288,9 +320,6 @@ input[type="number"]::-webkit-outer-spin-button {
   animation: fadeIn 0.4s ease;
 }
 
-/* ==========================================
-   8. MODAL NOVO CARTÃO
-   ========================================== */
 .modal-overlay {
   backdrop-filter: blur(5px);
 }
@@ -314,35 +343,6 @@ input[type="number"]::-webkit-outer-spin-button {
   color: var(--cor-erro);
 }
 
-/* ==========================================
-   9. RESPONSIVIDADE
-   ========================================== */
-@media (max-width: 768px) {
-  .saldos-header {
-    flex-direction: column;
-    text-align: center;
-    gap: 20px;
-    padding: 20px;
-  }
-
-  .saldo-display-container {
-    text-align: center;
-    width: 100%;
-  }
-
-  .tabs-container {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .pagamento-form-section > div[style*="display: flex"] {
-    flex-direction: column;
-  }
-}
-
-/* ==========================================
-   10. SISTEMA DE NOTIFICAÇÕES (TOASTS)
-   ========================================== */
 #toast-container {
   position: fixed;
   bottom: 30px;
@@ -369,78 +369,40 @@ input[type="number"]::-webkit-outer-spin-button {
 .toast i {
   font-size: 1.5rem;
 }
+
 .toast.sucesso {
   background-color: #0d1b2a;
   border-left: 5px solid var(--cor-sucesso);
 }
+
 .toast.erro {
   background-color: #1a0505;
   border-left: 5px solid var(--cor-erro);
 }
+
 .toast.hide {
   animation: fadeOutToast 0.3s forwards;
 }
 
-@keyframes slideInToast {
-  0% {
-    transform: translateX(100%);
-    opacity: 0;
+@media (max-width: 768px) {
+  .saldos-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+    padding: 20px;
   }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
+
+  .saldo-display-container {
+    text-align: center;
+    width: 100%;
   }
-}
 
-@keyframes fadeOutToast {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
+  .tabs-container {
+    flex-direction: column;
+    gap: 10px;
   }
-  100% {
-    transform: translateX(100%);
-    opacity: 0;
+
+  .pagamento-form-section > div[style*="display: flex"] {
+    flex-direction: column;
   }
-}
-
-/* Container dos botões dentro do card */
-.card-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-left: auto; /* Empurra os botões para a direita */
-}
-
-/* Estilo do botão de ícone */
-.btn-icon {
-  background: #2a2aef;
-  border: none;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.btn-icon:hover {
-  background: #3d3dff;
-}
-
-/* Botão de deletar específico */
-.btn-icon.delete {
-  background: #333355;
-}
-
-.btn-icon.delete:hover {
-  background: #ff4757;
-}
-
-/* Estilo para campos desabilitados */
-input:disabled, 
-select:disabled {
-    background-color: #0c0c16 !important; /* Cor mais escura */
-    border: 1px dashed #444 !important;    /* Borda tracejada (indica leitura apenas) */
-    color: #666 !important;                /* Texto cinza */
-    cursor: not-allowed !important;        /* Cursor de proibido */
-    opacity: 0.7;                          /* Leve transparência */
 }

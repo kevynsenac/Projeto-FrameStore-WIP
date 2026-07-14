@@ -1,6 +1,3 @@
-/* ==========================================
-   1. VARIÁVEIS E RESET GLOBAL
-   ========================================== */
 :root {
   --bg-color-dark: #050515;
   --bg-color-light: #161644;
@@ -29,9 +26,38 @@ body {
   font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   overflow-x: hidden;
   min-height: 100vh;
+  transition: background 0.5s ease;
 }
 
-/* Espaçamento extra para conteúdo abaixo do header */
+body[data-theme="steam"],
+body[data-theme="pc"] {
+  --bg-color-dark: #0b141a;
+  --bg-color-light: #1b2838;
+  --accent-blue: #66c0f4;
+  --card-bg: #171d25;
+}
+
+body[data-theme="playstation"] {
+  --bg-color-dark: #000022;
+  --bg-color-light: #003791;
+  --accent-blue: #0070d1;
+  --card-bg: #001233;
+}
+
+body[data-theme="xbox"] {
+  --bg-color-dark: #0b1a0b;
+  --bg-color-light: #107c10;
+  --accent-blue: #1b9c1b;
+  --card-bg: #0a1f0a;
+}
+
+body[data-theme="nintendo"] {
+  --bg-color-dark: #220000;
+  --bg-color-light: #a6000c;
+  --accent-blue: #e60012;
+  --card-bg: #330000;
+}
+
 main,
 .admin-container,
 .cart-container,
@@ -39,83 +65,6 @@ main,
 .points-container,
 .profile-content {
   margin-top: 20px;
-}
-
-/* ==========================================
-   2. MENU LATERAL (SIDEBAR) E OVERLAY
-   ========================================== */
-.sidebar-menu {
-  width: 260px;
-  background-color: #0a0a22;
-  padding: 20px;
-  position: fixed;
-  top: 0;
-  left: -300px;
-  height: 100vh;
-  z-index: 2000;
-  transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.8);
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.sidebar-menu.active {
-  left: 0;
-}
-
-.sidebar-header {
-  display: flex;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 20px;
-}
-
-.sidebar-menu ul {
-  list-style: none;
-}
-
-.sidebar-menu li {
-  margin-bottom: 20px;
-}
-
-.sidebar-menu a {
-  color: var(--text-color);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  opacity: 0.8;
-  transition: all 0.3s ease;
-}
-
-.sidebar-menu a i {
-  width: 25px;
-  text-align: center;
-}
-
-.sidebar-menu a:hover {
-  opacity: 1;
-  padding-left: 10px;
-  color: var(--hover-blue);
-  text-shadow: 0 0 10px rgba(92, 92, 255, 0.6);
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: none;
-  z-index: 1500;
-  backdrop-filter: blur(4px);
-}
-
-.overlay.active {
-  display: block;
-  animation: fadeIn 0.3s ease-in-out;
 }
 
 @keyframes fadeIn {
@@ -127,37 +76,6 @@ main,
   }
 }
 
-/* ==========================================
-   3. BANNER PRINCIPAL (SLIDER) DESTAQUES
-   ========================================== */
-.main-banner {
-  position: relative;
-  max-width: 1000px;
-  margin: 40px auto;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow:
-    0 15px 35px rgba(0, 0, 0, 0.6),
-    0 0 20px rgba(58, 58, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.banner-slider {
-  position: relative;
-  width: 100%;
-}
-
-.slide {
-  display: none;
-  width: 100%;
-  position: relative;
-}
-
-.slide.active {
-  display: block;
-  animation: fade 0.6s ease-in-out;
-}
-
 @keyframes fade {
   from {
     opacity: 0.5;
@@ -167,42 +85,6 @@ main,
     opacity: 1;
     transform: scale(1);
   }
-}
-
-.slide img {
-  width: 100%;
-  height: 500px;
-  object-fit: cover;
-  display: block;
-  transition:
-    transform 0.6s ease,
-    filter 0.6s ease;
-}
-
-.main-banner:hover .slide img {
-  filter: brightness(0.8) contrast(1.1);
-  transform: scale(1.03);
-}
-
-.banner-discount-tag {
-  position: absolute;
-  bottom: 40px;
-  right: 40px;
-  background: var(--promo-gradient);
-  color: white;
-  padding: 15px 25px;
-  border-radius: 12px;
-  font-size: 2.5rem;
-  font-weight: 900;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.6),
-    0 0 15px rgba(255, 0, 85, 0.5);
-  transform: rotate(-5deg);
-  border: 3px solid white;
-  z-index: 20;
-  animation: pulseTag 2s infinite;
-  pointer-events: none;
 }
 
 @keyframes pulseTag {
@@ -217,126 +99,12 @@ main,
   }
 }
 
-.banner-title {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 80px 40px 30px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-  color: white;
-  font-size: 2rem;
-  font-weight: bold;
-  pointer-events: none;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.prev,
-.next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.6);
-  color: var(--text-color);
-  padding: 15px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  cursor: pointer;
-  font-size: 24px;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  z-index: 10;
-  backdrop-filter: blur(5px);
-}
-
-.prev {
-  left: 20px;
-}
-.next {
-  right: 20px;
-}
-
-.prev:hover,
-.next:hover {
-  background: var(--accent-blue);
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 15px var(--accent-blue);
-  transform: translateY(-50%) scale(1.1);
-}
-
-/* ==========================================
-   4. GRID DE JOGOS E CARDS
-   ========================================== */
-.games-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 35px;
-  padding: 40px 5%;
-  justify-items: center;
-}
-
-.game-card {
-  position: relative;
-  background-color: var(--card-bg);
-  border-radius: 16px;
-  overflow: hidden;
-  text-align: center;
-  padding-bottom: 20px;
-  width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition:
-    transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    box-shadow 0.3s ease;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-}
-
-.game-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 30px rgba(58, 58, 255, 0.4);
-  border-color: rgba(58, 58, 255, 0.5);
-}
-
-.game-card img {
-  width: 100%;
-  height: 240px;
-  object-fit: cover;
-  border-bottom: 3px solid var(--accent-blue);
-}
-
-.game-card h3 {
-  font-size: 1.2rem;
-  margin: 15px 15px 10px;
-  color: var(--text-color);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: 600;
-}
-
-.price {
-  color: var(--price-color);
-  font-weight: 800;
-  font-size: 1.4rem;
-  margin-top: 5px;
-}
-
-.promo-badge {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  background: var(--promo-gradient);
-  color: white;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  z-index: 10;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-  letter-spacing: 1px;
-}
-
-/* ==========================================
-   5. NAVBAR E BUSCA UNIFICADA
-   ========================================== */
 .navbar {
   background-color: #0f0f1e;
   padding: 12px 20px;
@@ -351,7 +119,7 @@ main,
 }
 
 .logo-container {
-  flex: 1; /* Ocupa o mesmo espaço que as ações da direita */
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -383,13 +151,12 @@ main,
   padding: 4px 18px 4px 6px;
   flex-grow: 1;
   max-width: 550px;
-  margin: 0 auto; /* Garante a centralização no meio do espaço restante */
+  margin: 0 auto;
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
   gap: 10px;
 }
 
-/* Força o input do navegador a ficar invisível e herdar o design do container */
 .search-bar input {
   flex-grow: 1;
   background: transparent !important;
@@ -408,7 +175,6 @@ main,
   box-shadow: 0 0 15px rgba(58, 58, 255, 0.2);
 }
 
-/* Indicador transformado em botão interno */
 .active-filter-display {
   display: flex;
   align-items: center;
@@ -423,11 +189,17 @@ main,
   user-select: none;
   font-size: 0.85rem;
   transition: all 0.2s ease;
+  margin: 0 15px;
 }
 
 .active-filter-display:hover {
   background: rgba(255, 255, 255, 0.12);
   border-color: var(--accent-blue);
+}
+
+.active-filter-display i {
+  color: var(--accent-blue);
+  font-size: 1.2rem;
 }
 
 .dropdown-arrow {
@@ -436,12 +208,10 @@ main,
   transition: transform 0.2s ease;
 }
 
-/* Rotaciona a seta quando aberto */
 .active-filter-display.open .dropdown-arrow {
   transform: rotate(180deg);
 }
 
-/* Novo Menu Dropdown (Antiga Sidebar) */
 .filter-dropdown {
   position: absolute;
   top: calc(100% + 10px);
@@ -454,15 +224,12 @@ main,
   list-style: none;
   padding: 6px 0;
   z-index: 2000;
-
-  /* Animação via GPU (Sem Lag) */
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
   transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* Estado Aberto do Dropdown */
 .active-filter-display.open .filter-dropdown {
   opacity: 1;
   visibility: visible;
@@ -488,41 +255,14 @@ main,
   color: var(--hover-blue);
 }
 
-/* Item ativo no Dropdown */
 .filter-dropdown li.active-filter a {
   color: var(--accent-blue);
   background: rgba(58, 58, 255, 0.1);
   opacity: 1;
 }
 
-@media (max-width: 768px) {
-  .navbar {
-    padding: 10px 15px;
-    min-height: 60px;
-  }
-
-  .logo-container,
-  .user-actions {
-    flex: initial; /* Desativa a divisão igualitária no mobile */
-  }
-
-  .search-bar {
-    order: 3;
-    width: 100%;
-    max-width: none;
-    margin: 15px 0 10px 0;
-  }
-
-  .action-badge span:not(.cart-count) {
-    display: none;
-  }
-}
-
-/* ==========================================
-   6. AÇÕES DO USUÁRIO (PONTOS, CARRINHO E PERFIL)
-   ========================================== */
 .user-actions {
-  flex: 1; /* Ocupa o mesmo espaço que o container do logo */
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 15px;
@@ -598,9 +338,7 @@ main,
   gap: 8px;
   font-weight: bold;
   text-decoration: none;
-  transition:
-    transform 0.3s,
-    box-shadow 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s;
   box-shadow: 0 4px 10px rgba(138, 43, 226, 0.3);
 }
 
@@ -609,282 +347,13 @@ main,
   box-shadow: 0 6px 15px rgba(138, 43, 226, 0.5);
 }
 
-/* ==========================================
-   7. MEDIA QUERIES (RESPONSIVIDADE)
-   ========================================== */
-@media (max-width: 992px) {
-  .search-bar {
-    max-width: 300px;
-  }
-  .banner-discount-tag {
-    font-size: 1.8rem;
-    padding: 10px 18px;
-  }
-  .slide img {
-    height: 400px;
-  }
-}
-
-@media (max-width: 768px) {
-  .navbar {
-    padding: 10px 15px;
-    height: 60px;
-    justify-content: center;
-  }
-  .logo-unico {
-    height: 42px;
-  }
-  .logo-nome {
-    height: 26px;
-  }
-
-  .search-bar {
-    order: 3;
-    width: 100%;
-    max-width: none;
-    margin-top: 15px;
-  }
-  .action-badge span:not(.cart-count) {
-    display: none;
-  }
-  .slide img {
-    height: 300px;
-  }
-  .banner-discount-tag {
-    font-size: 1.2rem;
-    bottom: 20px;
-    right: 20px;
-  }
-}
-
-/* ==========================================
-   8. LOADING SPINNER
-   ========================================== */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 0;
-  width: 100%;
-}
-
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--accent-blue);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 15px;
-  box-shadow: 0 0 15px rgba(58, 58, 255, 0.2);
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.loading-container p {
-  color: var(--text-color);
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  opacity: 0.8;
-}
-
-/* ==========================================
-   9. TEMAS DE PLATAFORMA (DATA-THEME)
-   ========================================== */
-body {
-  transition: background 0.5s ease;
-}
-
-body[data-theme="steam"],
-body[data-theme="pc"] {
-  --bg-color-dark: #0b141a;
-  --bg-color-light: #1b2838;
-  --accent-blue: #66c0f4;
-  --card-bg: #171d25;
-}
-
-body[data-theme="playstation"] {
-  --bg-color-dark: #000022;
-  --bg-color-light: #003791;
-  --accent-blue: #0070d1;
-  --card-bg: #001233;
-}
-
-body[data-theme="xbox"] {
-  --bg-color-dark: #0b1a0b;
-  --bg-color-light: #107c10;
-  --accent-blue: #1b9c1b;
-  --card-bg: #0a1f0a;
-}
-
-body[data-theme="nintendo"] {
-  --bg-color-dark: #220000;
-  --bg-color-light: #a6000c;
-  --accent-blue: #e60012;
-  --card-bg: #330000;
-}
-
-/* ==========================================
-   10. DISPLAY DO FILTRO ATIVO (HEADER)
-   ========================================== */
-.active-filter-display {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 8px 20px;
-  border-radius: 20px;
-  border: 1px solid var(--accent-blue);
-  font-weight: 600;
-  color: var(--text-color);
-  margin: 0 15px;
-  transition: all 0.3s ease;
-}
-
-.active-filter-display i {
-  color: var(--accent-blue);
-  font-size: 1.2rem;
-}
-
-@media (max-width: 992px) {
-  .active-filter-display {
-    display: none; /* Oculto em telas menores para não quebrar o layout do header */
-  }
-}
-
-/* ==========================================
-   11. INDICADOR LATERAL (SIDEBAR)
-   ========================================== */
-.sidebar-menu {
-  width: 260px;
-  background-color: #0a0a22;
-  padding: 20px;
-  position: fixed;
-  top: 0;
-  left: 0; /* Fixado em 0 */
-  height: 100vh;
-  z-index: 2000;
-
-  /* Move a barra para fora da tela via GPU e reduz o tempo de 0.4s para 0.3s para maior fluidez */
-  transform: translateX(-110%);
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  will-change: transform; /* Informa o navegador para otimizar essa animação antes de ocorrer */
-
-  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.8);
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.sidebar-menu.active {
-  transform: translateX(0); /* Traz a barra de volta para a tela */
-}
-
-/* ==========================================
-   12. CARDS NA BIBLIOTECA
-   ========================================== */
-.game-card.na-biblioteca {
-  opacity: 0.55;
-  filter: grayscale(30%);
-}
-
-.game-card.na-biblioteca:hover {
-  opacity: 0.9;
-  filter: grayscale(0%);
-}
-
-.game-card.na-biblioteca .price {
-  color: #aaa;
-  font-size: 1.1rem;
-  font-weight: 500;
-  margin-bottom: 10px;
-}
-
-/* ==========================================
-   13. FAIXAS DE PLATAFORMA NOS CARDS
-   ========================================== */
-.platform-banner {
-  width: 100%;
-  padding: 8px 0;
-  font-size: 0.85rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: white;
-  border-radius: 16px 16px 0 0;
-}
-
-/* Injeção de ícones FontAwesome via CSS nas faixas */
-.platform-banner::before {
-  font-family: "Font Awesome 6 Brands", "Font Awesome 6 Free";
-  font-weight: 900;
-  font-size: 1.1rem;
-}
-
-.platform-pc {
-  background: linear-gradient(90deg, #1b2838, #2a475e);
-}
-.platform-pc::before {
-  content: "\f3f6";
-} /* steam symbol */
-
-.platform-playstation {
-  background: linear-gradient(90deg, #003791, #0070d1);
-}
-.platform-playstation::before {
-  content: "\f3df";
-} /* playstation symbol */
-
-.platform-xbox {
-  background: linear-gradient(90deg, #107c10, #1b9c1b);
-}
-.platform-xbox::before {
-  content: "\f412";
-} /* xbox symbol */
-
-.platform-nintendo {
-  background: linear-gradient(90deg, #e60012, #ff3333);
-}
-.platform-nintendo::before { 
-  content: "\f11b"; 
-  font-family: "Font Awesome 6 Free"; 
-  font-weight: 900; 
-}
-
-.platform-default {
-  background: linear-gradient(90deg, #444, #666);
-}
-.platform-default::before {
-  content: "\f11b"; /* gamepad */
-  font-family: "Font Awesome 6 Free";
-}
-
-/* ==========================================
-   14. AJUSTES DE SOBREPOSIÇÃO 
-   ========================================== */
-/* Desce a badge de promoção para não ficar em cima da faixa da plataforma */
-.promo-badge {
-  top: 45px;
-}
-
-/* ==========================================
-   HEADER DINÂMICO GLOBAL (AVATAR, LOGOUT)
-   ========================================== */
 .header-profile-badge {
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
   color: #fff;
-  background-color: rgba(255, 255, 255, 0.05); /* Alterado para background-color */
+  background-color: rgba(255, 255, 255, 0.05);
   padding: 6px 16px 6px 8px;
   border-radius: 25px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -895,8 +364,8 @@ body[data-theme="nintendo"] {
 
 .header-profile-badge:hover {
   border-color: var(--cor-tema, #2a2aef);
-  box-shadow: 0 0 12px rgba(var(--cor-tema-rgb, 42, 42, 239), 0.5); /* Adicionado brilho */
-  transform: translateY(-2px); /* Efeito de elevação sutil */
+  box-shadow: 0 0 12px rgba(var(--cor-tema-rgb, 42, 42, 239), 0.5);
+  transform: translateY(-2px);
 }
 
 .header-avatar {
@@ -925,11 +394,427 @@ body[data-theme="nintendo"] {
   transform: scale(1.15);
 }
 
-/* Esconde o texto do usuário no mobile para poupar espaço */
-@media (max-width: 768px) {
-  .header-profile-badge span {
-    display: none; 
+.sidebar-menu {
+  width: 260px;
+  background-color: #0a0a22;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 2000;
+  transform: translateX(-110%);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform;
+  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.8);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-menu.active {
+  transform: translateX(0);
+}
+
+.sidebar-header {
+  display: flex;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+}
+
+.sidebar-menu ul {
+  list-style: none;
+}
+
+.sidebar-menu li {
+  margin-bottom: 20px;
+}
+
+.sidebar-menu a {
+  color: var(--text-color);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.sidebar-menu a i {
+  width: 25px;
+  text-align: center;
+}
+
+.sidebar-menu a:hover {
+  opacity: 1;
+  padding-left: 10px;
+  color: var(--hover-blue);
+  text-shadow: 0 0 10px rgba(92, 92, 255, 0.6);
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  z-index: 1500;
+  backdrop-filter: blur(4px);
+}
+
+.overlay.active {
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.main-banner {
+  position: relative;
+  max-width: 1000px;
+  margin: 40px auto;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(58, 58, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.banner-slider {
+  position: relative;
+  width: 100%;
+}
+
+.slide {
+  display: none;
+  width: 100%;
+  position: relative;
+}
+
+.slide.active {
+  display: block;
+  animation: fade 0.6s ease-in-out;
+}
+
+.slide img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+.main-banner:hover .slide img {
+  filter: brightness(0.8) contrast(1.1);
+  transform: scale(1.03);
+}
+
+.banner-discount-tag {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  background: var(--promo-gradient);
+  color: white;
+  padding: 15px 25px;
+  border-radius: 12px;
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 0, 85, 0.5);
+  transform: rotate(-5deg);
+  border: 3px solid white;
+  z-index: 20;
+  animation: pulseTag 2s infinite;
+  pointer-events: none;
+}
+
+.banner-title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 80px 40px 30px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.prev,
+.next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--text-color);
+  padding: 15px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  font-size: 24px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  z-index: 10;
+  backdrop-filter: blur(5px);
+}
+
+.prev {
+  left: 20px;
+}
+
+.next {
+  right: 20px;
+}
+
+.prev:hover,
+.next:hover {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 15px var(--accent-blue);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 35px;
+  padding: 40px 5%;
+  justify-items: center;
+}
+
+.game-card {
+  position: relative;
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  text-align: center;
+  padding-bottom: 20px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.game-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(58, 58, 255, 0.4);
+  border-color: rgba(58, 58, 255, 0.5);
+}
+
+.game-card img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-bottom: 3px solid var(--accent-blue);
+}
+
+.game-card h3 {
+  font-size: 1.2rem;
+  margin: 15px 15px 10px;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.price {
+  color: var(--price-color);
+  font-weight: 800;
+  font-size: 1.4rem;
+  margin-top: 5px;
+}
+
+.game-card.na-biblioteca {
+  opacity: 0.55;
+  filter: grayscale(30%);
+}
+
+.game-card.na-biblioteca:hover {
+  opacity: 0.9;
+  filter: grayscale(0%);
+}
+
+.game-card.na-biblioteca .price {
+  color: #aaa;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.promo-badge {
+  position: absolute;
+  top: 45px;
+  left: 15px;
+  background: var(--promo-gradient);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  letter-spacing: 1px;
+}
+
+.platform-banner {
+  width: 100%;
+  padding: 8px 0;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: white;
+  border-radius: 16px 16px 0 0;
+}
+
+.platform-banner::before {
+  font-family: "Font Awesome 6 Brands", "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+
+.platform-pc {
+  background: linear-gradient(90deg, #1b2838, #2a475e);
+}
+
+.platform-pc::before {
+  content: "\f3f6";
+}
+
+.platform-playstation {
+  background: linear-gradient(90deg, #003791, #0070d1);
+}
+
+.platform-playstation::before {
+  content: "\f3df";
+}
+
+.platform-xbox {
+  background: linear-gradient(90deg, #107c10, #1b9c1b);
+}
+
+.platform-xbox::before {
+  content: "\f412";
+}
+
+.platform-nintendo {
+  background: linear-gradient(90deg, #e60012, #ff3333);
+}
+
+.platform-nintendo::before {
+  content: "\f11b";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+
+.platform-default {
+  background: linear-gradient(90deg, #444, #666);
+}
+
+.platform-default::before {
+  content: "\f11b";
+  font-family: "Font Awesome 6 Free";
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  width: 100%;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+  box-shadow: 0 0 15px rgba(58, 58, 255, 0.2);
+}
+
+.loading-container p {
+  color: var(--text-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+
+@media (max-width: 992px) {
+  .search-bar {
+    max-width: 300px;
   }
+  
+  .banner-discount-tag {
+    font-size: 1.8rem;
+    padding: 10px 18px;
+  }
+  
+  .slide img {
+    height: 400px;
+  }
+  
+  .active-filter-display {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 10px 15px;
+    height: 60px;
+    min-height: 60px;
+    justify-content: center;
+  }
+  
+  .logo-container,
+  .user-actions {
+    flex: initial;
+  }
+  
+  .logo-unico {
+    height: 42px;
+  }
+  
+  .logo-nome {
+    height: 26px;
+  }
+
+  .search-bar {
+    order: 3;
+    width: 100%;
+    max-width: none;
+    margin: 15px 0 10px 0;
+  }
+  
+  .action-badge span:not(.cart-count) {
+    display: none;
+  }
+  
+  .slide img {
+    height: 300px;
+  }
+  
+  .banner-discount-tag {
+    font-size: 1.2rem;
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .header-profile-badge span {
+    display: none;
+  }
+  
   .header-profile-badge {
     padding: 6px;
   }

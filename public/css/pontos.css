@@ -1,6 +1,31 @@
-/* ==========================================
-   HEADER / NAVBAR (Padrão Unificado)
-   ========================================== */
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalPop {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .navbar {
   background-color: #0f0f1e;
   padding: 12px 20px;
@@ -33,13 +58,15 @@
   object-fit: contain;
 }
 
-@media (max-width: 768px) {
-  .navbar { height: 60px; }
-  .logo-unico { height: 32px; }
-  .logo-nome { height: 20px; }
+.points-wrapper {
+  max-width: 1200px;
+  margin: 20px auto 40px;
+  padding: 0 20px;
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+  min-height: 60vh;
 }
 
-/* Badge de Saldo e Pontos no Header */
 .balance-badge {
   background: rgba(0, 255, 136, 0.1);
   color: #00ff88;
@@ -68,23 +95,6 @@
   box-shadow: 0 6px 15px rgba(254, 202, 87, 0.2);
 }
 
-
-/* ==========================================
-   LOJA DE RECOMPENSAS (PONTOS) - WRAPPER
-   ========================================== */
-.points-wrapper {
-  max-width: 1200px;
-  margin: 20px auto 40px;
-  padding: 0 20px;
-  color: #ffffff;
-  font-family: "Inter", sans-serif;
-  min-height: 60vh;
-}
-
-
-/* ==========================================
-   SEÇÃO EXPLICATIVA (COMO FUNCIONA)
-   ========================================== */
 .points-explainer {
   margin-bottom: 40px;
   animation: fadeInContent 0.5s ease-in-out;
@@ -137,10 +147,6 @@
   line-height: 1.5;
 }
 
-
-/* ==========================================
-   SESSÃO DE DESTAQUE: ROLETA DIÁRIA (CANVAS)
-   ========================================== */
 .roulette-container {
   background: linear-gradient(135deg, #1a1a2e 0%, #252545 100%);
   border: 2px solid #ffaa00;
@@ -167,7 +173,6 @@
   margin-bottom: 30px;
 }
 
-/* Wrapper do Canvas e Ponteiro */
 .wheel-container {
   position: relative;
   width: 300px;
@@ -179,10 +184,9 @@
   border-radius: 50%;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
   border: 4px solid #111;
-  background-color: #1a1a2e; /* Fundo escuro atrás do canvas */
+  background-color: #1a1a2e;
 }
 
-/* Seta apontadora no topo da roleta */
 .wheel-pointer {
   position: absolute;
   top: -15px;
@@ -192,12 +196,11 @@
   height: 0;
   border-left: 20px solid transparent;
   border-right: 20px solid transparent;
-  border-top: 35px solid #ff3366; /* Cor da seta (vermelha) */
+  border-top: 35px solid #ff3366;
   z-index: 10;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
 }
 
-/* Botões da Roleta */
 .roulette-actions {
   display: flex;
   flex-direction: column;
@@ -233,7 +236,6 @@
   transform: none;
 }
 
-/* Caixa do Contador de Tempo */
 .countdown-box {
   font-size: 1.1rem;
   color: #a5b1c2;
@@ -249,13 +251,9 @@
   color: #feca57;
   letter-spacing: 2px;
   margin-left: 5px;
-  font-variant-numeric: tabular-nums; /* Evita que o relógio trema */
+  font-variant-numeric: tabular-nums;
 }
 
-
-/* ==========================================
-   PAINEL DE CABEÇALHO DA LOJA DE CUPONS
-   ========================================== */
 .points-header {
   background-color: #1a1a2e;
   padding: 40px 30px;
@@ -285,10 +283,6 @@
   text-shadow: 0 0 15px rgba(254, 202, 87, 0.3);
 }
 
-
-/* ==========================================
-   GRID DE RECOMPENSAS (CUPONS)
-   ========================================== */
 .coupons-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -311,6 +305,15 @@
 .coupon-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 20px rgba(254, 202, 87, 0.15);
+}
+
+.coupon-card.expirado {
+  opacity: 0.4;
+  filter: grayscale(100%);
+  pointer-events: none;
+  border-top-color: #444;
+  box-shadow: none;
+  transform: none;
 }
 
 .coupon-card h3 {
@@ -336,6 +339,20 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
+}
+
+.coupon-timer {
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-top: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.coupon-timer i {
+  margin-right: 4px;
 }
 
 .btn-redeem {
@@ -365,10 +382,6 @@
   transform: none;
 }
 
-
-/* ==========================================
-   MODAL UNIVERSAL (Substitui os Alerts)
-   ========================================== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -393,11 +406,6 @@
   max-width: 450px;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
   animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes modalPop {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
 }
 
 #modal-title {
@@ -445,15 +453,6 @@
   transform: translateY(-2px);
 }
 
-
-/* ==========================================
-   LOADING GLOBAL
-   ========================================== */
-@keyframes fadeInContent {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 .loading-container {
   min-height: 30vh;
   display: flex;
@@ -472,35 +471,16 @@
   margin-bottom: 15px;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@media (max-width: 768px) {
+  .navbar {
+    height: 60px;
+  }
 
-/* ==========================================
-   ESTILIZAÇÃO DO CONTADOR E ESTADO EXPIRADO
-   ========================================== */
+  .logo-unico {
+    height: 32px;
+  }
 
-/* Estado quando o cupom já passou do prazo */
-.coupon-card.expirado {
-  opacity: 0.4;
-  filter: grayscale(100%); /* Fica tudo cinza/preto e branco */
-  pointer-events: none; /* Impede que seja clicado de alguma forma */
-  border-top-color: #444; /* Remove a borda laranja e bota cinza */
-  box-shadow: none;
-  transform: none;
-}
-
-/* O texto do Temporizador Vivo (Expira em: X dias) */
-.coupon-timer {
-  font-size: 0.85rem;
-  font-weight: bold;
-  margin-top: 8px;
-  background: rgba(0, 0, 0, 0.3);
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 4px;
-}
-
-.coupon-timer i {
-  margin-right: 4px;
+  .logo-nome {
+    height: 20px;
+  }
 }

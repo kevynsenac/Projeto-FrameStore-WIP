@@ -1,6 +1,3 @@
-/* ==========================================
-   1. VARIÁVEIS E RESET GLOBAL
-   ========================================== */
 :root {
   --bg-color: #050533;
   --box-bg: #0a0a3d;
@@ -28,9 +25,39 @@ body {
   flex-direction: column;
 }
 
-/* ==========================================
-   2. NAVBAR
-   ========================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInToast {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOutToast {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
 .navbar {
   background-color: rgba(15, 15, 30, 0.95);
   backdrop-filter: blur(10px);
@@ -65,25 +92,16 @@ body {
   transition: transform 0.3s ease;
 }
 
+.logo-link:hover .logo-unico {
+  transform: scale(1.08);
+}
+
 .logo-nome {
   height: 22px;
   width: auto;
   object-fit: contain;
 }
 
-.logo-link:hover .logo-unico {
-  transform: scale(1.08);
-}
-
-@media (max-width: 768px) {
-  .navbar { height: 60px; }
-  .logo-unico { height: 32px; }
-  .logo-nome { height: 18px; }
-}
-
-/* ==========================================
-   3. WRAPPER & CONTAINER DE LOGIN
-   ========================================== */
 .login-wrapper {
   flex: 1;
   display: flex;
@@ -108,11 +126,6 @@ body {
   animation: fadeIn 0.4s ease forwards;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 .login-container h1 {
   font-size: 1.8rem;
   margin-bottom: 8px;
@@ -127,9 +140,6 @@ body {
   line-height: 1.4;
 }
 
-/* ==========================================
-   4. ABAS
-   ========================================== */
 .tabs {
   display: flex;
   margin-bottom: 35px;
@@ -165,9 +175,6 @@ body {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* ==========================================
-   5. INPUTS DO FORMULÁRIO
-   ========================================== */
 .input-group {
   position: relative;
   margin-bottom: 20px;
@@ -224,9 +231,6 @@ body {
   color: var(--text-color);
 }
 
-/* ==========================================
-   6. DICAS DE SENHA
-   ========================================== */
 .password-tips {
   background: rgba(0, 0, 0, 0.25);
   padding: 16px;
@@ -267,9 +271,6 @@ body {
   font-weight: bold;
 }
 
-/* ==========================================
-   7. BOTÃO PRINCIPAL
-   ========================================== */
 .btn-access {
   width: 100%;
   background-color: var(--accent-blue);
@@ -299,15 +300,11 @@ body {
   display: none !important;
 }
 
-/* Remove ícone nativo do Edge */
 input::-ms-reveal,
 input::-ms-clear {
   display: none !important;
 }
 
-/* ==========================================
-   SISTEMA DE NOTIFICAÇÕES (TOASTS)
-   ========================================== */
 #toast-container {
   position: fixed;
   bottom: 30px;
@@ -349,12 +346,16 @@ input::-ms-clear {
   animation: fadeOutToast 0.3s forwards;
 }
 
-@keyframes slideInToast {
-  0% { transform: translateX(100%); opacity: 0; }
-  100% { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes fadeOutToast {
-  0% { transform: translateX(0); opacity: 1; }
-  100% { transform: translateX(100%); opacity: 0; }
+@media (max-width: 768px) {
+  .navbar {
+    height: 60px;
+  }
+  
+  .logo-unico {
+    height: 32px;
+  }
+  
+  .logo-nome {
+    height: 18px;
+  }
 }

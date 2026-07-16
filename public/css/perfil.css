@@ -428,43 +428,6 @@
   outline: none;
 }
 
-.color-picker-group {
-  flex: 0.3;
-}
-
-.hex-input-wrapper {
-  display: flex;
-  align-items: center;
-  background-color: #0d0d1a;
-  border: 1px solid rgba(var(--cor-tema-rgb), 0.2);
-  border-radius: 8px;
-  padding: 5px 15px;
-  transition: all 0.3s ease;
-  height: 50px;
-}
-
-.hex-input-wrapper:focus-within {
-  border-color: var(--cor-tema);
-  box-shadow: 0 0 10px rgba(var(--cor-tema-rgb), 0.4);
-}
-
-.color-preview {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: var(--cor-tema);
-  margin-right: 10px;
-  border: 2px solid #fff;
-}
-
-.hex-input-wrapper input {
-  border: none !important;
-  background: transparent !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  box-shadow: none !important;
-}
-
 .file-row {
   align-items: center;
 }
